@@ -1,0 +1,30 @@
+{
+  "name": "gg",
+  "version": "0.1.0",
+  "description": "GitGate CLI — compile TypeScript pipelines and inspect agent governance",
+  "license": "Apache-2.0",
+  "type": "module",
+  "bin": {
+    "gg": "./dist/index.js"
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx src/index.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@gitgate/ci": "workspace:*",
+    "commander": "^12.1.0",
+    "picocolors": "^1.1.1",
+    "yaml": "^2.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.8.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

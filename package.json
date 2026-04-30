@@ -1,0 +1,26 @@
+{
+  "name": "gitgate",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GitGate — TypeScript CI SDK and agent governance platform",
+  "type": "module",
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "test": "turbo test",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "prettier": "^3.4.2",
+    "turbo": "^2.3.3",
+    "typescript": "^5.8.0",
+    "vitest": "^3.0.0"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

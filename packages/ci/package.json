@@ -1,0 +1,38 @@
+{
+  "name": "@gitgate/ci",
+  "version": "0.1.0",
+  "description": "Type-safe GitHub Actions pipelines in TypeScript",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./presets": {
+      "import": "./dist/presets/index.js",
+      "types": "./dist/presets/index.d.ts"
+    },
+    "./agent": {
+      "import": "./dist/agent/index.js",
+      "types": "./dist/agent/index.d.ts"
+    }
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.0",
+    "vitest": "^3.0.0",
+    "yaml": "^2.6.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": ["github-actions", "ci", "typescript", "pipeline", "ubicloud"]
+}
