@@ -8,12 +8,18 @@ importers:
 
   .:
     devDependencies:
+      '@gitgate/ci':
+        specifier: workspace:*
+        version: link:packages/ci
       '@types/node':
         specifier: ^22.10.0
         version: 22.19.17
       prettier:
         specifier: ^3.4.2
         version: 3.8.3
+      tsx:
+        specifier: ^4.19.2
+        version: 4.21.0
       turbo:
         specifier: ^2.3.3
         version: 2.9.6

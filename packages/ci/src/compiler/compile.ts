@@ -44,16 +44,17 @@ export function compile(pipeline: Pipeline, options: CompileOptions = {}): strin
 function compileTriggers(triggers: Trigger[]): unknown {
   if (triggers.length === 1) {
     const t = triggers[0]!;
-    return { [t.event]: triggerConfig(t) };
+    return { [t.event]: triggerConfig(t) ?? {} };
   }
   const out: Record<string, unknown> = {};
-  // Schedule triggers may appear multiple times — accumulate cron entries into one array.
   const scheduleCrons: Array<{ cron: string }> = [];
   for (const t of triggers) {
     if (t.event === 'schedule') {
       scheduleCrons.push({ cron: (t.config as { cron: string }).cron });
     } else {
-      out[t.event] = triggerConfig(t);
+      // null configs (`pull_request:`) emit as `pull_request: {}` — semantically
+      // "trigger on all events of this type" in GitHub Actions.
+      out[t.event] = triggerConfig(t) ?? {};
     }
   }
   if (scheduleCrons.length > 0) out.schedule = scheduleCrons;
@@ -64,11 +65,11 @@ function triggerConfig(t: Trigger): unknown {
   switch (t.event) {
     case 'push': {
       const c = (t.config ?? {}) as PushTriggerConfig;
-      return mapPushPullKeys(c);
+      return mapPushPullKeys(c as unknown as Record<string, unknown>);
     }
     case 'pull_request': {
       const c = (t.config ?? {}) as PullRequestTriggerConfig;
-      return mapPushPullKeys(c);
+      return mapPushPullKeys(c as unknown as Record<string, unknown>);
     }
     case 'workflow_dispatch': {
       const c = (t.config ?? {}) as WorkflowDispatchConfig;

@@ -10,11 +10,14 @@
     "test": "turbo test",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "pipelines:compile": "tsx cli/src/index.ts ci compile"
   },
   "devDependencies": {
+    "@gitgate/ci": "workspace:*",
     "@types/node": "^22.10.0",
     "prettier": "^3.4.2",
+    "tsx": "^4.19.2",
     "turbo": "^2.3.3",
     "typescript": "^5.8.0",
     "vitest": "^3.0.0"

@@ -65,10 +65,10 @@ function blockScalar(s: string, indent: string): string {
 }
 
 function isEmpty(value: unknown): boolean {
-  if (value === null || value === undefined) return true;
-  if (Array.isArray(value)) return value.length === 0;
-  if (typeof value === 'object') return Object.keys(value as object).length === 0;
-  return false;
+  // Only `undefined` is dropped silently. Callers that want to drop empty
+  // objects/arrays must do so before reaching the serializer — explicit
+  // empty values (e.g. `pull_request: {}` for "all PR events") are kept.
+  return value === undefined;
 }
 
 function serializeScalar(value: unknown, indent: string): string {
@@ -128,21 +128,19 @@ function serializeArray(arr: unknown[], indent: string): string {
 
 function serializeKeyValue(key: string, value: unknown, indent: string): string {
   const keyStr = needsKeyQuoting(key) ? quoteString(key) : key;
+  const childIndent = `${indent}  `;
   if (Array.isArray(value)) {
     if (value.length === 0) return `${keyStr}: []`;
-    const arr = serializeArray(value, indent);
+    const arr = serializeArray(value, childIndent);
     return `${keyStr}:\n${arr}`;
   }
   if (value !== null && typeof value === 'object') {
     const entries = Object.entries(value as Record<string, unknown>).filter(([, v]) => !isEmpty(v));
     if (entries.length === 0) return `${keyStr}: {}`;
-    const obj = serializeObject(value as Record<string, unknown>, indent);
+    const obj = serializeObject(value as Record<string, unknown>, childIndent);
     return `${keyStr}:\n${obj}`;
   }
   const scalar = serializeScalar(value, indent);
-  if (scalar.startsWith('|')) {
-    return `${keyStr}: ${scalar}`;
-  }
   return `${keyStr}: ${scalar}`;
 }
 

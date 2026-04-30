@@ -1,0 +1,33 @@
+name: Monorepo
+on:
+  pull_request:
+    paths:
+      - 'packages/**'
+jobs:
+  detect:
+    name: detect
+    runs-on: ubicloud-standard-2
+    outputs:
+      affected: '${{ steps.affected.outputs.list }}'
+    steps:
+      - name: Checkout
+        uses: 'actions/checkout@v4'
+      - name: Detect
+        id: affected
+        run: echo hello
+  build:
+    name: build
+    runs-on: ubicloud-standard-4
+    needs: detect
+    if: 'needs.detect.outputs.affected != '''''
+    steps:
+      - name: Checkout
+        uses: 'actions/checkout@v4'
+      - name: Setup Node.js 20
+        uses: 'actions/setup-node@v4'
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
