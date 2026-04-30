@@ -522,24 +522,59 @@ jobs:
       <div class="tag mb-4">// OPEN SOURCE</div>
       <h2 class="text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">Built in the open.</h2>
       <p class="mt-4 text-lg text-[var(--gg-muted)]">
-        The CI SDK is open source. The generated YAML has zero GitGate dependency. Eject any time —
-        nothing on disk locks you in.
+        Three Apache-2.0 packages: a TypeScript CI SDK, a CLI, and a complete pure-TypeScript git
+        protocol engine. The generated YAML has zero GitGate dependency. Eject any time.
       </p>
     </div>
-    <div class="grid md:grid-cols-3 gap-5 mt-12">
+
+    <div class="grid md:grid-cols-2 gap-5 mt-12">
+      <!-- git-core feature tile -->
+      <a href="https://www.npmjs.com/package/@gitgate/git-core" class="card hover:border-white/20 transition md:col-span-2 flex flex-col md:flex-row md:items-center gap-6">
+        <div class="flex-1">
+          <div class="font-mono text-xs text-[var(--gg-accent)]">@gitgate/git-core</div>
+          <div class="mt-2 text-2xl font-semibold text-white">A complete git protocol, in TypeScript</div>
+          <p class="mt-2 text-sm text-[var(--gg-muted)] max-w-xl">
+            Pure-TypeScript implementation of git: objects, packfiles, smart-HTTP, diff, three-way merge,
+            refs. ~2.4k LOC of source, 162 passing tests, single dep on <code class="font-mono">pako</code>.
+            Runs on Cloudflare Workers, Node, Bun, Deno, and the browser. This is what powers our
+            provenance chains — every PR event becomes a commit on a per-PR git repo on Artifacts.
+          </p>
+        </div>
+        <div class="term shrink-0 md:w-80">
+          <div class="term-header">
+            <span class="term-dot dot-r"></span><span class="term-dot dot-y"></span><span class="term-dot dot-g"></span>
+            <span class="term-title">@gitgate/git-core</span>
+          </div>
+          <div class="term-body text-[12.5px]">
+<pre class="whitespace-pre"><span class="comment"># Build a commit in memory, no fs</span>
+<span class="kw">const</span> <span class="var">tree</span> = <span class="fn">encodeTree</span>([{
+  mode: <span class="str">'100644'</span>, name: <span class="str">'README.md'</span>,
+  sha: <span class="var">blobSha</span>,
+}]);
+<span class="kw">const</span> <span class="var">commit</span> = <span class="fn">encodeCommit</span>({ ... });
+<span class="kw">const</span> <span class="var">pack</span> = <span class="kw">await</span> <span class="fn">buildPackfile</span>(...);<span class="cursor"></span></pre>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-5 mt-5">
       <a href="https://www.npmjs.com/package/@gitgate/ci" class="card hover:border-white/20 transition">
         <div class="font-mono text-xs text-[var(--gg-accent)]">@gitgate/ci</div>
         <div class="mt-2 text-lg font-semibold text-white">TypeScript pipeline SDK</div>
+        <p class="mt-2 text-sm text-[var(--gg-muted)]">Compile typed pipelines to GitHub Actions YAML.</p>
         <div class="mt-4 text-xs font-mono text-[var(--gg-muted)]">npm · Apache 2.0</div>
       </a>
       <a href="https://www.npmjs.com/package/gg" class="card hover:border-white/20 transition">
         <div class="font-mono text-xs text-[var(--gg-accent)]">gg</div>
-        <div class="mt-2 text-lg font-semibold text-white">CLI: compile, init, convert, estimate</div>
+        <div class="mt-2 text-lg font-semibold text-white">CLI</div>
+        <p class="mt-2 text-sm text-[var(--gg-muted)]">compile · init · convert · estimate · gate score</p>
         <div class="mt-4 text-xs font-mono text-[var(--gg-muted)]">npm · Apache 2.0</div>
       </a>
       <a href="https://github.com/gitgate/gitgate" class="card hover:border-white/20 transition">
         <div class="font-mono text-xs text-[var(--gg-accent)]">github.com/gitgate</div>
-        <div class="mt-2 text-lg font-semibold text-white">Source, issues, roadmap</div>
+        <div class="mt-2 text-lg font-semibold text-white">Monorepo, issues, roadmap</div>
+        <p class="mt-2 text-sm text-[var(--gg-muted)]">Source for the SDK, CLI, and git engine.</p>
         <div class="mt-4 text-xs font-mono text-[var(--gg-muted)]">git · public</div>
       </a>
     </div>

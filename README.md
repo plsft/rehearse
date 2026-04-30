@@ -20,11 +20,12 @@ GitGate is two products in one monorepo:
 ```
 packages/
   ci/         — @gitgate/ci, the public SDK (Apache 2.0)
+  git-core/   — @gitgate/git-core, pure-TypeScript git protocol (Apache 2.0)
   shared/     — shared TypeScript types and Zod schemas
   db/         — Drizzle schema + D1 migrations
 apps/
   api/        — Cloudflare Worker (Hono) hosting the Platform API
-  site/       — gitgate.com marketing site (static, Cloudflare Pages)
+  site/       — gitgate.com marketing site (Vite + Tailwind v4 + Alpine)
 cli/          — `gg`, the CLI (Apache 2.0)
 docs/         — Markdown reference docs
 ```
