@@ -32,6 +32,7 @@
     </a>
     <nav class="hidden md:flex items-center gap-7">
       <a href="#typescript-ci" class="nav-link">CI&nbsp;SDK</a>
+      <a href="#convert" class="nav-link">Convert</a>
       <a href="#governance" class="nav-link">Governance</a>
       <a href="/pricing.html" class="nav-link">Pricing</a>
       <a href="/docs.html" class="nav-link">Docs</a>
@@ -231,6 +232,111 @@ Savings:          <span class="ok">$0.0912 (81.4%)</span><span class="cursor"></
   </div>
 </section>
 
+<!-- ============== CONVERT (YAML → TS) ============== -->
+<section id="convert" class="py-24 hairline">
+  <div class="max-w-6xl mx-auto px-5">
+    <div class="max-w-3xl">
+      <div class="tag mb-4">// MIGRATE</div>
+      <h2 class="text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">Already have YAML? Convert it.</h2>
+      <p class="mt-4 text-lg text-[var(--gg-muted)]">
+        Point <code class="font-mono text-white/90">gg ci convert</code> at any existing GitHub Actions workflow.
+        It parses the YAML, maps runner labels to Ubicloud, rewrites <code class="font-mono">actions/checkout</code>
+        and other common steps to typed builders, and emits a TypeScript file you can refactor like normal code.
+      </p>
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-6 mt-10 items-stretch">
+      <div class="term flex flex-col">
+        <div class="term-header">
+          <span class="term-dot dot-r"></span><span class="term-dot dot-y"></span><span class="term-dot dot-g"></span>
+          <span class="term-title">.github/workflows/ci.yml — before</span>
+        </div>
+        <div class="term-body flex-1">
+<pre class="whitespace-pre overflow-x-auto">name: CI
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: <span class="str">'20'</span>
+      - run: npm ci
+      - run: npm test</pre>
+        </div>
+      </div>
+      <div class="term flex flex-col">
+        <div class="term-header">
+          <span class="term-dot dot-r"></span><span class="term-dot dot-y"></span><span class="term-dot dot-g"></span>
+          <span class="term-title">.gitgate/pipelines/ci.ts — after</span>
+        </div>
+        <div class="term-body flex-1">
+<pre class="whitespace-pre overflow-x-auto"><span class="comment">// AUTO-CONVERTED from GitHub Actions YAML by @gitgate/ci</span>
+<span class="kw">import</span> { <span class="fn">Runner</span>, <span class="fn">job</span>, <span class="fn">pipeline</span>,
+         <span class="fn">step</span>, <span class="fn">triggers</span> } <span class="kw">from</span> <span class="str">'@gitgate/ci'</span>;
+
+<span class="kw">export const</span> <span class="var">workflow</span> = <span class="fn">pipeline</span>(<span class="str">'CI'</span>, {
+  triggers: [
+    <span class="fn">triggers</span>.<span class="fn">pullRequest</span>({ branches: [<span class="str">'main'</span>] }),
+    <span class="fn">triggers</span>.<span class="fn">push</span>({ branches: [<span class="str">'main'</span>] }),
+  ],
+  jobs: [
+    <span class="fn">job</span>(<span class="str">'test'</span>, {
+      runner: <span class="fn">Runner</span>.<span class="fn">ubicloud</span>(<span class="str">'standard-4'</span>),
+      steps: [
+        <span class="fn">step</span>.<span class="fn">checkout</span>(),
+        <span class="fn">step</span>.<span class="fn">action</span>(<span class="str">'actions/setup-node@v4'</span>,
+          { with: { <span class="str">'node-version'</span>: <span class="str">'20'</span> } }),
+        <span class="fn">step</span>.<span class="fn">run</span>(<span class="str">'npm ci'</span>),
+        <span class="fn">step</span>.<span class="fn">run</span>(<span class="str">'npm test'</span>),
+      ],
+    }),
+  ],
+});<span class="cursor"></span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="term mt-6">
+      <div class="term-header">
+        <span class="term-dot dot-r"></span><span class="term-dot dot-y"></span><span class="term-dot dot-g"></span>
+        <span class="term-title">$ gg ci convert</span>
+      </div>
+      <div class="term-body">
+<pre class="whitespace-pre overflow-x-auto"><span class="prompt"></span>gg ci convert .github/workflows/ci.yml
+<span class="ok">✓</span> Wrote .gitgate/pipelines/ci.ts
+<span class="warn">!</span> actions/setup-node mapped to step.action — install @gitgate/ci/presets and
+   use node.setup() for nicer ergonomics
+<span class="ok">●</span> ubuntu-latest → Runner.ubicloud('standard-4')
+<span class="ok">●</span> 1 trigger group, 1 job, 4 steps converted<span class="cursor"></span></pre>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-5 mt-10">
+      <div class="card">
+        <div class="font-mono text-xs text-[var(--gg-accent)] mb-2">RUNNER REMAP</div>
+        <div class="text-base font-semibold text-white">ubuntu-latest → ubicloud</div>
+        <p class="mt-2 text-sm text-[var(--gg-muted)]">Common GitHub-hosted labels are mapped to equivalent Ubicloud sizes. Override with one edit.</p>
+      </div>
+      <div class="card">
+        <div class="font-mono text-xs text-[var(--gg-accent)] mb-2">SAFE BY DEFAULT</div>
+        <div class="text-base font-semibold text-white">Round-trip preserved</div>
+        <p class="mt-2 text-sm text-[var(--gg-muted)]">Compile the converted TS and you get back the same YAML semantics — verify with <code class="font-mono">gg ci validate</code>.</p>
+      </div>
+      <div class="card">
+        <div class="font-mono text-xs text-[var(--gg-accent)] mb-2">WARNINGS, NOT FAILURES</div>
+        <div class="text-base font-semibold text-white">Unknown actions stay verbatim</div>
+        <p class="mt-2 text-sm text-[var(--gg-muted)]">Custom or rare actions become <code class="font-mono">step.action(...)</code>, with a warning suggesting a typed wrapper.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ============== GOVERNANCE ============== -->
 <section id="governance" class="py-24 hairline">
   <div class="max-w-6xl mx-auto px-5">
@@ -329,9 +435,12 @@ Savings:          <span class="ok">$0.0912 (81.4%)</span><span class="cursor"></
     <div class="grid md:grid-cols-3 gap-5 mt-12">
       <div class="card">
         <div class="font-mono text-[var(--gg-accent)] text-2xl">01</div>
-        <div class="mt-2 text-lg font-semibold text-white">Install the SDK</div>
+        <div class="mt-2 text-lg font-semibold text-white">Install or convert</div>
         <pre class="mt-3 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>npm i -D @gitgate/ci
+<span class="comment"># new repo:</span>
 <span class="prompt"></span>npx gg ci init
+<span class="comment"># existing YAML:</span>
+<span class="prompt"></span>npx gg ci convert .github/workflows/ci.yml
 <span class="prompt"></span>npx gg ci compile</pre>
       </div>
       <div class="card">
