@@ -11,6 +11,7 @@ import { GitHubAdapter } from '../adapters/github.js';
 import type { Env } from '../env.js';
 import { detectAgent } from '../engine/agent-detection.js';
 import { recordUsage, periodKey } from '../engine/budgets.js';
+import { loadAndPersistGitgateYml } from '../engine/config-loader.js';
 import {
   buildCheckRunSummary,
   computeMergeConfidence,
@@ -72,9 +73,42 @@ export class RepoAnalyzer {
       case 'pr.closed':
         await this.onClosed(event.data);
         return;
+      case 'push':
+        await this.onPush(event.data);
+        return;
       default:
         return;
     }
+  }
+
+  private async onPush(data: {
+    org: string;
+    repo: string;
+    installationId: number;
+    ref: string;
+    after: string;
+    commits: Array<{ added: string[]; modified: string[]; removed: string[] }>;
+  }): Promise<void> {
+    const touchedConfig = data.commits.some(
+      (c) =>
+        c.added.includes('.gitgate.yml') ||
+        c.modified.includes('.gitgate.yml') ||
+        c.removed.includes('.gitgate.yml'),
+    );
+    if (!touchedConfig) return;
+    const repoRow = await this.loadRepoRow(data.org, data.repo);
+    if (!repoRow) return;
+    const { api, db } = this.services();
+    await loadAndPersistGitgateYml({
+      api,
+      db,
+      org: data.org,
+      repo: data.repo,
+      installationId: data.installationId,
+      ref: data.after,
+      orgId: repoRow.orgId,
+      repoId: repoRow.id,
+    });
   }
 
   private services() {
