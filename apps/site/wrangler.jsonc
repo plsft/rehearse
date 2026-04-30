@@ -2,5 +2,5 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "gitgate-site",
   "compatibility_date": "2025-04-01",
-  "pages_build_output_dir": "public"
+  "pages_build_output_dir": "dist"
 }

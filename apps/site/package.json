@@ -4,10 +4,20 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "wrangler pages dev public",
-    "deploy": "wrangler pages deploy public --project-name gitgate-site"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy": "vite build && wrangler pages deploy dist --project-name gitgate-site"
+  },
+  "dependencies": {
+    "alpinejs": "^3.14.7"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "@types/alpinejs": "^3.13.10",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.8.0",
+    "vite": "^6.0.0",
     "wrangler": "^3.99.0"
   }
 }
