@@ -19,8 +19,8 @@
 <header :class="scrolled ? 'border-b border-white/10 backdrop-blur bg-black/60' : 'border-b border-transparent'"
         class="fixed inset-x-0 top-0 z-50 transition-colors">
   <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
-    <a href="/" class="flex items-center gap-2.5 font-mono">
-      <span class="text-[var(--gg-accent)]">▍</span>
+    <a href="/" class="flex items-center gap-2.5 font-mono group" aria-label="GitGate home">
+      <span class="logo-mark logo-mark-md text-[var(--gg-accent)] transition-transform group-hover:scale-110"></span>
       <span class="font-semibold tracking-tight text-white">gitgate</span>
     </a>
     <nav class="hidden md:flex items-center gap-7">
@@ -171,7 +171,7 @@
 
 <footer class="py-14 hairline">
   <div class="max-w-6xl mx-auto px-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 font-mono text-sm text-[var(--gg-muted)]">
-    <div><span class="text-white">gitgate</span> · by FlareFound</div>
+    <div class="flex items-center gap-2"><span class="logo-mark logo-mark-sm text-[var(--gg-accent)]"></span><span class="text-white">gitgate</span> · by FlareFound</div>
     <div class="flex flex-wrap gap-x-6 gap-y-2">
       <a href="/" class="nav-link">Home</a>
       <a href="/docs.html" class="nav-link">Docs</a>

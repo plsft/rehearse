@@ -19,6 +19,27 @@
   display: none !important;
 }
 
+/* GitGate logo mark — colored via `color` thanks to CSS mask. */
+.logo-mark {
+  display: inline-block;
+  background-color: currentColor;
+  -webkit-mask: url('/gg-logo.svg') no-repeat center / contain;
+  mask: url('/gg-logo.svg') no-repeat center / contain;
+  flex-shrink: 0;
+}
+.logo-mark-sm {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+.logo-mark-md {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+.logo-mark-lg {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
 html {
   background: var(--gg-bg);
   color: var(--gg-fg);

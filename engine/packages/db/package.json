@@ -1,0 +1,29 @@
+{
+  "name": "@gitgate/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "generate": "drizzle-kit generate",
+    "migrate": "wrangler d1 migrations apply gitgate-db --local",
+    "seed": "tsx seed.ts"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.38.0",
+    "@gitgate/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.30.0",
+    "@cloudflare/workers-types": "^4.0.0"
+  }
+}
