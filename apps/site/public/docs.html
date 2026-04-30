@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#0a0a0a" />
+<title>GitGate — Docs</title>
+<meta name="description" content="GitGate documentation: CI SDK quickstart, governance quickstart, Merge Confidence reference." />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="canonical" href="https://gitgate.com/docs.html" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="/assets/style.css" />
+</head>
+<body class="antialiased" x-data="{ scrolled: false }" x-init="window.addEventListener('scroll', () => scrolled = window.scrollY > 8)">
+
+<header :class="scrolled ? 'border-b border-white/10 backdrop-blur bg-black/60' : 'border-b border-transparent'"
+        class="fixed inset-x-0 top-0 z-50 transition-colors">
+  <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2.5 font-mono">
+      <span class="text-[var(--gg-accent)]">▍</span>
+      <span class="font-semibold tracking-tight text-white">gitgate</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-7">
+      <a href="/#typescript-ci" class="nav-link">CI&nbsp;SDK</a>
+      <a href="/#governance" class="nav-link">Governance</a>
+      <a href="/pricing.html" class="nav-link">Pricing</a>
+      <a href="/docs.html" class="nav-link text-white">Docs</a>
+      <a href="https://github.com/gitgate/gitgate" class="nav-link">GitHub</a>
+    </nav>
+    <a href="https://github.com/apps/gitgate" class="btn btn-primary">Install GitHub App</a>
+  </div>
+</header>
+
+<section class="bg-grid pt-36 pb-16">
+  <div class="max-w-3xl mx-auto px-5">
+    <div class="tag mb-4">// DOCS</div>
+    <h1 class="text-4xl sm:text-5xl font-semibold tracking-tight gradient-text">Documentation lives in the repo.</h1>
+    <p class="mt-5 text-lg text-[var(--gg-muted)]">
+      The full docs ship as Markdown in the GitHub repo so the source of truth never drifts.
+      Pick a starting point below, or browse the source.
+    </p>
+    <div class="mt-8 flex flex-wrap gap-3">
+      <a href="https://github.com/gitgate/gitgate" class="btn btn-primary">Browse on GitHub →</a>
+      <a href="https://www.npmjs.com/package/@gitgate/ci" class="btn btn-ghost">@gitgate/ci on npm</a>
+    </div>
+  </div>
+</section>
+
+<section class="py-12 hairline">
+  <div class="max-w-3xl mx-auto px-5 grid sm:grid-cols-2 gap-5">
+    <a href="https://github.com/gitgate/gitgate/blob/main/docs/ci-quickstart.md" class="card hover:border-white/20 transition">
+      <div class="font-mono text-xs text-[var(--gg-accent)]">QUICKSTART</div>
+      <div class="mt-2 text-lg font-semibold text-white">CI SDK in 5 minutes</div>
+      <p class="mt-2 text-sm text-[var(--gg-muted)]">Install <code class="font-mono">@gitgate/ci</code>, scaffold a pipeline, compile, commit.</p>
+      <div class="mt-4 font-mono text-xs text-[var(--gg-muted)]">$ npx gg ci init</div>
+    </a>
+    <a href="https://github.com/gitgate/gitgate/blob/main/docs/governance-quickstart.md" class="card hover:border-white/20 transition">
+      <div class="font-mono text-xs text-[var(--gg-accent)]">QUICKSTART</div>
+      <div class="mt-2 text-lg font-semibold text-white">Governance in 30 seconds</div>
+      <p class="mt-2 text-sm text-[var(--gg-muted)]">Install the GitHub App, open a PR, watch the score appear.</p>
+      <div class="mt-4 font-mono text-xs text-[var(--gg-muted)]">https://github.com/apps/gitgate</div>
+    </a>
+    <a href="https://github.com/gitgate/gitgate/blob/main/docs/merge-confidence.md" class="card hover:border-white/20 transition">
+      <div class="font-mono text-xs text-[var(--gg-accent)]">REFERENCE</div>
+      <div class="mt-2 text-lg font-semibold text-white">Merge Confidence</div>
+      <p class="mt-2 text-sm text-[var(--gg-muted)]">Six components, custom weights, branch protection wiring.</p>
+      <div class="mt-4 font-mono text-xs text-[var(--gg-muted)]">/docs/merge-confidence.md</div>
+    </a>
+    <a href="https://github.com/gitgate/gitgate/blob/main/packages/ci/README.md" class="card hover:border-white/20 transition">
+      <div class="font-mono text-xs text-[var(--gg-accent)]">REFERENCE</div>
+      <div class="mt-2 text-lg font-semibold text-white">@gitgate/ci API</div>
+      <p class="mt-2 text-sm text-[var(--gg-muted)]"><code class="font-mono">pipeline()</code>, <code class="font-mono">job()</code>, presets, agent helpers.</p>
+      <div class="mt-4 font-mono text-xs text-[var(--gg-muted)]">/packages/ci/README.md</div>
+    </a>
+  </div>
+</section>
+
+<footer class="py-14 hairline">
+  <div class="max-w-6xl mx-auto px-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 font-mono text-sm text-[var(--gg-muted)]">
+    <div><span class="text-white">gitgate</span> · by FlareFound</div>
+    <div class="flex flex-wrap gap-x-6 gap-y-2">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/pricing.html" class="nav-link">Pricing</a>
+      <a href="https://github.com/gitgate/gitgate" class="nav-link">GitHub</a>
+      <a href="mailto:hello@gitgate.com" class="nav-link">Contact</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

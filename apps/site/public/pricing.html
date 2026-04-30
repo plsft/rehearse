@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#0a0a0a" />
+<title>GitGate — Pricing</title>
+<meta name="description" content="GitGate pricing: free for OSS, $8/repo/mo on Team, custom Enterprise. The CI SDK is unlimited and Apache 2.0." />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="canonical" href="https://gitgate.com/pricing.html" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="/assets/style.css" />
+</head>
+<body class="antialiased" x-data="{ scrolled: false, faq: null }" x-init="window.addEventListener('scroll', () => scrolled = window.scrollY > 8)">
+
+<!-- NAV -->
+<header :class="scrolled ? 'border-b border-white/10 backdrop-blur bg-black/60' : 'border-b border-transparent'"
+        class="fixed inset-x-0 top-0 z-50 transition-colors">
+  <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2.5 font-mono">
+      <span class="text-[var(--gg-accent)]">▍</span>
+      <span class="font-semibold tracking-tight text-white">gitgate</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-7">
+      <a href="/#typescript-ci" class="nav-link">CI&nbsp;SDK</a>
+      <a href="/#governance" class="nav-link">Governance</a>
+      <a href="/pricing.html" class="nav-link text-white">Pricing</a>
+      <a href="/docs.html" class="nav-link">Docs</a>
+      <a href="https://github.com/gitgate/gitgate" class="nav-link">GitHub</a>
+    </nav>
+    <a href="https://github.com/apps/gitgate" class="btn btn-primary">Install GitHub App</a>
+  </div>
+</header>
+
+<section class="bg-grid pt-36 pb-16">
+  <div class="max-w-6xl mx-auto px-5 text-center max-w-3xl">
+    <div class="tag mb-4 mx-auto">// PRICING</div>
+    <h1 class="text-4xl sm:text-5xl font-semibold tracking-tight gradient-text">Pay for governance, not the SDK.</h1>
+    <p class="mt-5 text-lg text-[var(--gg-muted)]">
+      <code class="font-mono text-white/90">@gitgate/ci</code> and the <code class="font-mono text-white/90">gg</code> CLI are open source and free.
+      The platform — agent detection, Merge Confidence, provenance — bills per repo.
+    </p>
+  </div>
+</section>
+
+<!-- TIER GRID -->
+<section class="py-12">
+  <div class="max-w-6xl mx-auto px-5 grid md:grid-cols-3 gap-5">
+    <div class="card flex flex-col">
+      <div class="font-mono text-xs text-[var(--gg-muted)]">FREE</div>
+      <div class="mt-1 text-3xl font-semibold text-white">$0</div>
+      <div class="text-xs text-[var(--gg-muted)] font-mono">forever</div>
+      <ul class="mt-5 space-y-2 text-sm text-[var(--gg-muted)] flex-1">
+        <li><span class="ok">✓</span> 3 repos</li>
+        <li><span class="ok">✓</span> Agent detection &amp; labeling</li>
+        <li><span class="ok">✓</span> Merge Confidence (default weights)</li>
+        <li><span class="ok">✓</span> 30-day retention</li>
+        <li><span class="ok">✓</span> <code class="font-mono">@gitgate/ci</code> + CLI unlimited</li>
+      </ul>
+      <a href="https://github.com/apps/gitgate" class="btn btn-ghost mt-6 justify-center">Install Free</a>
+    </div>
+
+    <div class="card flex flex-col" style="border-color: rgba(34,197,94,0.4); box-shadow: 0 0 0 1px rgba(34,197,94,0.2), 0 24px 60px rgba(34,197,94,0.1)">
+      <div class="flex items-center justify-between">
+        <div class="font-mono text-xs text-[var(--gg-accent)]">TEAM</div>
+        <span class="tag">popular</span>
+      </div>
+      <div class="mt-1 text-3xl font-semibold text-white">$8 <span class="text-base text-[var(--gg-muted)] font-normal">/ repo / mo</span></div>
+      <div class="text-xs text-[var(--gg-muted)] font-mono">11–50 repos: $6 · 51+: $4</div>
+      <ul class="mt-5 space-y-2 text-sm text-[var(--gg-muted)] flex-1">
+        <li><span class="ok">✓</span> Unlimited repos</li>
+        <li><span class="ok">✓</span> Custom confidence weights</li>
+        <li><span class="ok">✓</span> Provenance chains (git-native)</li>
+        <li><span class="ok">✓</span> Agent budgets &amp; leaderboards</li>
+        <li><span class="ok">✓</span> 1 year retention</li>
+        <li><span class="ok">✓</span> Slack alerts</li>
+      </ul>
+      <a href="https://github.com/apps/gitgate" class="btn btn-primary mt-6 justify-center">Start Team</a>
+    </div>
+
+    <div class="card flex flex-col">
+      <div class="font-mono text-xs text-[var(--gg-muted)]">ENTERPRISE</div>
+      <div class="mt-1 text-3xl font-semibold text-white">Custom</div>
+      <div class="text-xs text-[var(--gg-muted)] font-mono">talk to us</div>
+      <ul class="mt-5 space-y-2 text-sm text-[var(--gg-muted)] flex-1">
+        <li><span class="ok">✓</span> Multi-provider (GH + GL + BB)</li>
+        <li><span class="ok">✓</span> SSO &amp; SCIM</li>
+        <li><span class="ok">✓</span> SIEM export (Datadog, Splunk)</li>
+        <li><span class="ok">✓</span> Unlimited retention</li>
+        <li><span class="ok">✓</span> SLA &amp; dedicated support</li>
+      </ul>
+      <a href="mailto:hello@gitgate.com" class="btn btn-ghost mt-6 justify-center">Contact us</a>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON -->
+<section class="py-16 hairline">
+  <div class="max-w-6xl mx-auto px-5">
+    <h2 class="text-2xl sm:text-3xl font-semibold gradient-text tracking-tight">Plan comparison</h2>
+    <div class="mt-8 term">
+      <div class="term-header">
+        <span class="term-dot dot-r"></span><span class="term-dot dot-y"></span><span class="term-dot dot-g"></span>
+        <span class="term-title">~/gitgate.com/pricing</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm font-mono">
+          <thead class="bg-white/[0.02] text-[var(--gg-muted)] text-left">
+            <tr>
+              <th class="py-3 px-5 font-semibold">Feature</th>
+              <th class="py-3 px-5 font-semibold text-center">Free</th>
+              <th class="py-3 px-5 font-semibold text-center text-[var(--gg-accent)]">Team</th>
+              <th class="py-3 px-5 font-semibold text-center">Enterprise</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5">
+            <tr><td class="py-3 px-5 text-white/90">Repos</td><td class="text-center">3</td><td class="text-center text-[var(--gg-accent)]">unlimited</td><td class="text-center">unlimited</td></tr>
+            <tr><td class="py-3 px-5 text-white/90"><code>@gitgate/ci</code> SDK</td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td></tr>
+            <tr><td class="py-3 px-5 text-white/90">Agent detection &amp; labels</td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td></tr>
+            <tr><td class="py-3 px-5 text-white/90">Merge Confidence — default weights</td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td></tr>
+            <tr><td class="py-3 px-5 text-white/90">Merge Confidence — custom weights</td><td class="text-center text-[var(--gg-muted)]">—</td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td></tr>
+            <tr><td class="py-3 px-5 text-white/90">Provenance chains</td><td class="text-center text-[var(--gg-muted)]">—</td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td></tr>
+            <tr><td class="py-3 px-5 text-white/90">Agent budgets</td><td class="text-center text-[var(--gg-muted)]">—</td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td></tr>
+            <tr><td class="py-3 px-5 text-white/90">Leaderboards</td><td class="text-center text-[var(--gg-muted)]">—</td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td></tr>
+            <tr><td class="py-3 px-5 text-white/90">SSO / SCIM</td><td class="text-center text-[var(--gg-muted)]">—</td><td class="text-center text-[var(--gg-muted)]">—</td><td class="text-center"><span class="ok">✓</span></td></tr>
+            <tr><td class="py-3 px-5 text-white/90">SIEM export</td><td class="text-center text-[var(--gg-muted)]">—</td><td class="text-center text-[var(--gg-muted)]">—</td><td class="text-center"><span class="ok">✓</span></td></tr>
+            <tr><td class="py-3 px-5 text-white/90">Retention</td><td class="text-center">30 d</td><td class="text-center text-[var(--gg-accent)]">1 yr</td><td class="text-center">unlimited</td></tr>
+            <tr><td class="py-3 px-5 text-white/90">Support</td><td class="text-center">community</td><td class="text-center">email</td><td class="text-center">SLA</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="py-16 hairline">
+  <div class="max-w-3xl mx-auto px-5">
+    <h2 class="text-2xl sm:text-3xl font-semibold gradient-text tracking-tight">Questions</h2>
+    <div class="mt-8 space-y-3">
+      <template x-for="(item, i) in [
+        { q: 'Can I use the CI SDK without the GitHub App?', a: '<code>@gitgate/ci</code> is independent and works on its own. The output is plain GitHub Actions YAML with zero GitGate runtime dependency.' },
+        { q: 'What happens if I stop paying for Team?', a: 'You stay on the Free tier — agent detection, default Merge Confidence, and the SDK keep working. Custom weights, provenance, budgets, and leaderboards pause until you re-subscribe.' },
+        { q: 'Is my audit data portable?', a: 'Yes. Provenance chains are git repos hosted on Cloudflare Artifacts. <code>git clone</code> is your compliance export — no proprietary format.' },
+        { q: 'Do you bill for monorepos?', a: 'One repo = one bill, regardless of how many packages live inside. We meter on GitHub repository IDs, not packages.' },
+        { q: 'Can I self-host?', a: 'Not in v0.1. Enterprise customers get an isolated tenant on Cloudflare; full self-hosting is on the roadmap once the Artifacts platform supports it.' },
+        { q: 'Is there a free trial of Team?', a: 'Yes — 30 days, no card required. Install the GitHub App and request the trial from your org settings.' }
+      ]" :key="i">
+        <div class="card cursor-pointer" @click="faq = (faq === i ? null : i)" :class="faq === i ? 'border-white/20' : ''">
+          <div class="flex items-start justify-between gap-4">
+            <div class="font-mono text-sm text-white" x-text="'> ' + item.q"></div>
+            <span class="font-mono text-[var(--gg-muted)] text-sm shrink-0" x-text="faq === i ? '[-]' : '[+]'"></span>
+          </div>
+          <div x-show="faq === i" x-collapse class="mt-3 text-sm text-[var(--gg-muted)]" x-html="item.a"></div>
+        </div>
+      </template>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="py-16 hairline">
+  <div class="max-w-3xl mx-auto px-5 text-center">
+    <h2 class="text-3xl font-semibold gradient-text">Install in 30 seconds.</h2>
+    <p class="mt-3 text-[var(--gg-muted)]">Free tier is enough to evaluate. No card up front.</p>
+    <a href="https://github.com/apps/gitgate" class="btn btn-primary mt-6">Install GitHub App →</a>
+  </div>
+</section>
+
+<footer class="py-14 hairline">
+  <div class="max-w-6xl mx-auto px-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 font-mono text-sm text-[var(--gg-muted)]">
+    <div><span class="text-white">gitgate</span> · by FlareFound</div>
+    <div class="flex flex-wrap gap-x-6 gap-y-2">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/docs.html" class="nav-link">Docs</a>
+      <a href="https://github.com/gitgate/gitgate" class="nav-link">GitHub</a>
+      <a href="mailto:hello@gitgate.com" class="nav-link">Contact</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
