@@ -48,20 +48,20 @@
 <!-- ============== HERO ============== -->
 <section class="bg-grid pt-36 pb-20 relative">
   <div class="max-w-6xl mx-auto px-5">
-    <!-- Pitch text -->
-    <div class="max-w-3xl">
+    <!-- Pitch text — centered -->
+    <div class="max-w-3xl mx-auto text-center">
       <div class="tag mb-5"><span class="w-1.5 h-1.5 rounded-full bg-[var(--gg-accent)] inline-block"></span> public alpha · Apache 2.0</div>
       <h1 class="text-4xl sm:text-5xl lg:text-[3.7rem] leading-[1.04] font-semibold tracking-tight gradient-text">
         Stop pushing CI failures.
       </h1>
-      <p class="mt-6 text-lg text-[var(--gg-muted)] max-w-2xl">
+      <p class="mt-6 text-lg text-[var(--gg-muted)] max-w-2xl mx-auto">
         GitGate runs your <code class="font-mono text-white/90">.github/workflows/*.yml</code> on your laptop, in
         <span class="text-white">seconds</span>. Catch the failure before the
         push. Same YAML. Same outcome. <span class="accent-text font-semibold">5–13× faster than <code class="font-mono">act</code></span> on real workflows.
       </p>
 
       <!-- Install command -->
-      <div id="install" class="term mt-8 max-w-2xl">
+      <div id="install" class="term mt-8 max-w-2xl mx-auto text-left">
         <div class="term-header">
           <span class="term-dot dot-r"></span>
           <span class="term-dot dot-y"></span>
@@ -86,12 +86,12 @@
         </div>
       </div>
 
-      <div class="mt-6 flex flex-wrap items-center gap-3">
+      <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
         <a href="#bench" class="btn btn-primary">See the numbers</a>
         <a href="/docs.html" class="btn btn-ghost">Read the docs →</a>
       </div>
 
-      <div class="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-[12.5px] font-mono text-[var(--gg-muted)]">
+      <div class="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2 text-[12.5px] font-mono text-[var(--gg-muted)]">
         <span><span class="ok">●</span> No new config</span>
         <span><span class="ok">●</span> Host + container backends</span>
         <span><span class="ok">●</span> Matrix + services</span>
@@ -99,36 +99,20 @@
       </div>
     </div>
 
-    <!-- Demo terminal — full container width so the output never wraps. -->
-    <div class="mt-14 term">
+    <!-- Demo terminal — simulated live run, full container width. -->
+    <div class="mt-14 term" x-data="heroDemo()" x-init="start()">
       <div class="term-header">
         <span class="term-dot dot-r"></span>
         <span class="term-dot dot-y"></span>
         <span class="term-dot dot-g"></span>
         <span class="term-title">$ gitgate run .github/workflows/ci.yml</span>
       </div>
-      <div class="term-body">
-<pre class="whitespace-pre"><span class="comment"># gitgate · CI</span>
-<span class="comment">workflow: .github/workflows/ci.yml</span>
-<span class="comment">jobs:     2  (parallel ≤ 4)</span>
-
-<span class="ok">▶</span> <span class="text-white">job: typecheck</span>  <span class="comment">(host · ubicloud-standard-4)</span>
-  <span class="ok">⊘</span> Checkout                                  <span class="comment">host has the repo</span>
-  <span class="ok">⊘</span> Setup pnpm                                <span class="comment">host has pnpm</span>
-  <span class="ok">⊘</span> Setup Node 22                             <span class="comment">host has node v22.19.0</span>
-  <span class="ok">✓</span> Install                                   <span class="comment">1.40s</span>
-  <span class="ok">✓</span> Typecheck                                 <span class="comment">3.18s</span>
-
-<span class="ok">▶</span> <span class="text-white">job: test</span>  <span class="comment">(host · ubicloud-standard-4)</span>
-  <span class="ok">✓</span> Test ts-ci                                <span class="comment">1.13s</span>
-  <span class="ok">✓</span> Test git-engine                           <span class="comment">3.71s</span>
-
-────────────────────────────────────────────────────────────────────────
-<span class="text-white">CI</span>  <span class="ok">PASS</span>  <span class="num">9.09s</span>  <span class="comment">(202 tests · 2 jobs in parallel)</span><span class="cursor"></span></pre>
+      <div class="term-body min-h-[420px]">
+        <pre class="whitespace-pre" x-html="lines.join('\n') + '<span class=&quot;cursor&quot;></span>'"></pre>
       </div>
     </div>
     <div class="mt-3 text-[12px] font-mono text-[var(--gg-muted)] text-right">
-      actual output · same workflow takes ~50–110s on GitHub-hosted runners
+      simulated output · real run on a Windows 11 laptop takes 9.09s · GitHub-hosted ~50–110s
     </div>
   </div>
 </section>

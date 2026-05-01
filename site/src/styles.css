@@ -113,6 +113,17 @@ body {
 }
 @keyframes blink { 50% { opacity: 0; } }
 
+/* In-progress step indicator — pulsing amber arrow, matches a real
+   spinner in the runner output without relying on Unicode spinner frames. */
+.running {
+  color: var(--gg-amber);
+  animation: pulse 0.85s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.45; }
+  50%      { opacity: 1; }
+}
+
 .btn {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 10px 16px;
