@@ -1,0 +1,38 @@
+name: pg
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: app
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 6
+    env:
+      PGPASSWORD: postgres
+      PGHOST: postgres
+      PGUSER: postgres
+      PGDATABASE: app
+    steps:
+      - name: Install psql client
+        run: apk add --no-cache postgresql-client || (apt-get update && apt-get install -y postgresql-client)
+      - name: Wait for postgres
+        run: until pg_isready -h $PGHOST; do sleep 1; done
+      - name: Create schema
+        run: psql -c 'CREATE TABLE widgets (id SERIAL PRIMARY KEY, name TEXT NOT NULL);'
+      - name: Insert + select
+        run: |
+          psql -c "INSERT INTO widgets (name) VALUES ('alpha'), ('beta'), ('gamma');"
+          psql -c 'SELECT id, name FROM widgets ORDER BY id;'
+      - name: Show server version
+        run: psql -c 'SELECT version();'

@@ -29,7 +29,7 @@ import { parseWorkflow, type ParsedJob, type ParsedStep } from '@gitgate/ci';
 import { spawn } from 'node:child_process';
 import { readFileSync, existsSync } from 'node:fs';
 import { performance } from 'node:perf_hooks';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 
 interface StepOutcome {
   label: string;
@@ -245,17 +245,46 @@ function printSummary(
   );
 }
 
+/** From `/path/to/repo/.github/workflows/ci.yml` → `/path/to/repo`. */
+function inferRepoRoot(workflowPath: string): string {
+  const dir = dirname(workflowPath);
+  if (dir.replace(/\\/g, '/').endsWith('/.github/workflows')) {
+    return dirname(dirname(dir));
+  }
+  return dir;
+}
+
+function parseArgs(argv: string[]): { workflow?: string; job?: string; cwd?: string } {
+  const out: { workflow?: string; job?: string; cwd?: string } = {};
+  const positional: string[] = [];
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i]!;
+    if (a === '--cwd') { out.cwd = argv[++i]; continue; }
+    if (a.startsWith('--cwd=')) { out.cwd = a.slice('--cwd='.length); continue; }
+    positional.push(a);
+  }
+  out.workflow = positional[0];
+  out.job = positional[1];
+  return out;
+}
+
 async function main(): Promise<void> {
-  const [, , workflowArg, jobArg] = process.argv;
-  if (!workflowArg) {
-    console.error('usage: tsx poc/run-workflow.ts <path-to-workflow.yml> [job-name]');
+  const args = parseArgs(process.argv.slice(2));
+  if (!args.workflow) {
+    console.error('usage: tsx poc/run-workflow.ts <path-to-workflow.yml> [job-name] [--cwd <dir>]');
     process.exit(2);
   }
-  const workflowPath = resolve(process.cwd(), workflowArg);
+  const workflowPath = resolve(process.cwd(), args.workflow);
   if (!existsSync(workflowPath)) {
     console.error(`workflow not found: ${workflowPath}`);
     process.exit(2);
   }
+  const cwd = args.cwd ? resolve(process.cwd(), args.cwd) : inferRepoRoot(workflowPath);
+  if (!existsSync(cwd)) {
+    console.error(`cwd not found: ${cwd}`);
+    process.exit(2);
+  }
+
   const yaml = readFileSync(workflowPath, 'utf-8');
   const wf = parseWorkflow(yaml);
   const jobs = Object.entries(wf.jobs);
@@ -263,23 +292,22 @@ async function main(): Promise<void> {
     console.error('workflow has no jobs');
     process.exit(2);
   }
-  const target = jobArg
-    ? jobs.filter(([k]) => k === jobArg)
-    : jobs;
+  const target = args.job ? jobs.filter(([k]) => k === args.job) : jobs;
   if (target.length === 0) {
-    console.error(`no job named "${jobArg}". available: ${jobs.map(([k]) => k).join(', ')}`);
+    console.error(`no job named "${args.job}". available: ${jobs.map(([k]) => k).join(', ')}`);
     process.exit(2);
   }
 
-  const wfName = wf.name ?? workflowArg;
-  console.log(color('bold', `flowrunna · ${wfName}`));
-  console.log(color('gray', `${workflowPath}`));
+  const wfName = wf.name ?? args.workflow;
+  console.log(color('bold', `runner · ${wfName}`));
+  console.log(color('gray', `workflow: ${workflowPath}`));
+  console.log(color('gray', `cwd:      ${cwd}`));
   console.log(color('gray', `host: ${process.platform} ${process.arch}, node ${process.version}`));
 
   const overall = performance.now();
   const results: { jobKey: string; outcomes: StepOutcome[]; jobMs: number }[] = [];
   for (const [k, j] of target) {
-    const { outcomes, jobMs } = await runJob(k, j, process.cwd());
+    const { outcomes, jobMs } = await runJob(k, j, cwd);
     results.push({ jobKey: k, outcomes, jobMs });
     if (outcomes.some((o) => o.status === 'fail')) break;
   }

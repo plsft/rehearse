@@ -11,3 +11,4 @@ dist
 *.tsbuildinfo
 coverage
 .vitest-cache
+poc/playground
