@@ -11,8 +11,8 @@ jobs:
         env:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: app
-        ports:
-          - 5432:5432
+        # No host port binding — we reach postgres via the docker network alias
+        # 'postgres' from inside the job container. Avoids host-port collisions.
         options: >-
           --health-cmd pg_isready
           --health-interval 5s

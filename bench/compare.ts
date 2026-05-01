@@ -64,32 +64,58 @@ interface Run {
   ms: number;
   ok: boolean;
   exit: number;
+  timedOut?: boolean;
 }
 
-function spawnTimed(cmd: string, args: string[], cwd: string, env: NodeJS.ProcessEnv = {}): Promise<Run> {
+function spawnTimed(
+  cmd: string,
+  args: string[],
+  cwd: string,
+  opts: { env?: NodeJS.ProcessEnv; timeoutMs?: number } = {},
+): Promise<Run> {
   const t0 = performance.now();
   return new Promise((done) => {
     const proc = spawn(cmd, args, {
       cwd,
-      env: { ...process.env, ...env },
+      env: { ...process.env, ...(opts.env ?? {}) },
       stdio: 'ignore',
     });
-    proc.on('error', () => done({ ms: performance.now() - t0, ok: false, exit: -1 }));
-    proc.on('exit', (code) => done({ ms: performance.now() - t0, ok: code === 0, exit: code ?? -1 }));
+    let timer: NodeJS.Timeout | undefined;
+    let timedOut = false;
+    if (opts.timeoutMs) {
+      timer = setTimeout(() => {
+        timedOut = true;
+        try { proc.kill('SIGKILL'); } catch { /* */ }
+      }, opts.timeoutMs);
+    }
+    proc.on('error', () => {
+      if (timer) clearTimeout(timer);
+      done({ ms: performance.now() - t0, ok: false, exit: -1, timedOut });
+    });
+    proc.on('exit', (code) => {
+      if (timer) clearTimeout(timer);
+      done({ ms: performance.now() - t0, ok: code === 0 && !timedOut, exit: code ?? -1, timedOut });
+    });
   });
 }
 
+const OURS_TIMEOUT_MS = 5 * 60 * 1000;
+const ACT_TIMEOUT_MS = 6 * 60 * 1000;
+
 async function runOurs(target: Target): Promise<Run> {
   const cli = resolve(REPO_ROOT, 'runner/dist/cli.js');
-  const args = ['run', target.workflow, '--quiet', '--backend', target.ourBackend];
+  const wf = resolve(REPO_ROOT, target.workflow);
+  const targetCwd = resolve(REPO_ROOT, target.cwd);
+  const args = ['run', wf, '--cwd', targetCwd, '--quiet', '--backend', target.ourBackend];
   if (target.job) args.push('--job', target.job);
-  return spawnTimed('node', [cli, ...args], resolve(REPO_ROOT, target.cwd));
+  return spawnTimed('node', [cli, ...args], targetCwd, { timeoutMs: OURS_TIMEOUT_MS });
 }
 
 async function runAct(target: Target): Promise<Run | null> {
   if (target.actSkip) return null;
   const image = target.actImage ?? 'node:22-bookworm-slim';
-  const args = ['-W', target.workflow, '--no-cache-server'];
+  const wf = resolve(REPO_ROOT, target.workflow);
+  const args = ['-W', wf, '--no-cache-server'];
   if (target.job) args.push('-j', target.job);
   // Map common runner labels to a host-friendly image. Without this, act
   // refuses to run unfamiliar labels (e.g. ubicloud-standard-4).
@@ -100,7 +126,7 @@ async function runAct(target: Target): Promise<Run | null> {
     args.push('-P', `${label}=${image}`);
   }
   args.push('--quiet');
-  return spawnTimed('act', args, resolve(REPO_ROOT, target.cwd));
+  return spawnTimed('act', args, resolve(REPO_ROOT, target.cwd), { timeoutMs: ACT_TIMEOUT_MS });
 }
 
 interface Result {
@@ -139,6 +165,10 @@ async function main(): Promise<void> {
     console.error('runner/dist/cli.js missing — run `pnpm --filter @gitgate/runner build` first');
     process.exit(2);
   }
+  // Clean up any stragglers from prior runs so port bindings / volume mounts
+  // don't collide. Best-effort.
+  await spawnTimed('docker', ['ps', '-aq', '--filter', 'name=act-'], REPO_ROOT, { timeoutMs: 5000 });
+  await spawnTimed('bash', ['-c', 'docker rm -f $(docker ps -aq --filter "name=act-") 2>/dev/null; docker rm -f $(docker ps -aq --filter "name=runner-") 2>/dev/null; true'], REPO_ROOT, { timeoutMs: 30_000 });
 
   const results: Result[] = [];
   for (const target of targets) {
@@ -154,7 +184,7 @@ async function main(): Promise<void> {
       if (!target.actSkip) {
         process.stdout.write('  cold (act) … ');
         actCold = await runAct(target);
-        process.stdout.write(`${actCold ? fmtMs(actCold.ms) + (actCold.ok ? ' ✓' : ' ✗') : 'skipped'}\n`);
+        process.stdout.write(`${actCold ? fmtMs(actCold.ms) + (actCold.timedOut ? ' ⏱ timeout' : actCold.ok ? ' ✓' : ' ✗') : 'skipped'}\n`);
       }
     }
 
@@ -166,7 +196,7 @@ async function main(): Promise<void> {
     if (!target.actSkip) {
       process.stdout.write('  warm (act) … ');
       actWarm = await runAct(target);
-      process.stdout.write(`${actWarm ? fmtMs(actWarm.ms) + (actWarm.ok ? ' ✓' : ' ✗') : 'skipped'}\n`);
+      process.stdout.write(`${actWarm ? fmtMs(actWarm.ms) + (actWarm.timedOut ? ' ⏱ timeout' : actWarm.ok ? ' ✓' : ' ✗') : 'skipped'}\n`);
     } else {
       process.stdout.write(`  warm (act) … skipped (${target.actSkipReason})\n`);
     }
