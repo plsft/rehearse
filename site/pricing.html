@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#08090c" />
+<title>GitGate — Pricing</title>
+<meta name="description" content="GitGate pricing. The local runner is free and Apache 2.0 forever. Team adds shared cache and dashboards. Cloud adds BYOK Ubicloud orchestration." />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="canonical" href="https://gitgate.com/pricing.html" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script type="module" src="/src/main.ts"></script>
+</head>
+<body class="antialiased" x-data="{ scrolled: false, faq: null }" x-init="window.addEventListener('scroll', () => scrolled = window.scrollY > 8)">
+
+<!-- NAV -->
+<header :class="scrolled ? 'border-b border-white/10 backdrop-blur bg-black/55' : 'border-b border-transparent'"
+        class="fixed inset-x-0 top-0 z-50 transition-colors">
+  <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2.5 font-mono group" aria-label="GitGate home">
+      <span class="logo-mark logo-mark-md text-[var(--gg-accent)] transition-transform group-hover:scale-110"></span>
+      <span class="font-semibold tracking-tight text-white">gitgate</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-7">
+      <a href="/#bench" class="nav-link">Bench</a>
+      <a href="/#features" class="nav-link">Features</a>
+      <a href="/cloud.html" class="nav-link">Cloud</a>
+      <a href="/pricing.html" class="nav-link nav-link-active">Pricing</a>
+      <a href="/docs.html" class="nav-link">Docs</a>
+      <a href="https://github.com/gitgate/gitgate" class="nav-link">GitHub</a>
+    </nav>
+    <a href="/#install" class="btn btn-primary">Install</a>
+  </div>
+</header>
+
+<section class="bg-grid pt-36 pb-12">
+  <div class="max-w-3xl mx-auto px-5 text-center">
+    <div class="eyebrow">// Pricing</div>
+    <h1 class="mt-2 text-4xl sm:text-5xl font-semibold tracking-tight gradient-text">Free locally. Reasonable at team scale.</h1>
+    <p class="mt-5 text-lg text-[var(--gg-muted)]">
+      The runner, the SDK, the git engine — all Apache 2.0 and unlimited.
+      The hosted layer (shared cache, team dashboard, Ubicloud BYOK) is paid
+      and per-developer, not per-repo.
+    </p>
+  </div>
+</section>
+
+<!-- TIER GRID -->
+<section class="py-12">
+  <div class="max-w-6xl mx-auto px-5 grid md:grid-cols-3 gap-5">
+    <div class="card flex flex-col">
+      <div class="font-mono text-xs text-[var(--gg-muted)]">FREE</div>
+      <div class="mt-1 text-3xl font-semibold text-white">$0</div>
+      <div class="text-xs text-[var(--gg-muted)] font-mono">forever · Apache 2.0</div>
+      <ul class="mt-5 space-y-2 text-sm text-[var(--gg-muted)] flex-1">
+        <li><span class="ok">✓</span> Full local runner (unlimited)</li>
+        <li><span class="ok">✓</span> Host + container backends</li>
+        <li><span class="ok">✓</span> Matrix, services, composite actions</li>
+        <li><span class="ok">✓</span> Watch mode, pre-push hook</li>
+        <li><span class="ok">✓</span> Local-fs cache</li>
+        <li><span class="ok">✓</span> TypeScript pipeline SDK</li>
+        <li><span class="ok">✓</span> Community support (GitHub Discussions)</li>
+      </ul>
+      <a href="/#install" class="btn btn-ghost mt-6 justify-center">Install Free</a>
+    </div>
+
+    <div class="card flex flex-col" style="border-color: rgba(34,197,94,0.4); box-shadow: 0 0 0 1px rgba(34,197,94,0.2), 0 24px 60px rgba(34,197,94,0.1)">
+      <div class="flex items-center justify-between">
+        <div class="font-mono text-xs text-[var(--gg-accent)]">TEAM</div>
+        <span class="tag">popular</span>
+      </div>
+      <div class="mt-1 text-3xl font-semibold text-white">$12 <span class="text-base text-[var(--gg-muted)] font-normal">/ dev / mo</span></div>
+      <div class="text-xs text-[var(--gg-muted)] font-mono">billed annually · 14-day trial, no card</div>
+      <ul class="mt-5 space-y-2 text-sm text-[var(--gg-muted)] flex-1">
+        <li><span class="ok">✓</span> Everything in Free</li>
+        <li><span class="ok">✓</span> Shared remote cache (R2-backed)</li>
+        <li><span class="ok">✓</span> Team dashboard (run history, flake spotting)</li>
+        <li><span class="ok">✓</span> Pre-push policies (require workflow X to pass)</li>
+        <li><span class="ok">✓</span> Slack integration</li>
+        <li><span class="ok">✓</span> Email + chat support</li>
+      </ul>
+      <a href="mailto:hello@gitgate.com?subject=GitGate%20Team%20trial" class="btn btn-primary mt-6 justify-center">Start Team trial</a>
+    </div>
+
+    <div class="card flex flex-col">
+      <div class="flex items-center justify-between">
+        <div class="font-mono text-xs text-[var(--gg-muted)]">CLOUD</div>
+        <span class="tag" style="color: var(--gg-blue); border-color: rgba(96,165,250,0.3); background: rgba(96,165,250,0.1)">BYOK</span>
+      </div>
+      <div class="mt-1 text-3xl font-semibold text-white">$24 <span class="text-base text-[var(--gg-muted)] font-normal">/ dev / mo</span></div>
+      <div class="text-xs text-[var(--gg-muted)] font-mono">+ your Ubicloud compute, billed direct</div>
+      <ul class="mt-5 space-y-2 text-sm text-[var(--gg-muted)] flex-1">
+        <li><span class="ok">✓</span> Everything in Team</li>
+        <li><span class="ok">✓</span> Cloud runners via your Ubicloud account</li>
+        <li><span class="ok">✓</span> Cloud cache + artifact storage</li>
+        <li><span class="ok">✓</span> Concurrency unlocked: matrices in parallel</li>
+        <li><span class="ok">✓</span> No GitGate margin on runner minutes</li>
+      </ul>
+      <a href="/cloud.html" class="btn btn-ghost mt-6 justify-center">Read cloud docs</a>
+    </div>
+  </div>
+
+  <div class="max-w-6xl mx-auto px-5 mt-5 grid md:grid-cols-1 gap-5">
+    <div class="card">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <div class="font-mono text-xs text-[var(--gg-muted)]">ENTERPRISE</div>
+          <div class="mt-1 text-2xl font-semibold text-white">Custom · talk to us</div>
+          <p class="mt-1 text-sm text-[var(--gg-muted)] max-w-xl">
+            Self-hosted cache cluster, SSO/SCIM, audit log export, on-prem
+            Ubicloud relay, signed contracts, custom SLA. For orgs with 100+
+            developers or strict residency requirements.
+          </p>
+        </div>
+        <a href="mailto:hello@gitgate.com?subject=GitGate%20Enterprise" class="btn btn-ghost shrink-0">Contact us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON -->
+<section class="py-16 hairline">
+  <div class="max-w-6xl mx-auto px-5">
+    <h2 class="text-2xl sm:text-3xl font-semibold gradient-text tracking-tight">Plan comparison</h2>
+    <div class="mt-8 term">
+      <div class="term-header">
+        <span class="term-dot dot-r"></span><span class="term-dot dot-y"></span><span class="term-dot dot-g"></span>
+        <span class="term-title">~/gitgate.com/pricing</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm font-mono">
+          <thead class="bg-white/[0.02] text-[var(--gg-muted)] text-left">
+            <tr>
+              <th class="py-3 px-5 font-semibold">Feature</th>
+              <th class="py-3 px-5 font-semibold text-center">Free</th>
+              <th class="py-3 px-5 font-semibold text-center text-[var(--gg-accent)]">Team</th>
+              <th class="py-3 px-5 font-semibold text-center">Cloud</th>
+              <th class="py-3 px-5 font-semibold text-center">Enterprise</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5">
+            <tr><td class="py-3 px-5 text-white/90">Local runner (host + container)</td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td></tr>
+            <tr><td class="py-3 px-5 text-white/90">Watch mode &amp; pre-push hook</td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td></tr>
+            <tr><td class="py-3 px-5 text-white/90">@gitgate/ci TypeScript pipelines</td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td></tr>
+            <tr><td class="py-3 px-5 text-white/90">Local-fs cache</td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td></tr>
+            <tr><td class="py-3 px-5 text-white/90">Shared remote cache (team)</td><td class="text-center text-[var(--gg-muted)]">—</td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td></tr>
+            <tr><td class="py-3 px-5 text-white/90">Team dashboard / run history</td><td class="text-center text-[var(--gg-muted)]">—</td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td></tr>
+            <tr><td class="py-3 px-5 text-white/90">Pre-push policies (org-wide)</td><td class="text-center text-[var(--gg-muted)]">—</td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td></tr>
+            <tr><td class="py-3 px-5 text-white/90">Ubicloud BYOK cloud runners</td><td class="text-center text-[var(--gg-muted)]">—</td><td class="text-center text-[var(--gg-muted)]">—</td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td></tr>
+            <tr><td class="py-3 px-5 text-white/90">Cloud cache &amp; artifacts</td><td class="text-center text-[var(--gg-muted)]">—</td><td class="text-center text-[var(--gg-muted)]">—</td><td class="text-center"><span class="ok">✓</span></td><td class="text-center"><span class="ok">✓</span></td></tr>
+            <tr><td class="py-3 px-5 text-white/90">SSO / SCIM</td><td class="text-center text-[var(--gg-muted)]">—</td><td class="text-center text-[var(--gg-muted)]">—</td><td class="text-center text-[var(--gg-muted)]">—</td><td class="text-center"><span class="ok">✓</span></td></tr>
+            <tr><td class="py-3 px-5 text-white/90">Self-hosted cache cluster</td><td class="text-center text-[var(--gg-muted)]">—</td><td class="text-center text-[var(--gg-muted)]">—</td><td class="text-center text-[var(--gg-muted)]">—</td><td class="text-center"><span class="ok">✓</span></td></tr>
+            <tr><td class="py-3 px-5 text-white/90">Audit log export (SIEM)</td><td class="text-center text-[var(--gg-muted)]">—</td><td class="text-center text-[var(--gg-muted)]">—</td><td class="text-center text-[var(--gg-muted)]">—</td><td class="text-center"><span class="ok">✓</span></td></tr>
+            <tr><td class="py-3 px-5 text-white/90">Support</td><td class="text-center">community</td><td class="text-center">email + chat</td><td class="text-center">email + chat</td><td class="text-center">SLA</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="py-16 hairline">
+  <div class="max-w-3xl mx-auto px-5">
+    <h2 class="text-2xl sm:text-3xl font-semibold gradient-text tracking-tight">Questions</h2>
+    <div class="mt-8 space-y-3">
+      <template x-for="(item, i) in [
+        { q: 'Is the local runner really free forever?', a: 'Yes. <code>gitgate</code>, <code>@gitgate/ci</code>, and <code>@gitgate/git-core</code> are Apache 2.0. No usage limits, no signup. The paid tiers add team and cloud features on top.' },
+        { q: 'Why per-developer pricing instead of per-repo?', a: 'Because the dev pre-push loop is the use case. We charge for the human running it, not for the place the code lives. Team plans cover unlimited repos.' },
+        { q: 'How does the BYOK cloud option work?', a: 'You get a Ubicloud account, generate an API key, and pass <code>--cloud</code> to <code>gitgate run</code>. We orchestrate the workflow on Ubicloud-hosted runners. Compute is billed direct by Ubicloud — we make zero margin on runner minutes.' },
+        { q: 'Why Ubicloud and not GitHub-hosted runners?', a: 'Ubicloud runners are roughly 10× cheaper than GitHub-hosted for equivalent specs. If you wanted GitHub-hosted, you would just push to GitHub. The point of <code>--cloud</code> is the cost win when local isn\\'t enough.' },
+        { q: 'Can I use the runner without paying you?', a: 'Yes. The local runner has no phone-home, no telemetry by default, and no feature locks. You can adopt and ignore us.' },
+        { q: 'What about CI on GitHub itself?', a: 'GitGate is the dev pre-push loop. Your existing GitHub Actions workflow keeps running on GitHub. The point is to catch failures locally so you push fewer red builds.' },
+        { q: 'Does GitGate replace act?', a: 'For most pre-push use cases, yes — the bench shows GitGate is 3–5× faster on workflows act can run, and completes workflows act stalls on. <code>act</code> remains a valid choice if you specifically want its container parity model.' },
+        { q: 'What\\'s your data retention policy on Team?', a: 'Run history is kept 90 days on Team, 1 year on Cloud, custom on Enterprise. The runner itself stores nothing remotely on Free.' }
+      ]" :key="i">
+        <div class="card cursor-pointer" @click="faq = (faq === i ? null : i)" :class="faq === i ? 'border-white/20' : ''">
+          <div class="flex items-start justify-between gap-4">
+            <div class="font-mono text-sm text-white" x-text="'> ' + item.q"></div>
+            <span class="font-mono text-[var(--gg-muted)] text-sm shrink-0" x-text="faq === i ? '[-]' : '[+]'"></span>
+          </div>
+          <div x-show="faq === i" x-collapse class="mt-3 text-sm text-[var(--gg-muted)]" x-html="item.a"></div>
+        </div>
+      </template>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="py-16 hairline">
+  <div class="max-w-3xl mx-auto px-5 text-center">
+    <h2 class="text-3xl font-semibold gradient-text">Try it on your repo.</h2>
+    <p class="mt-3 text-[var(--gg-muted)]">30 seconds to install. No card up front for Team trial.</p>
+    <a href="/#install" class="btn btn-primary mt-6">Install GitGate →</a>
+  </div>
+</section>
+
+<footer class="py-14 hairline">
+  <div class="max-w-6xl mx-auto px-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 font-mono text-sm text-[var(--gg-muted)]">
+    <div class="flex items-center gap-2">
+      <span class="logo-mark logo-mark-sm text-[var(--gg-accent)]"></span>
+      <span class="text-white">gitgate</span> · by FlareFound
+    </div>
+    <div class="flex flex-wrap gap-x-6 gap-y-2">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/docs.html" class="nav-link">Docs</a>
+      <a href="/cloud.html" class="nav-link">Cloud</a>
+      <a href="https://github.com/gitgate/gitgate" class="nav-link">GitHub</a>
+      <a href="mailto:hello@gitgate.com" class="nav-link">Contact</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#08090c" />
+<title>GitGate — GitHub Actions, locally. 5–13× faster than act.</title>
+<meta name="description" content="Run your .github/workflows/*.yml on your laptop in seconds, not minutes. 5–13× faster than act on real workflows. Same YAML. No new config." />
+<meta property="og:title" content="GitGate — GitHub Actions, locally" />
+<meta property="og:description" content="Run your .github/workflows/*.yml on your laptop in seconds. 5–13× faster than act. Same YAML. No new config." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://gitgate.com" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="canonical" href="https://gitgate.com/" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script type="module" src="/src/main.ts"></script>
+</head>
+<body class="antialiased" x-data="{ scrolled: false, copied: '', tab: 'cli' }" x-init="window.addEventListener('scroll', () => scrolled = window.scrollY > 8)">
+
+<!-- ============== NAV ============== -->
+<header :class="scrolled ? 'border-b border-white/10 backdrop-blur bg-black/55' : 'border-b border-transparent'"
+        class="fixed inset-x-0 top-0 z-50 transition-colors">
+  <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2.5 font-mono group" aria-label="GitGate home">
+      <span class="logo-mark logo-mark-md text-[var(--gg-accent)] transition-transform group-hover:scale-110"></span>
+      <span class="font-semibold tracking-tight text-white">gitgate</span>
+      <span class="hidden sm:inline text-[11px] text-[var(--gg-muted)] border border-white/10 rounded px-1.5 py-0.5">v0.1</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-7">
+      <a href="#bench" class="nav-link">Bench</a>
+      <a href="#features" class="nav-link">Features</a>
+      <a href="/cloud.html" class="nav-link">Cloud</a>
+      <a href="/pricing.html" class="nav-link">Pricing</a>
+      <a href="/docs.html" class="nav-link">Docs</a>
+      <a href="https://github.com/gitgate/gitgate" class="nav-link">GitHub</a>
+    </nav>
+    <div class="flex items-center gap-2">
+      <a href="#install" class="btn btn-primary">Install
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- ============== HERO ============== -->
+<section class="bg-grid pt-36 pb-20 relative">
+  <div class="max-w-6xl mx-auto px-5 grid lg:grid-cols-12 gap-10 items-center">
+    <div class="lg:col-span-7">
+      <div class="tag mb-5"><span class="w-1.5 h-1.5 rounded-full bg-[var(--gg-accent)] inline-block"></span> public alpha · Apache 2.0</div>
+      <h1 class="text-4xl sm:text-5xl lg:text-[3.7rem] leading-[1.04] font-semibold tracking-tight gradient-text">
+        Stop pushing<br/>CI failures.
+      </h1>
+      <p class="mt-6 text-lg text-[var(--gg-muted)] max-w-xl">
+        GitGate runs your <code class="font-mono text-white/90">.github/workflows/*.yml</code> on your laptop, in
+        <span class="text-white">seconds</span>. Catch the failure before the
+        push. Same YAML. Same outcome. <span class="accent-text font-semibold">5–13× faster than <code class="font-mono">act</code></span> on real workflows.
+      </p>
+
+      <!-- Install command -->
+      <div id="install" class="term mt-8 max-w-xl">
+        <div class="term-header">
+          <span class="term-dot dot-r"></span>
+          <span class="term-dot dot-y"></span>
+          <span class="term-dot dot-g"></span>
+          <span class="term-title">~/your-repo</span>
+        </div>
+        <div class="term-body flex items-center justify-between gap-3">
+          <div>
+            <span class="prompt"></span><span class="text-white">npm install -g </span><span class="str">gitgate</span>
+          </div>
+          <button @click="navigator.clipboard.writeText('npm install -g gitgate'); copied='install'; setTimeout(()=>copied='', 1600)" class="copy-button shrink-0">
+            <span x-show="copied !== 'install'">copy</span><span x-show="copied === 'install'" x-cloak class="text-[var(--gg-accent)]">✓ copied</span>
+          </button>
+        </div>
+        <div class="term-body flex items-center justify-between gap-3 border-t border-white/5">
+          <div>
+            <span class="prompt"></span><span class="text-white">gitgate run </span><span class="comment"># your existing workflow.yml</span>
+          </div>
+          <button @click="navigator.clipboard.writeText('gitgate run .github/workflows/ci.yml'); copied='run'; setTimeout(()=>copied='', 1600)" class="copy-button shrink-0">
+            <span x-show="copied !== 'run'">copy</span><span x-show="copied === 'run'" x-cloak class="text-[var(--gg-accent)]">✓ copied</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-6 flex flex-wrap items-center gap-3">
+        <a href="#bench" class="btn btn-primary">See the numbers</a>
+        <a href="/docs.html" class="btn btn-ghost">Read the docs →</a>
+      </div>
+
+      <div class="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-[12.5px] font-mono text-[var(--gg-muted)]">
+        <span><span class="ok">●</span> No new config</span>
+        <span><span class="ok">●</span> Host + container backends</span>
+        <span><span class="ok">●</span> Matrix + services</span>
+        <span><span class="ok">●</span> 94% of real workflows just work</span>
+      </div>
+    </div>
+
+    <!-- Hero terminal demo -->
+    <div class="lg:col-span-5">
+      <div class="term">
+        <div class="term-header">
+          <span class="term-dot dot-r"></span>
+          <span class="term-dot dot-y"></span>
+          <span class="term-dot dot-g"></span>
+          <span class="term-title">$ gitgate run .github/workflows/ci.yml</span>
+        </div>
+        <div class="term-body">
+<pre class="whitespace-pre overflow-x-auto"><span class="comment"># gitgate · CI</span>
+<span class="comment">workflow: .github/workflows/ci.yml</span>
+<span class="comment">jobs:     2  (parallel ≤ 4)</span>
+
+<span class="ok">▶</span> <span class="text-white">job: typecheck</span> <span class="comment">(host · ubicloud-standard-4)</span>
+  <span class="ok">⊘</span> Checkout                        <span class="comment">host has the repo</span>
+  <span class="ok">⊘</span> Setup pnpm                      <span class="comment">host has pnpm</span>
+  <span class="ok">⊘</span> Setup Node 22                   <span class="comment">host has node v22.19.0</span>
+  <span class="ok">✓</span> Install                         <span class="comment">1.40s</span>
+  <span class="ok">✓</span> Typecheck                       <span class="comment">3.18s</span>
+
+<span class="ok">▶</span> <span class="text-white">job: test</span> <span class="comment">(host · ubicloud-standard-4)</span>
+  <span class="ok">✓</span> Test ts-ci                      <span class="comment">1.13s</span>
+  <span class="ok">✓</span> Test git-engine                 <span class="comment">3.71s</span>
+
+────────────────────────────────────────────────
+<span class="text-white">CI</span>  <span class="ok">PASS</span>  <span class="num">9.09s</span>  <span class="comment">(202 tests, 2 jobs in parallel)</span><span class="cursor"></span></pre>
+        </div>
+      </div>
+      <div class="mt-3 text-[12px] font-mono text-[var(--gg-muted)] text-right">
+        actual output · same workflow takes ~50–110s on GitHub-hosted runners
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== BENCH ============== -->
+<section id="bench" class="py-24 hairline bg-track">
+  <div class="max-w-6xl mx-auto px-5">
+    <div class="max-w-3xl">
+      <div class="eyebrow">// The benchmark</div>
+      <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">Real workflows. Real numbers.</h2>
+      <p class="mt-4 text-lg text-[var(--gg-muted)]">
+        Five workflows on a Windows 11 laptop, head-to-head against
+        <a href="https://github.com/nektos/act" class="link">nektos/act</a>.
+        Same YAML, same job, same runner image when applicable. Both tools
+        timed warm.
+      </p>
+    </div>
+
+    <div class="mt-12 term">
+      <div class="term-header">
+        <span class="term-dot dot-r"></span><span class="term-dot dot-y"></span><span class="term-dot dot-g"></span>
+        <span class="term-title">$ pnpm tsx bench/compare.ts --skip-cold</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm font-mono">
+          <thead class="bg-white/[0.02] text-[var(--gg-muted)] text-left">
+            <tr>
+              <th class="py-3 px-5 font-semibold">Target</th>
+              <th class="py-3 px-5 font-semibold text-right">GitGate</th>
+              <th class="py-3 px-5 font-semibold text-right">act</th>
+              <th class="py-3 px-5 font-semibold text-right">Speedup</th>
+              <th class="py-3 px-5 font-semibold w-[28%]">Visual</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5 text-white/90">
+            <tr>
+              <td class="py-3 px-5">our-ci<div class="text-[11px] text-[var(--gg-muted)]">typecheck + 202 tests, 2 jobs</div></td>
+              <td class="py-3 px-5 text-right ok font-bold">9.09s</td>
+              <td class="py-3 px-5 text-right text-[var(--gg-muted)]">30.28s</td>
+              <td class="py-3 px-5 text-right ok font-bold">3.33×</td>
+              <td class="py-3 px-5">
+                <div class="flex flex-col gap-1.5">
+                  <div class="bar-track"><div class="bar-fill" style="width: 30%"></div></div>
+                  <div class="bar-track"><div class="bar-fill bar-fill-act" style="width: 100%"></div></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="py-3 px-5">node-matrix<div class="text-[11px] text-[var(--gg-muted)]">matrix [18.x, 20.x, 22.x] · 3 cells</div></td>
+              <td class="py-3 px-5 text-right ok font-bold">4.63s</td>
+              <td class="py-3 px-5 text-right text-[var(--gg-muted)]">24.55s</td>
+              <td class="py-3 px-5 text-right ok font-bold">5.30×</td>
+              <td class="py-3 px-5">
+                <div class="flex flex-col gap-1.5">
+                  <div class="bar-track"><div class="bar-fill" style="width: 19%"></div></div>
+                  <div class="bar-track"><div class="bar-fill bar-fill-act" style="width: 100%"></div></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="py-3 px-5">service-postgres<div class="text-[11px] text-[var(--gg-muted)]">postgres:16 + 4 psql steps</div></td>
+              <td class="py-3 px-5 text-right ok font-bold">20.50s</td>
+              <td class="py-3 px-5 text-right err">timed out (&gt;360s)</td>
+              <td class="py-3 px-5 text-right ok font-bold">act fails</td>
+              <td class="py-3 px-5">
+                <div class="flex flex-col gap-1.5">
+                  <div class="bar-track"><div class="bar-fill" style="width: 6%"></div></div>
+                  <div class="bar-track"><div class="bar-fill bar-fill-fail" style="width: 100%"></div></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="py-3 px-5">hono-bun<div class="text-[11px] text-[var(--gg-muted)]">real OSS · honojs/hono · 26 tests</div></td>
+              <td class="py-3 px-5 text-right ok font-bold">6.09s</td>
+              <td class="py-3 px-5 text-right text-[var(--gg-muted)]">n/a</td>
+              <td class="py-3 px-5 text-right text-[var(--gg-muted)]">act lacks bun</td>
+              <td class="py-3 px-5">
+                <div class="flex flex-col gap-1.5">
+                  <div class="bar-track"><div class="bar-fill" style="width: 100%"></div></div>
+                  <div class="text-[10px] text-[var(--gg-muted)] font-mono">vs ~120s on GitHub-hosted</div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="py-3 px-5">hono-node-matrix<div class="text-[11px] text-[var(--gg-muted)]">real OSS · 3-cell matrix</div></td>
+              <td class="py-3 px-5 text-right ok font-bold">45.00s</td>
+              <td class="py-3 px-5 text-right text-[var(--gg-muted)]">n/a</td>
+              <td class="py-3 px-5 text-right text-[var(--gg-muted)]">act lacks bun</td>
+              <td class="py-3 px-5">
+                <div class="flex flex-col gap-1.5">
+                  <div class="bar-track"><div class="bar-fill" style="width: 100%"></div></div>
+                  <div class="text-[10px] text-[var(--gg-muted)] font-mono">vs ~3 min on GitHub-hosted (parallel)</div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <p class="mt-6 text-sm text-[var(--gg-muted)] max-w-3xl">
+      <span class="text-white">Honest caveats:</span> warm-cache numbers
+      (developer's <code class="font-mono">node_modules</code> already on disk).
+      Cold-vs-cold is narrower — a fresh <code class="font-mono">pnpm install</code>
+      dominates everything. The wedge is the dev pre-push loop, where deps
+      are already there and we're not re-provisioning a VM. Full methodology
+      and cold numbers in <a href="https://github.com/gitgate/gitgate/blob/main/bench/RESULTS.md" class="link">bench/RESULTS.md</a>.
+    </p>
+  </div>
+</section>
+
+<!-- ============== FEATURES ============== -->
+<section id="features" class="py-24 hairline">
+  <div class="max-w-6xl mx-auto px-5">
+    <div class="max-w-3xl">
+      <div class="eyebrow">// Features</div>
+      <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">A real runner. Not a demo.</h2>
+      <p class="mt-4 text-lg text-[var(--gg-muted)]">
+        Parallel jobs. Matrix. Services. Caching. Watch mode. Pre-push hook.
+        All wired in. 62 tests passing in the runner package alone.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mt-12">
+      <div class="card card-feature">
+        <div class="flex items-center gap-2.5">
+          <span class="step-plate" style="font-size:14px">⚡</span>
+          <div class="font-mono text-xs text-[var(--gg-accent)]">HOST BACKEND</div>
+        </div>
+        <div class="mt-3 text-lg font-semibold text-white">Skip Docker entirely.</div>
+        <p class="mt-2 text-sm text-[var(--gg-muted)]">
+          When your job doesn't need a container, GitGate runs steps directly
+          on the host. Reuses the developer's <code class="font-mono">node_modules</code>,
+          <code class="font-mono">.bun-install</code>, and toolchain caches. <span class="text-white">act can't do this.</span>
+        </p>
+      </div>
+
+      <div class="card card-feature">
+        <div class="flex items-center gap-2.5">
+          <span class="step-plate" style="font-size:14px">📦</span>
+          <div class="font-mono text-xs text-[var(--gg-accent)]">CONTAINER BACKEND</div>
+        </div>
+        <div class="mt-3 text-lg font-semibold text-white">Services, properly networked.</div>
+        <p class="mt-2 text-sm text-[var(--gg-muted)]">
+          Postgres, Redis, MySQL — start as services on a private Docker network with
+          <code class="font-mono">--network-alias</code> wired correctly. Health-check
+          waiting included. <span class="text-white">act stalls on this on Windows.</span>
+        </p>
+      </div>
+
+      <div class="card card-feature">
+        <div class="flex items-center gap-2.5">
+          <span class="step-plate" style="font-size:14px">⊞</span>
+          <div class="font-mono text-xs text-[var(--gg-accent)]">MATRIX</div>
+        </div>
+        <div class="mt-3 text-lg font-semibold text-white"><code class="font-mono">strategy.matrix</code> works.</div>
+        <p class="mt-2 text-sm text-[var(--gg-muted)]">
+          Cartesian product, <code class="font-mono">include</code>,
+          <code class="font-mono">exclude</code>. Each cell with substituted
+          <code class="font-mono">${{ matrix.* }}</code>. Independent jobs run
+          in parallel; cells share workspace and run sequentially (per-cell
+          worktree on the roadmap).
+        </p>
+      </div>
+
+      <div class="card card-feature">
+        <div class="flex items-center gap-2.5">
+          <span class="step-plate" style="font-size:14px">↻</span>
+          <div class="font-mono text-xs text-[var(--gg-accent)]">WATCH MODE</div>
+        </div>
+        <div class="mt-3 text-lg font-semibold text-white">Inner-loop dev tool.</div>
+        <p class="mt-2 text-sm text-[var(--gg-muted)]">
+          <code class="font-mono">gitgate watch</code> re-runs your workflow on
+          every save. Debounced, queue-coalesced. Stop typing
+          <code class="font-mono">git push -f</code>; iterate against your CI
+          on every keystroke.
+        </p>
+      </div>
+
+      <div class="card card-feature">
+        <div class="flex items-center gap-2.5">
+          <span class="step-plate" style="font-size:14px">🛡</span>
+          <div class="font-mono text-xs text-[var(--gg-accent)]">PRE-PUSH HOOK</div>
+        </div>
+        <div class="mt-3 text-lg font-semibold text-white">Block bad pushes at the source.</div>
+        <p class="mt-2 text-sm text-[var(--gg-muted)]">
+          <code class="font-mono">gitgate install-hook</code> writes a
+          <code class="font-mono">.git/hooks/pre-push</code> that runs your
+          workflow first. Push only if green. CI minutes spent: zero.
+        </p>
+      </div>
+
+      <div class="card card-feature">
+        <div class="flex items-center gap-2.5">
+          <span class="step-plate" style="font-size:14px">🗃</span>
+          <div class="font-mono text-xs text-[var(--gg-accent)]">CACHE</div>
+        </div>
+        <div class="mt-3 text-lg font-semibold text-white"><code class="font-mono">actions/cache</code> works.</div>
+        <p class="mt-2 text-sm text-[var(--gg-muted)]">
+          Real <code class="font-mono">actions/cache</code> semantics on local
+          fs. Exact-key hits. Restore-key longest-prefix matching. <code class="font-mono">cache-hit</code>,
+          <code class="font-mono">cache-primary-key</code>,
+          <code class="font-mono">cache-matched-key</code> outputs. Persistent across runs.
+        </p>
+      </div>
+
+      <div class="card card-feature">
+        <div class="flex items-center gap-2.5">
+          <span class="step-plate" style="font-size:14px">⊕</span>
+          <div class="font-mono text-xs text-[var(--gg-accent)]">COMPOSITE ACTIONS</div>
+        </div>
+        <div class="mt-3 text-lg font-semibold text-white">Local <code class="font-mono">./.github/actions/*</code> expand.</div>
+        <p class="mt-2 text-sm text-[var(--gg-muted)]">
+          Composite actions get inlined with <code class="font-mono">${{ inputs.x }}</code>
+          substituted from the parent's <code class="font-mono">with:</code>. Real
+          workflows that ship their own helpers just work.
+        </p>
+      </div>
+
+      <div class="card card-feature">
+        <div class="flex items-center gap-2.5">
+          <span class="step-plate" style="font-size:14px">⌂</span>
+          <div class="font-mono text-xs text-[var(--gg-accent)]">SHIMS</div>
+        </div>
+        <div class="mt-3 text-lg font-semibold text-white">15+ actions run in-process.</div>
+        <p class="mt-2 text-sm text-[var(--gg-muted)]">
+          <code class="font-mono">checkout</code>, <code class="font-mono">setup-node</code>,
+          <code class="font-mono">setup-bun</code>, <code class="font-mono">setup-go</code>,
+          <code class="font-mono">cache</code>, etc. — handled directly in
+          TypeScript instead of pulling a Docker image to wrap them.
+        </p>
+      </div>
+
+      <div class="card card-feature">
+        <div class="flex items-center gap-2.5">
+          <span class="step-plate" style="font-size:14px">𝓣𝓢</span>
+          <div class="font-mono text-xs text-[var(--gg-accent)]">TS PIPELINES</div>
+        </div>
+        <div class="mt-3 text-lg font-semibold text-white">YAML optional. TypeScript supported.</div>
+        <p class="mt-2 text-sm text-[var(--gg-muted)]">
+          Write workflows in TypeScript with <code class="font-mono">@gitgate/ci</code>.
+          Compile to plain GitHub Actions YAML.
+          <a href="/docs.html#ts" class="link">Convert</a> existing YAML to TS in one command.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== HOW IT WORKS ============== -->
+<section class="py-24 hairline bg-grid">
+  <div class="max-w-6xl mx-auto px-5">
+    <div class="max-w-3xl">
+      <div class="eyebrow">// How it works</div>
+      <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">Three commands. Same YAML.</h2>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-5 mt-12">
+      <div class="card">
+        <div class="flex items-center gap-3">
+          <span class="step-plate">01</span>
+          <div class="text-lg font-semibold text-white">Install</div>
+        </div>
+        <pre class="mt-4 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>npm install -g gitgate</pre>
+        <p class="mt-3 text-sm text-[var(--gg-muted)]">Single binary. Apache 2.0. No account, no signup.</p>
+      </div>
+      <div class="card">
+        <div class="flex items-center gap-3">
+          <span class="step-plate">02</span>
+          <div class="text-lg font-semibold text-white">Run</div>
+        </div>
+        <pre class="mt-4 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>gitgate run .github/workflows/ci.yml
+<span class="prompt"></span>gitgate run .github/workflows/ci.yml -j test</pre>
+        <p class="mt-3 text-sm text-[var(--gg-muted)]">Backend chosen per job: host (fast) or container (parity).</p>
+      </div>
+      <div class="card">
+        <div class="flex items-center gap-3">
+          <span class="step-plate">03</span>
+          <div class="text-lg font-semibold text-white">Wire it in</div>
+        </div>
+        <pre class="mt-4 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>gitgate watch <span class="comment"># inner-loop</span>
+<span class="prompt"></span>gitgate install-hook <span class="comment"># pre-push</span></pre>
+        <p class="mt-3 text-sm text-[var(--gg-muted)]">Inner loop or pre-push enforcement. Or both.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== CLOUD ============== -->
+<section class="py-24 hairline">
+  <div class="max-w-6xl mx-auto px-5 grid lg:grid-cols-12 gap-10 items-center">
+    <div class="lg:col-span-6">
+      <div class="eyebrow">// When you do need cloud</div>
+      <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">Optional cloud runners.<br/>Bring your own Ubicloud.</h2>
+      <p class="mt-5 text-lg text-[var(--gg-muted)]">
+        Most CI runs belong on the laptop. Sometimes you genuinely need cloud
+        — bigger matrices, GPU runners, deploy steps. GitGate Cloud relays
+        the run to <a href="https://www.ubicloud.com" class="link">Ubicloud</a>
+        — <span class="text-white">10× cheaper than GitHub-hosted</span> — using
+        <span class="text-white">your own API key</span>. We orchestrate; you pay
+        Ubicloud direct.
+      </p>
+      <ul class="mt-6 space-y-2 text-sm text-[var(--gg-muted)]">
+        <li><span class="ok">✓</span> Same <code class="font-mono">runner</code> binary, <code class="font-mono">--cloud</code> flag</li>
+        <li><span class="ok">✓</span> Bring your own Ubicloud API key</li>
+        <li><span class="ok">✓</span> Compute billed direct by Ubicloud (no GitGate margin on runner minutes)</li>
+        <li><span class="ok">✓</span> Same cache and artifact contract as local</li>
+      </ul>
+      <div class="mt-7 flex flex-wrap gap-3">
+        <a href="/cloud.html" class="btn btn-primary">Read the cloud docs →</a>
+        <a href="https://www.ubicloud.com" class="btn btn-ghost">About Ubicloud</a>
+      </div>
+    </div>
+    <div class="lg:col-span-6">
+      <div class="term">
+        <div class="term-header">
+          <span class="term-dot dot-r"></span><span class="term-dot dot-y"></span><span class="term-dot dot-g"></span>
+          <span class="term-title">$ gitgate run … --cloud</span>
+        </div>
+        <div class="term-body">
+<pre class="whitespace-pre overflow-x-auto"><span class="prompt"></span>export UBICLOUD_TOKEN=ubi_…
+<span class="prompt"></span>gitgate run .github/workflows/release.yml \
+  --cloud --runner ubicloud-standard-8 -j build
+
+<span class="comment"># gitgate · Release</span>
+<span class="ok">▶</span> <span class="text-white">job: build</span> <span class="comment">(cloud · ubicloud-standard-8)</span>
+  <span class="ok">⊘</span> Checkout                        <span class="comment">cloud-side, shallow</span>
+  <span class="ok">✓</span> Install                         <span class="comment">  9.2s</span>
+  <span class="ok">✓</span> Build production bundle         <span class="comment"> 41.0s</span>
+  <span class="ok">✓</span> Push to registry                <span class="comment">  4.1s</span>
+
+────────────────────────────────────────────────
+<span class="text-white">Release</span>  <span class="ok">PASS</span>  <span class="num">54.30s</span>
+<span class="comment">cost: $0.0188 (8-core × 54s · ubicloud)</span><span class="cursor"></span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== COMPATIBILITY ============== -->
+<section class="py-24 hairline bg-track">
+  <div class="max-w-6xl mx-auto px-5">
+    <div class="max-w-3xl">
+      <div class="eyebrow">// Compatibility</div>
+      <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">94% of real workflows just work.</h2>
+      <p class="mt-4 text-lg text-[var(--gg-muted)]">
+        We audited the public CI of two large OSS projects. The rest is
+        documented and tracked.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-5 mt-12">
+      <div class="card text-center">
+        <div class="metric text-5xl">100%</div>
+        <div class="mt-2 text-sm text-[var(--gg-muted)]">our own CI<div class="text-[11px]">3 jobs · 16 steps</div></div>
+      </div>
+      <div class="card text-center" style="border-color: rgba(34,197,94,0.4)">
+        <div class="metric text-5xl">96.2%</div>
+        <div class="mt-2 text-sm text-[var(--gg-muted)]"><a href="https://github.com/vitejs/vite" class="link">vitejs/vite</a> ci.yml<div class="text-[11px]">5 jobs · 26 steps</div></div>
+      </div>
+      <div class="card text-center" style="border-color: rgba(34,197,94,0.4)">
+        <div class="metric text-5xl">94.4%</div>
+        <div class="mt-2 text-sm text-[var(--gg-muted)]"><a href="https://github.com/honojs/hono" class="link">honojs/hono</a> ci.yml<div class="text-[11px]">14 jobs · 71 steps</div></div>
+      </div>
+    </div>
+
+    <div class="mt-10 grid md:grid-cols-2 gap-5">
+      <div class="card">
+        <div class="font-mono text-xs text-[var(--gg-accent)] mb-2">SUPPORTED TODAY</div>
+        <ul class="text-sm text-[var(--gg-muted)] space-y-1.5">
+          <li><span class="ok">✓</span> All <code class="font-mono">run:</code> steps (bash / pwsh / cmd)</li>
+          <li><span class="ok">✓</span> Top ~15 actions in-process: checkout, setup-*, cache, artifacts</li>
+          <li><span class="ok">✓</span> <code class="font-mono">strategy.matrix</code> with include/exclude</li>
+          <li><span class="ok">✓</span> <code class="font-mono">needs:</code> with parallel scheduling</li>
+          <li><span class="ok">✓</span> <code class="font-mono">if:</code> on jobs and steps (subset)</li>
+          <li><span class="ok">✓</span> <code class="font-mono">services:</code> with health checks</li>
+          <li><span class="ok">✓</span> Local composite actions (<code class="font-mono">./.github/actions/*</code>)</li>
+          <li><span class="ok">✓</span> <code class="font-mono">${{ matrix… }}</code>, <code class="font-mono">env</code>, <code class="font-mono">secrets</code>, <code class="font-mono">needs</code>, <code class="font-mono">steps</code>, <code class="font-mono">runner</code></li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="font-mono text-xs text-[var(--gg-amber)] mb-2">NOT YET</div>
+        <ul class="text-sm text-[var(--gg-muted)] space-y-1.5">
+          <li><span class="warn">○</span> Per-cell matrix workspace isolation (cells share workspace, run sequentially today)</li>
+          <li><span class="warn">○</span> Reusable workflows (<code class="font-mono">uses: ./.github/workflows/foo.yml</code>)</li>
+          <li><span class="warn">○</span> Remote composite actions (<code class="font-mono">org/repo@ref</code>)</li>
+          <li><span class="warn">○</span> JavaScript-action runtime (<code class="font-mono">runs.using: node20</code>)</li>
+          <li><span class="warn">○</span> OIDC / <code class="font-mono">id-token: write</code></li>
+          <li><span class="warn">○</span> <code class="font-mono">concurrency:</code> cancellation</li>
+          <li><span class="warn">○</span> Real <code class="font-mono">actions/upload-artifact</code> (local fs only today)</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="mt-6 text-sm text-[var(--gg-muted)] max-w-3xl">
+      Run <code class="font-mono">gitgate compat .github/workflows/ci.yml</code>
+      to audit your own. We'll list what runs today, what no-ops, and what
+      doesn't yet.
+    </p>
+  </div>
+</section>
+
+<!-- ============== OPEN SOURCE ============== -->
+<section class="py-24 hairline">
+  <div class="max-w-6xl mx-auto px-5">
+    <div class="max-w-3xl">
+      <div class="eyebrow">// Open source</div>
+      <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">Built in the open.</h2>
+      <p class="mt-4 text-lg text-[var(--gg-muted)]">
+        Three Apache-2.0 packages on npm. Nothing in this stack ties you to
+        the hosted product.
+      </p>
+    </div>
+    <div class="grid md:grid-cols-3 gap-5 mt-12">
+      <a href="https://www.npmjs.com/package/gitgate" class="card hover:border-white/20 transition">
+        <div class="font-mono text-xs text-[var(--gg-accent)]">gitgate</div>
+        <div class="mt-2 text-lg font-semibold text-white">The runner CLI</div>
+        <p class="mt-2 text-sm text-[var(--gg-muted)]">Local-first GH Actions runner: parallel scheduler, host + container backends, matrix, services, watch, pre-push.</p>
+        <div class="mt-4 text-xs font-mono text-[var(--gg-muted)]">npm · Apache 2.0</div>
+      </a>
+      <a href="https://www.npmjs.com/package/@gitgate/ci" class="card hover:border-white/20 transition">
+        <div class="font-mono text-xs text-[var(--gg-accent)]">@gitgate/ci</div>
+        <div class="mt-2 text-lg font-semibold text-white">TypeScript pipeline SDK</div>
+        <p class="mt-2 text-sm text-[var(--gg-muted)]">Author workflows in TS, compile to plain GitHub Actions YAML, convert YAML → TS.</p>
+        <div class="mt-4 text-xs font-mono text-[var(--gg-muted)]">npm · Apache 2.0</div>
+      </a>
+      <a href="https://www.npmjs.com/package/@gitgate/git-core" class="card hover:border-white/20 transition">
+        <div class="font-mono text-xs text-[var(--gg-accent)]">@gitgate/git-core</div>
+        <div class="mt-2 text-lg font-semibold text-white">Pure-TypeScript git engine</div>
+        <p class="mt-2 text-sm text-[var(--gg-muted)]">Powers <code class="font-mono">actions/checkout</code> without shelling out. Workers / Node / Bun / browser. 162 tests.</p>
+        <div class="mt-4 text-xs font-mono text-[var(--gg-muted)]">npm · Apache 2.0</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============== CTA ============== -->
+<section class="py-24 hairline">
+  <div class="max-w-3xl mx-auto px-5 text-center">
+    <h2 class="text-3xl sm:text-4xl font-semibold gradient-text tracking-tight">Run your CI now.</h2>
+    <p class="mt-3 text-[var(--gg-muted)]">No account. No signup. Apache 2.0.</p>
+    <div class="mt-8 inline-flex flex-wrap justify-center gap-3">
+      <a href="#install" class="btn btn-primary">Install GitGate →</a>
+      <a href="/docs.html" class="btn btn-ghost">Read the quickstart</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============== FOOTER ============== -->
+<footer class="py-14 hairline">
+  <div class="max-w-6xl mx-auto px-5 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+    <div class="font-mono text-sm text-[var(--gg-muted)] flex items-center gap-2">
+      <span class="logo-mark logo-mark-sm text-[var(--gg-accent)]"></span>
+      <span class="text-white">gitgate</span> · by FlareFound · Built on Cloudflare.
+    </div>
+    <div class="flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-[13px]">
+      <a href="https://github.com/gitgate/gitgate" class="nav-link">GitHub</a>
+      <a href="https://www.npmjs.com/package/gitgate" class="nav-link">npm</a>
+      <a href="/docs.html" class="nav-link">Docs</a>
+      <a href="/cloud.html" class="nav-link">Cloud</a>
+      <a href="/pricing.html" class="nav-link">Pricing</a>
+      <a href="mailto:hello@gitgate.com" class="nav-link">Contact</a>
+    </div>
+  </div>
+  <div class="max-w-6xl mx-auto px-5 mt-6 font-mono text-[11px] text-[var(--gg-muted)]">
+    <span class="ok">●</span> all systems green · gitgate v0.1
+  </div>
+</footer>
+
+</body>
+</html>
