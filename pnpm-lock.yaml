@@ -71,6 +71,34 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@22.19.17)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.3)
 
+  runner:
+    dependencies:
+      '@gitgate/ci':
+        specifier: workspace:*
+        version: link:../ts-ci
+      '@gitgate/git-core':
+        specifier: workspace:*
+        version: link:../git-engine
+      commander:
+        specifier: ^12.1.0
+        version: 12.1.0
+      picocolors:
+        specifier: ^1.1.1
+        version: 1.1.1
+    devDependencies:
+      '@types/node':
+        specifier: ^22.10.0
+        version: 22.19.17
+      tsx:
+        specifier: ^4.19.2
+        version: 4.21.0
+      typescript:
+        specifier: ^5.8.0
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@22.19.17)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.3)
+
   ts-ci:
     devDependencies:
       typescript:

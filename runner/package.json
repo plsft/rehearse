@@ -1,0 +1,37 @@
+{
+  "name": "@gitgate/runner",
+  "version": "0.1.0",
+  "description": "Local-first runner for GitHub Actions workflows. Same YAML, fast.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "runner": "./dist/cli.js"
+  },
+  "exports": {
+    ".": { "import": "./dist/index.js", "types": "./dist/index.d.ts" },
+    "./cli": { "import": "./dist/cli.js" }
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "dev": "tsx src/cli.ts"
+  },
+  "dependencies": {
+    "@gitgate/ci": "workspace:*",
+    "@gitgate/git-core": "workspace:*",
+    "commander": "^12.1.0",
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.8.0",
+    "vitest": "^3.0.0"
+  },
+  "publishConfig": { "access": "public" },
+  "keywords": ["github-actions", "ci", "runner", "local-ci", "act-alternative"]
+}

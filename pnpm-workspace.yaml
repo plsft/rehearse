@@ -2,3 +2,4 @@ packages:
   - 'ts-ci'
   - 'git-engine'
   - 'cli'
+  - 'runner'

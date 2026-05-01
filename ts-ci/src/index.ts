@@ -18,5 +18,12 @@ export { toYaml } from './compiler/yaml.js';
 export { generateHeader } from './compiler/header.js';
 export { convert } from './converter/transform.js';
 export { parseWorkflow } from './converter/parse.js';
+export type {
+  ParsedJob,
+  ParsedStep,
+  ParsedWorkflow,
+  ParsedTriggers,
+  ParsedTriggerConfig,
+} from './converter/parse.js';
 export { estimate } from './estimator/cost.js';
 export type * from './types.js';
