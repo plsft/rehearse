@@ -17,7 +17,8 @@
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
     "format": "prettier --write .",
-    "pipelines:compile": "tsx cli/src/index.ts ci compile"
+    "pipelines:compile": "tsx cli/src/index.ts ci compile",
+    "release": "node scripts/release.mjs"
   },
   "devDependencies": {
     "@gitgate/ci": "workspace:*",

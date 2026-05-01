@@ -7,9 +7,9 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*.*.*'
 permissions:
-  contents: read
+  contents: write
   id-token: write
 jobs:
   publish:
@@ -30,23 +30,51 @@ jobs:
           node-version: '22'
           cache: pnpm
           registry-url: 'https://registry.npmjs.org'
+      - name: Detect release channel
+        run: |
+          set -euo pipefail
+          TAG="${{ github.ref_name }}"
+          VERSION="${TAG#v}"
+          if [[ "$VERSION" == *-* ]]; then
+            SUFFIX="${VERSION#*-}"
+            NPM_TAG="${SUFFIX%%.*}"
+            echo "Tag $TAG → prerelease, npm dist-tag '$NPM_TAG'"
+            echo "NPM_TAG=$NPM_TAG"   >> "$GITHUB_ENV"
+            echo "PRERELEASE=true"    >> "$GITHUB_ENV"
+          else
+            echo "Tag $TAG → stable, npm dist-tag 'latest'"
+            echo "NPM_TAG=latest"     >> "$GITHUB_ENV"
+            echo "PRERELEASE=false"   >> "$GITHUB_ENV"
+          fi
       - name: Install
         run: pnpm install --frozen-lockfile
       - name: Build all packages
         run: pnpm turbo build
       - name: 'Publish @gitgate/git-core'
-        run: 'pnpm --filter @gitgate/git-core publish --access public --no-git-checks'
+        run: 'pnpm --filter @gitgate/git-core publish --tag "$NPM_TAG" --access public --no-git-checks'
         env:
           NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
       - name: 'Publish @gitgate/ci'
-        run: 'pnpm --filter @gitgate/ci publish --access public --no-git-checks'
+        run: 'pnpm --filter @gitgate/ci publish --tag "$NPM_TAG" --access public --no-git-checks'
         env:
           NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
       - name: 'Publish @gitgate/cli'
-        run: 'pnpm --filter @gitgate/cli publish --access public --no-git-checks'
+        run: 'pnpm --filter @gitgate/cli publish --tag "$NPM_TAG" --access public --no-git-checks'
         env:
           NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
       - name: 'Publish @gitgate/runner'
-        run: 'pnpm --filter @gitgate/runner publish --access public --no-git-checks'
+        run: 'pnpm --filter @gitgate/runner publish --tag "$NPM_TAG" --access public --no-git-checks'
         env:
           NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
+      - name: Create GitHub Release with auto-generated notes
+        run: |
+          set -euo pipefail
+          ARGS=(--generate-notes --verify-tag --title "${{ github.ref_name }}")
+          if [ "$PRERELEASE" = "true" ]; then
+            ARGS+=(--prerelease)
+          else
+            ARGS+=(--latest)
+          fi
+          gh release create "${{ github.ref_name }}" "${ARGS[@]}"
+        env:
+          GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
