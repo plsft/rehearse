@@ -21,7 +21,7 @@ export const release = pipeline('Release', {
   permissions: { contents: 'read', idToken: 'write' },
   jobs: [
     job('publish', {
-      runner: Runner.ubicloud('standard-2'),
+      runner: Runner.github('ubuntu-latest'),
       steps: [
         step.checkout({ fetchDepth: 0 }),
         step.action('pnpm/action-setup@v4', { with: { version: '9.15.0' }, name: 'Setup pnpm' }),

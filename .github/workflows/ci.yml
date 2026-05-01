@@ -15,7 +15,7 @@ permissions:
 jobs:
   typecheck:
     name: typecheck
-    runs-on: ubicloud-standard-4
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: 'actions/checkout@v4'
@@ -36,7 +36,7 @@ jobs:
         run: pnpm turbo typecheck
   test:
     name: test
-    runs-on: ubicloud-standard-4
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: 'actions/checkout@v4'

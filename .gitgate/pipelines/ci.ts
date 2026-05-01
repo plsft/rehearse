@@ -21,11 +21,11 @@ export const ci = pipeline('CI', {
   permissions: { contents: 'read' },
   jobs: [
     job('typecheck', {
-      runner: Runner.ubicloud('standard-4'),
+      runner: Runner.github('ubuntu-latest'),
       steps: [...setupNodePnpm, step.run('pnpm turbo typecheck', { name: 'Typecheck' })],
     }),
     job('test', {
-      runner: Runner.ubicloud('standard-4'),
+      runner: Runner.github('ubuntu-latest'),
       steps: [
         ...setupNodePnpm,
         step.run('pnpm --filter @gitgate/ci test', { name: 'Test ts-ci' }),

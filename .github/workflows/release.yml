@@ -14,7 +14,7 @@ permissions:
 jobs:
   publish:
     name: publish
-    runs-on: ubicloud-standard-2
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: 'actions/checkout@v4'
