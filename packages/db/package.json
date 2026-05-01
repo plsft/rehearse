@@ -21,6 +21,7 @@
     "seed": "tsx src/seed.ts"
   },
   "dependencies": {
+    "@gitgate/shared": "workspace:*",
     "drizzle-orm": "^0.36.4"
   },
   "devDependencies": {
