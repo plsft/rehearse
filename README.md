@@ -1,87 +1,89 @@
-# GitGate
+# Local-first runner for GitHub Actions
 
-**CI in TypeScript. Agent governance for Git.**
+> **Stop pushing CI failures.** Run your `.github/workflows/*.yml` locally
+> before you push. Same YAML, same outcome, in tens of seconds.
 
-GitGate is a monorepo with a mix of **Apache 2.0 open-source packages** (published
-to npm) and a **source-available platform** (hosted at `gitgate.com`). See
-[LICENSING.md](LICENSING.md) for the boundary.
+This repo is a working set of POCs validating the wedge:
+**run an unmodified GitHub Actions workflow on a developer laptop, fast.**
 
----
+It is not yet a shipping product. The work is being staged across three POCs
+that together prove the speed and compatibility claims.
 
-## Open source
+## Status
 
-Three packages, all Apache 2.0, all on npm, all with zero runtime dependency on
-the hosted platform. Use them standalone or alongside the GitHub App.
-
-| Package | What it does | Install |
+| | What | Result |
 | --- | --- | --- |
-| [`@gitgate/ci`](packages/ci) | Compile TypeScript pipelines to GitHub Actions YAML. Type-safe builders, presets for Node/Bun/Python/Rust/Go/Docker, agent-aware extensions. | `npm i -D @gitgate/ci` |
-| [`@gitgate/git-core`](packages/git-core) | Pure-TypeScript git protocol: objects, packfiles, smart-HTTP, diff, three-way merge. Runs on Workers / Node / Bun / Deno / browser. | `npm i @gitgate/git-core` |
-| [`gg`](cli) | CLI for compiling pipelines, converting YAML → TypeScript, estimating cost, and inspecting agent governance. | `npm i -D gg` |
+| ✅ POC #1 | Localhost runner against our own CI | 16.86s end-to-end (3 jobs, 16 steps) |
+| ✅ POC #2 | Compatibility audit of real OSS workflows | hono 94.4%, vite 96.2% of steps executable |
+| ✅ POC #2b | Real run of `honojs/hono` `bun` job | 9.27s warm vs ~120s on GitHub (~13×) |
+| ✅ POC #3 | Container backend with `services: postgres` | 20.12s warm vs ~75s on GitHub (~3.75×) |
+| 🟡 next | Matrix expansion, parallel job scheduler | — |
+| 🟡 next | Real runner package (replace POCs) | — |
+| 🟡 next | Pre-commit / pre-push hook integration | — |
 
-```bash
-# Five-second tour
-npx gg ci init                # scaffold .gitgate/pipelines/ci.ts
-npx gg ci compile             # → .github/workflows/ci.yml
-npx gg ci convert old.yml     # YAML → TypeScript
-```
+See [`poc/RESULTS.md`](poc/RESULTS.md) for the speed numbers and methodology.
 
-## The hosted platform
-
-A GitHub App that detects agent-authored PRs, computes a Merge Confidence
-score (0–100) reported as a GitHub Check Run, and stores immutable provenance
-chains as git repos on Cloudflare Artifacts. No dashboard at launch — every
-governance surface lives in the GitHub PR UI.
-
-Install at <https://github.com/apps/gitgate>. The platform is source-available
-under [`apps/api`](apps/api) for transparency but is **not licensed for
-self-hosting**.
-
----
-
-## Repository layout
+## Repo layout
 
 ```
-packages/
-  ci/         — @gitgate/ci, the public SDK             (Apache 2.0, public)
-  git-core/   — @gitgate/git-core, pure-TS git protocol (Apache 2.0, public)
-  shared/     — shared types and Zod schemas            (source-available)
-  db/         — Drizzle schema + D1 migrations          (source-available)
-apps/
-  api/        — Hono Worker hosting the Platform API    (source-available)
-  site/       — gitgate.com (Vite + Tailwind v4 + Alpine, source-available)
-cli/          — gg, the CLI                              (Apache 2.0, public)
-docs/         — Markdown reference docs
+ts-ci/         — TypeScript SDK that parses + compiles GitHub Actions YAML
+                 (Apache 2.0, npm: @gitgate/ci)
+git-engine/    — Pure-TypeScript git protocol implementation
+                 (Apache 2.0, npm: @gitgate/git-core)
+cli/           — `gg` CLI: compile/init/convert/validate/watch/estimate
+poc/           — Single-file proofs (this is the active surface)
+  run-workflow.ts   — POC #1: localhost backend
+  2-compat.ts       — POC #2: compatibility analyzer
+  3-container.ts    — POC #3: Docker container backend with services
+  fixtures/         — real workflows from hono, vite, plus our own
+  RESULTS.md        — numbers + methodology
+old/           — pre-pivot code kept for reference; not in workspace
+.gitgate/      — TypeScript source for this repo's own CI
+.github/       — generated workflow YAML (do not edit by hand)
 ```
 
----
-
-## Quickstarts
-
-- **CI SDK** — [docs/ci-quickstart.md](docs/ci-quickstart.md)
-- **Governance** — [docs/governance-quickstart.md](docs/governance-quickstart.md)
-- **Merge Confidence reference** — [docs/merge-confidence.md](docs/merge-confidence.md)
-
-## Local development
+## Run the POCs
 
 ```bash
 pnpm install
-pnpm turbo build
-pnpm turbo test
-pnpm turbo typecheck
+
+# POC #1 — run our own CI on the host
+pnpm tsx poc/run-workflow.ts .github/workflows/ci.yml
+
+# POC #2 — audit any workflow's compatibility
+pnpm tsx poc/2-compat.ts poc/fixtures/hono-ci.yml
+
+# POC #2b — run a real OSS workflow
+git clone --depth 1 https://github.com/honojs/hono.git poc/playground/hono
+pnpm tsx poc/run-workflow.ts poc/playground/hono/.github/workflows/ci.yml bun
+
+# POC #3 — container backend with postgres (requires Docker running)
+pnpm tsx poc/3-container.ts poc/fixtures/service-postgres.yml
 ```
 
-The CI SDK compiler has snapshot tests in `packages/ci/test/compiler/snapshots/`
-that fail when the YAML output changes — review the diff and commit the
-updated snapshot.
+## Speed claim, honestly
 
-## Contributing
+The wedge is real but the numbers depend on cache state. The defensible
+public claim today is:
 
-External contributions are welcome on the OSS packages. See
-[CONTRIBUTING.md](CONTRIBUTING.md).
+- **5–13× faster on the warm pre-push loop** — developer's `node_modules`
+  already on disk; we skip VM boot, queue, and fresh install
+- **~3–4× faster for jobs that need containers** (postgres, redis), once
+  images are pulled
+- **~1.5× faster vs cold-cache CI**, because a fresh `pnpm install` /
+  `bun install` is the dominant cost on both ends
 
-## License
+The win is the dev pre-push loop, not replacing CI runners.
 
-- `packages/ci`, `packages/git-core`, `cli`: **Apache 2.0**.
-- Everything else: **source-available, proprietary**. See
-  [LICENSING.md](LICENSING.md).
+## What's open source
+
+`ts-ci` and `git-engine` are Apache 2.0 and publishable to npm as
+`@gitgate/ci` and `@gitgate/git-core`. See [`LICENSING.md`](LICENSING.md).
+The runner itself, when it ships as a standalone package, will also be
+Apache 2.0.
+
+## Naming
+
+The product doesn't have a name yet. Don't ship one until the runner is
+measurably faster than `act` on three real workflows including one with
+containers.

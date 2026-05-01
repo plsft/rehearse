@@ -6,14 +6,11 @@ import { runEstimate } from './commands/ci/estimate.js';
 import { runInit } from './commands/ci/init.js';
 import { runValidate } from './commands/ci/validate.js';
 import { runWatch } from './commands/ci/watch.js';
-import { runGateProvenance } from './commands/gate/provenance.js';
-import { runGateScore } from './commands/gate/score.js';
-import { runGateStatus } from './commands/gate/status.js';
 
 const program = new Command();
 program
   .name('gg')
-  .description('GitGate — TypeScript pipelines and agent governance')
+  .description('TypeScript pipelines for GitHub Actions')
   .version('0.1.0');
 
 const ci = program.command('ci').description('Compile and manage TypeScript pipelines');
@@ -46,20 +43,6 @@ ci.command('estimate')
   .action(async (opts: { durations?: string; runsPerMonth?: number }) =>
     process.exit(await runEstimate(opts)),
   );
-
-const gate = program.command('gate').description('Inspect agent governance for the current repo');
-gate
-  .command('status')
-  .description('Show governance state for the current repo')
-  .action(async () => process.exit(await runGateStatus()));
-gate
-  .command('score <pr>')
-  .description('Show Merge Confidence breakdown for a PR')
-  .action(async (pr: string) => process.exit(await runGateScore(pr)));
-gate
-  .command('provenance <pr>')
-  .description('Show provenance events for a PR')
-  .action(async (pr: string) => process.exit(await runGateProvenance(pr)));
 
 program.parseAsync(process.argv).catch((err: unknown) => {
   console.error(err);

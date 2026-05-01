@@ -1,4 +1,4 @@
 packages:
-  - 'packages/*'
-  - 'apps/*'
+  - 'ts-ci'
+  - 'git-engine'
   - 'cli'

@@ -28,13 +28,9 @@ export const ci = pipeline('CI', {
       runner: Runner.ubicloud('standard-4'),
       steps: [
         ...setupNodePnpm,
-        step.run('pnpm --filter @gitgate/ci test', { name: 'Test @gitgate/ci' }),
-        step.run('pnpm --filter @gitgate/git-core test', { name: 'Test @gitgate/git-core' }),
+        step.run('pnpm --filter @gitgate/ci test', { name: 'Test ts-ci' }),
+        step.run('pnpm --filter @gitgate/git-core test', { name: 'Test git-engine' }),
       ],
-    }),
-    job('site', {
-      runner: Runner.ubicloud('standard-2'),
-      steps: [...setupNodePnpm, step.run('pnpm --filter @gitgate/site build', { name: 'Build site' })],
     }),
   ],
 });
