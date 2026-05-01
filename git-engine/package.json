@@ -1,6 +1,6 @@
 {
   "name": "@gitgate/git-core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Pure-TypeScript git protocol: objects, packfiles, smart-HTTP, diff, merge, refs",
   "license": "Apache-2.0",
   "type": "module",
@@ -12,7 +12,11 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "vitest run",

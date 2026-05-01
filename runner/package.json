@@ -1,6 +1,6 @@
 {
   "name": "@gitgate/runner",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Local-first runner for GitHub Actions workflows. Same YAML, fast.",
   "license": "Apache-2.0",
   "type": "module",
@@ -10,10 +10,19 @@
     "runner": "./dist/cli.js"
   },
   "exports": {
-    ".": { "import": "./dist/index.js", "types": "./dist/index.d.ts" },
-    "./cli": { "import": "./dist/cli.js" }
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./cli": {
+      "import": "./dist/cli.js"
+    }
   },
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "vitest run",
@@ -33,8 +42,16 @@
     "typescript": "^5.8.0",
     "vitest": "^3.0.0"
   },
-  "publishConfig": { "access": "public" },
-  "keywords": ["github-actions", "ci", "runner", "local-ci", "act-alternative"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "github-actions",
+    "ci",
+    "runner",
+    "local-ci",
+    "act-alternative"
+  ],
   "homepage": "https://github.com/plsft/gitgate#readme",
   "bugs": "https://github.com/plsft/gitgate/issues",
   "repository": {

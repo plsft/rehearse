@@ -1,6 +1,6 @@
 {
   "name": "@gitgate/ci",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Type-safe GitHub Actions pipelines in TypeScript",
   "license": "Apache-2.0",
   "type": "module",
@@ -20,7 +20,11 @@
       "types": "./dist/agent/index.d.ts"
     }
   },
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "vitest run",
@@ -34,7 +38,13 @@
   "publishConfig": {
     "access": "public"
   },
-  "keywords": ["github-actions", "ci", "typescript", "pipeline", "ubicloud"],
+  "keywords": [
+    "github-actions",
+    "ci",
+    "typescript",
+    "pipeline",
+    "ubicloud"
+  ],
   "homepage": "https://github.com/plsft/gitgate/tree/main/ts-ci#readme",
   "bugs": "https://github.com/plsft/gitgate/issues",
   "repository": {
