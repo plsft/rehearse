@@ -1,0 +1,26 @@
+name: node-matrix
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        node: ['18.x', '20.x', '22.x']
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Print version
+        run: node --version
+      - name: Tiny CPU work (deterministic)
+        run: |
+          for i in 1 2 3 4 5; do
+            node -e "let s=0;for(let j=0;j<1e7;j++)s+=Math.sqrt(j);process.stdout.write(s.toFixed(0)+'\n')"
+          done
+      - name: Smoke test
+        run: |
+          node -e "console.log('node', process.version, 'arch', process.arch, 'platform', process.platform)"
+          node --version

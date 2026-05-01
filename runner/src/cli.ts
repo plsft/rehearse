@@ -7,6 +7,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import pc from 'picocolors';
 import { run } from './orchestrator.js';
+import { watchWorkflow } from './watch.js';
 import type { BackendName } from './types.js';
 
 const program = new Command();
@@ -48,6 +49,28 @@ program
       }) + '\n');
     }
     process.exit(result.status === 'failure' ? 1 : 0);
+  });
+
+program
+  .command('watch <workflow>')
+  .description('Re-run the workflow on file changes (inner-loop dev tool)')
+  .option('-j, --job <name>', 'restrict to a single job')
+  .option('-b, --backend <type>', 'host | container | auto', 'auto')
+  .option('-p, --max-parallel <n>', 'max concurrent jobs', (v) => Number(v))
+  .option('-c, --cwd <dir>', 'working directory')
+  .option('--env-file <file>', 'load env vars from file')
+  .action(async (workflow, opts) => {
+    const env = opts.envFile ? loadEnvFile(opts.envFile) : {};
+    await watchWorkflow({
+      workflowPath: workflow,
+      cwd: opts.cwd,
+      jobFilter: opts.job,
+      backend: opts.backend === 'auto' ? 'auto' : (opts.backend as BackendName),
+      maxParallel: opts.maxParallel,
+      verbosity: 'normal',
+      env,
+      secrets: env,
+    });
   });
 
 program

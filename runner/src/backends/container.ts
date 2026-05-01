@@ -26,7 +26,8 @@ export class ContainerBackend implements Backend {
 
   async prepare(args: PrepareArgs): Promise<JobSession> {
     ensureDockerRunning();
-    const network = `runner-${args.jobId}`;
+    const safeId = args.jobId.replace(/[^A-Za-z0-9_.-]+/g, '_');
+    const network = `runner-${safeId}`;
     const services = parseServices(args.job.raw);
     const allContainers: string[] = [];
 
@@ -38,7 +39,7 @@ export class ContainerBackend implements Backend {
 
     try {
       for (const svc of services) {
-        const containerName = `runner-${args.jobId}-svc-${svc.name}`;
+        const containerName = `runner-${safeId}-svc-${svc.name}`;
         const cli: string[] = [
           'run', '-d', '--rm',
           '--name', containerName,
@@ -54,7 +55,7 @@ export class ContainerBackend implements Backend {
         await waitHealthy(containerName);
       }
 
-      const jobContainerName = `runner-${args.jobId}-job`;
+      const jobContainerName = `runner-${safeId}-job`;
       const cli: string[] = [
         'run', '-d', '--rm',
         '--name', jobContainerName,
@@ -77,8 +78,8 @@ export class ContainerBackend implements Backend {
         env: args.job.env,
         containerName: jobContainerName,
         network,
-        serviceContainers: services.map((s) => `runner-${args.jobId}-svc-${s.name}`),
-        tempDir: mkdtempSync(resolve(tmpdir(), `runner-${args.jobId}-`)),
+        serviceContainers: services.map((s) => `runner-${safeId}-svc-${s.name}`),
+        tempDir: mkdtempSync(resolve(tmpdir(), `runner-${safeId}-`)),
       };
     } catch (err) {
       // Clean up partial state on prepare failure

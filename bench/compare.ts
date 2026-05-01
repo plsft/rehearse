@@ -49,6 +49,14 @@ const TARGETS: Target[] = [
     description: 'workflow with postgres:16-alpine service',
   },
   {
+    name: 'node-matrix',
+    workflow: 'poc/fixtures/node-matrix.yml',
+    cwd: '.',
+    ourBackend: 'host',
+    actImage: 'node:22-bookworm-slim',
+    description: 'matrix [18.x, 20.x, 22.x] of CPU-bound node steps (act can run this)',
+  },
+  {
     name: 'hono-bun',
     workflow: 'poc/playground/hono/.github/workflows/ci.yml',
     cwd: 'poc/playground/hono',
@@ -57,6 +65,16 @@ const TARGETS: Target[] = [
     actSkip: true,
     actSkipReason: 'standard act images do not have bun preinstalled',
     description: 'real OSS workflow: honojs/hono bun job',
+  },
+  {
+    name: 'hono-node-matrix',
+    workflow: 'poc/playground/hono/.github/workflows/ci.yml',
+    cwd: 'poc/playground/hono',
+    job: 'node',
+    ourBackend: 'host',
+    actSkip: true,
+    actSkipReason: 'requires bun + multi-version node in image',
+    description: 'matrix over node [18.18.2, 20.x, 22.x] (3 cells, parallel for us)',
   },
 ];
 

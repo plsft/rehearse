@@ -4,6 +4,7 @@
  * pick a backend per job. Result: a flat list of PlannedJobs ready to execute.
  */
 import type { ParsedJob, ParsedStep, ParsedWorkflow } from '@gitgate/ci';
+import { expandComposite, resolveAction } from './composite.js';
 import { evalExpr } from './expression.js';
 import { cellId, expandMatrix, parseMatrix } from './matrix.js';
 import type { BackendName, ExpressionContext, PlannedJob, PlannedStep, RunOptions } from './types.js';
@@ -85,14 +86,16 @@ function stepLabel(step: ParsedStep, idx: number): string {
   return `step ${idx + 1}`;
 }
 
-function planSteps(rawSteps: ParsedStep[], ctx: ExpressionContext): PlannedStep[] {
-  return rawSteps.map((raw, index) => {
+function planSteps(rawSteps: ParsedStep[], ctx: ExpressionContext, opts: RunOptions): PlannedStep[] {
+  const repoRoot = opts.cwd ?? process.cwd();
+  const out: PlannedStep[] = [];
+  for (const [index, raw] of rawSteps.entries()) {
     const env = substituteEnv(raw.env as Record<string, string> | undefined, ctx);
     const w = substituteWith(raw.with, ctx);
     const run = substituteString(raw.run, ctx);
     const uses = substituteString(raw.uses, ctx);
     const ifCondition = raw.if ? raw.if : undefined;
-    return {
+    const planned: PlannedStep = {
       index,
       label: stepLabel(raw, index),
       raw,
@@ -105,7 +108,19 @@ function planSteps(rawSteps: ParsedStep[], ctx: ExpressionContext): PlannedStep[
       ifCondition,
       continueOnError: raw['continue-on-error'] === true,
     };
-  });
+
+    // Local composite expansion. The parent step is replaced by the
+    // action's inner steps, with `${{ inputs.x }}` substituted.
+    if (uses && (uses.startsWith('./') || uses.startsWith('.\\'))) {
+      const resolved = resolveAction(uses, repoRoot);
+      if (resolved && resolved.action.runs?.using === 'composite') {
+        out.push(...expandComposite(planned, resolved, ctx));
+        continue;
+      }
+    }
+    out.push(planned);
+  }
+  return out;
 }
 
 export function plan(workflow: ParsedWorkflow, opts: RunOptions): PlannedJob[] {
@@ -120,7 +135,7 @@ export function plan(workflow: ParsedWorkflow, opts: RunOptions): PlannedJob[] {
       const ctx = matrixContext(cell, opts);
       const id = cells.length === 1 ? jobKey : `${jobKey}:${cellId(cell)}`;
       const env = substituteEnv(rawJob.env as Record<string, string> | undefined, ctx);
-      const steps = planSteps(rawJob.steps ?? [], ctx);
+      const steps = planSteps(rawJob.steps ?? [], ctx, opts);
       const runsOn = String(Array.isArray(rawJob['runs-on']) ? rawJob['runs-on'][0] : rawJob['runs-on'] ?? 'ubuntu-latest');
       out.push({
         id,

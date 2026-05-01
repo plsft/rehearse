@@ -16,7 +16,8 @@ export class HostBackend implements Backend {
   readonly name = 'host' as const;
 
   async prepare(args: PrepareArgs): Promise<JobSession> {
-    const tempDir = mkdtempSync(resolve(tmpdir(), `runner-${args.jobId}-`));
+    const safeId = args.jobId.replace(/[^A-Za-z0-9_.-]+/g, '_');
+    const tempDir = mkdtempSync(resolve(tmpdir(), `runner-${safeId}-`));
     return {
       jobId: args.jobId,
       hostCwd: args.hostCwd,

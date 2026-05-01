@@ -24,7 +24,8 @@
     "@gitgate/ci": "workspace:*",
     "@gitgate/git-core": "workspace:*",
     "commander": "^12.1.0",
-    "picocolors": "^1.1.1"
+    "picocolors": "^1.1.1",
+    "yaml": "^2.6.1"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
