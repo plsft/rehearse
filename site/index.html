@@ -47,20 +47,21 @@
 
 <!-- ============== HERO ============== -->
 <section class="bg-grid pt-36 pb-20 relative">
-  <div class="max-w-6xl mx-auto px-5 grid lg:grid-cols-12 gap-10 items-center">
-    <div class="lg:col-span-7">
+  <div class="max-w-6xl mx-auto px-5">
+    <!-- Pitch text -->
+    <div class="max-w-3xl">
       <div class="tag mb-5"><span class="w-1.5 h-1.5 rounded-full bg-[var(--gg-accent)] inline-block"></span> public alpha · Apache 2.0</div>
       <h1 class="text-4xl sm:text-5xl lg:text-[3.7rem] leading-[1.04] font-semibold tracking-tight gradient-text">
-        Stop pushing<br/>CI failures.
+        Stop pushing CI failures.
       </h1>
-      <p class="mt-6 text-lg text-[var(--gg-muted)] max-w-xl">
+      <p class="mt-6 text-lg text-[var(--gg-muted)] max-w-2xl">
         GitGate runs your <code class="font-mono text-white/90">.github/workflows/*.yml</code> on your laptop, in
         <span class="text-white">seconds</span>. Catch the failure before the
         push. Same YAML. Same outcome. <span class="accent-text font-semibold">5–13× faster than <code class="font-mono">act</code></span> on real workflows.
       </p>
 
       <!-- Install command -->
-      <div id="install" class="term mt-8 max-w-xl">
+      <div id="install" class="term mt-8 max-w-2xl">
         <div class="term-header">
           <span class="term-dot dot-r"></span>
           <span class="term-dot dot-y"></span>
@@ -98,38 +99,36 @@
       </div>
     </div>
 
-    <!-- Hero terminal demo -->
-    <div class="lg:col-span-5">
-      <div class="term">
-        <div class="term-header">
-          <span class="term-dot dot-r"></span>
-          <span class="term-dot dot-y"></span>
-          <span class="term-dot dot-g"></span>
-          <span class="term-title">$ gitgate run .github/workflows/ci.yml</span>
-        </div>
-        <div class="term-body">
-<pre class="whitespace-pre overflow-x-auto"><span class="comment"># gitgate · CI</span>
+    <!-- Demo terminal — full container width so the output never wraps. -->
+    <div class="mt-14 term">
+      <div class="term-header">
+        <span class="term-dot dot-r"></span>
+        <span class="term-dot dot-y"></span>
+        <span class="term-dot dot-g"></span>
+        <span class="term-title">$ gitgate run .github/workflows/ci.yml</span>
+      </div>
+      <div class="term-body">
+<pre class="whitespace-pre"><span class="comment"># gitgate · CI</span>
 <span class="comment">workflow: .github/workflows/ci.yml</span>
 <span class="comment">jobs:     2  (parallel ≤ 4)</span>
 
-<span class="ok">▶</span> <span class="text-white">job: typecheck</span> <span class="comment">(host · ubicloud-standard-4)</span>
-  <span class="ok">⊘</span> Checkout                        <span class="comment">host has the repo</span>
-  <span class="ok">⊘</span> Setup pnpm                      <span class="comment">host has pnpm</span>
-  <span class="ok">⊘</span> Setup Node 22                   <span class="comment">host has node v22.19.0</span>
-  <span class="ok">✓</span> Install                         <span class="comment">1.40s</span>
-  <span class="ok">✓</span> Typecheck                       <span class="comment">3.18s</span>
+<span class="ok">▶</span> <span class="text-white">job: typecheck</span>  <span class="comment">(host · ubicloud-standard-4)</span>
+  <span class="ok">⊘</span> Checkout                                  <span class="comment">host has the repo</span>
+  <span class="ok">⊘</span> Setup pnpm                                <span class="comment">host has pnpm</span>
+  <span class="ok">⊘</span> Setup Node 22                             <span class="comment">host has node v22.19.0</span>
+  <span class="ok">✓</span> Install                                   <span class="comment">1.40s</span>
+  <span class="ok">✓</span> Typecheck                                 <span class="comment">3.18s</span>
 
-<span class="ok">▶</span> <span class="text-white">job: test</span> <span class="comment">(host · ubicloud-standard-4)</span>
-  <span class="ok">✓</span> Test ts-ci                      <span class="comment">1.13s</span>
-  <span class="ok">✓</span> Test git-engine                 <span class="comment">3.71s</span>
+<span class="ok">▶</span> <span class="text-white">job: test</span>  <span class="comment">(host · ubicloud-standard-4)</span>
+  <span class="ok">✓</span> Test ts-ci                                <span class="comment">1.13s</span>
+  <span class="ok">✓</span> Test git-engine                           <span class="comment">3.71s</span>
 
-────────────────────────────────────────────────
-<span class="text-white">CI</span>  <span class="ok">PASS</span>  <span class="num">9.09s</span>  <span class="comment">(202 tests, 2 jobs in parallel)</span><span class="cursor"></span></pre>
-        </div>
+────────────────────────────────────────────────────────────────────────
+<span class="text-white">CI</span>  <span class="ok">PASS</span>  <span class="num">9.09s</span>  <span class="comment">(202 tests · 2 jobs in parallel)</span><span class="cursor"></span></pre>
       </div>
-      <div class="mt-3 text-[12px] font-mono text-[var(--gg-muted)] text-right">
-        actual output · same workflow takes ~50–110s on GitHub-hosted runners
-      </div>
+    </div>
+    <div class="mt-3 text-[12px] font-mono text-[var(--gg-muted)] text-right">
+      actual output · same workflow takes ~50–110s on GitHub-hosted runners
     </div>
   </div>
 </section>
