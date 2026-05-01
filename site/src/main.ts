@@ -17,7 +17,7 @@ interface HeroDemoState {
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 /**
- * Simulated `gitgate run` output for the hero terminal.
+ * Simulated `runner run` output for the hero terminal.
  *
  * Animates the run line-by-line in compressed real-ish time. Steps that
  * are in progress show a pulsing `▸` and update to `✓` when their

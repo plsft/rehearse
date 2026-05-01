@@ -23,15 +23,22 @@ This package is the orchestrator. The pieces it composes:
 ## Install
 
 ```bash
-# Inside this repo, as a workspace package — already wired in.
-pnpm install
-pnpm --filter @gitgate/runner build
+# As a global tool
+npm install -g @gitgate/runner
+# or pnpm / bun
+pnpm add -g @gitgate/runner
+bun add -g @gitgate/runner
+
+# Verify
+runner --version
 ```
+
+The package installs a single binary called `runner`.
 
 ## CLI
 
 ```bash
-node runner/dist/cli.js run <workflow.yml> [options]
+runner run <workflow.yml> [options]
 
 Options:
   -j, --job <name>        run only this job (matrix variants of it still all run)

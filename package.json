@@ -1,8 +1,14 @@
 {
-  "name": "gitgate",
+  "name": "gitgate-monorepo",
   "version": "0.1.0",
   "private": true,
-  "description": "GitGate — TypeScript CI SDK and agent governance platform",
+  "description": "GitGate — local-first runner for GitHub Actions workflows",
+  "homepage": "https://github.com/plsft/gitgate#readme",
+  "bugs": "https://github.com/plsft/gitgate/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/plsft/gitgate.git"
+  },
   "type": "module",
   "scripts": {
     "build": "turbo build",

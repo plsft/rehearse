@@ -34,5 +34,13 @@
   "publishConfig": {
     "access": "public"
   },
-  "keywords": ["github-actions", "ci", "typescript", "pipeline", "ubicloud"]
+  "keywords": ["github-actions", "ci", "typescript", "pipeline", "ubicloud"],
+  "homepage": "https://github.com/plsft/gitgate/tree/main/ts-ci#readme",
+  "bugs": "https://github.com/plsft/gitgate/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/plsft/gitgate.git",
+    "directory": "ts-ci"
+  },
+  "author": "plsft"
 }

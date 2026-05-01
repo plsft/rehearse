@@ -36,5 +36,13 @@
     "packfile",
     "typescript",
     "cloudflare-workers"
-  ]
+  ],
+  "homepage": "https://github.com/plsft/gitgate/tree/main/git-engine#readme",
+  "bugs": "https://github.com/plsft/gitgate/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/plsft/gitgate.git",
+    "directory": "git-engine"
+  },
+  "author": "plsft"
 }

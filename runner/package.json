@@ -34,5 +34,13 @@
     "vitest": "^3.0.0"
   },
   "publishConfig": { "access": "public" },
-  "keywords": ["github-actions", "ci", "runner", "local-ci", "act-alternative"]
+  "keywords": ["github-actions", "ci", "runner", "local-ci", "act-alternative"],
+  "homepage": "https://github.com/plsft/gitgate#readme",
+  "bugs": "https://github.com/plsft/gitgate/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/plsft/gitgate.git",
+    "directory": "runner"
+  },
+  "author": "plsft"
 }

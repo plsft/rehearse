@@ -1,13 +1,20 @@
 /**
- * npm release — fired on tags matching `v*`. Publishes the three OSS packages
- * (@gitgate/ci, @gitgate/git-core, gg) using NPM_TOKEN. Uses the tag itself as
- * the version source — verify against package.json before tagging.
+ * npm release — fires on tags matching `v*`. Publishes the four OSS
+ * packages under the `@gitgate` scope using `NPM_TOKEN` (configured as a
+ * GitHub Actions secret in github.com/plsft/gitgate).
  *
- * To cut a release:
- *   pnpm --filter @gitgate/ci version 0.2.0
+ * Cut a release:
+ *   pnpm --filter @gitgate/runner version 0.2.0
  *   git tag v0.2.0 && git push --tags
  */
 import { Runner, job, pipeline, secrets, step, triggers } from '@gitgate/ci';
+
+const PACKAGES = [
+  '@gitgate/git-core', // no internal deps — publish first
+  '@gitgate/ci',
+  '@gitgate/cli', // depends on @gitgate/ci
+  '@gitgate/runner', // depends on @gitgate/ci + @gitgate/git-core
+] as const;
 
 export const release = pipeline('Release', {
   triggers: [triggers.push({ tags: ['v*'] })],
@@ -19,28 +26,21 @@ export const release = pipeline('Release', {
         step.checkout({ fetchDepth: 0 }),
         step.action('pnpm/action-setup@v4', { with: { version: '9.15.0' }, name: 'Setup pnpm' }),
         step.action('actions/setup-node@v4', {
-          with: { 'node-version': '22', cache: 'pnpm', 'registry-url': 'https://registry.npmjs.org' },
+          with: {
+            'node-version': '22',
+            cache: 'pnpm',
+            'registry-url': 'https://registry.npmjs.org',
+          },
           name: 'Setup Node 22',
         }),
         step.run('pnpm install --frozen-lockfile', { name: 'Install' }),
-        step.run('pnpm --filter @gitgate/git-core build', { name: 'Build @gitgate/git-core' }),
-        step.run('pnpm --filter @gitgate/ci build', { name: 'Build @gitgate/ci' }),
-        step.run('pnpm --filter gg build', { name: 'Build gg' }),
-        step.run(
-          'pnpm --filter @gitgate/git-core publish --access public --no-git-checks',
-          {
-            name: 'Publish @gitgate/git-core',
+        step.run('pnpm turbo build', { name: 'Build all packages' }),
+        ...PACKAGES.map((name) =>
+          step.run(`pnpm --filter ${name} publish --access public --no-git-checks`, {
+            name: `Publish ${name}`,
             env: { NODE_AUTH_TOKEN: secrets('NPM_TOKEN') },
-          },
+          }),
         ),
-        step.run('pnpm --filter @gitgate/ci publish --access public --no-git-checks', {
-          name: 'Publish @gitgate/ci',
-          env: { NODE_AUTH_TOKEN: secrets('NPM_TOKEN') },
-        }),
-        step.run('pnpm --filter gg publish --access public --no-git-checks', {
-          name: 'Publish gg',
-          env: { NODE_AUTH_TOKEN: secrets('NPM_TOKEN') },
-        }),
       ],
     }),
   ],

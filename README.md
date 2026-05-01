@@ -1,89 +1,125 @@
-# Local-first runner for GitHub Actions
+# GitGate
 
 > **Stop pushing CI failures.** Run your `.github/workflows/*.yml` locally
 > before you push. Same YAML, same outcome, in tens of seconds.
 
-This repo is a working set of POCs validating the wedge:
-**run an unmodified GitHub Actions workflow on a developer laptop, fast.**
+GitGate is a local-first runner for GitHub Actions workflows. It reads your
+existing `.github/workflows/*.yml` and executes them on your laptop with two
+backends — host (subprocess, fast) and container (Docker, with services and
+parity). Free, Apache 2.0, source on `github.com/plsft/gitgate`.
 
-It is not yet a shipping product. The work is being staged across three POCs
-that together prove the speed and compatibility claims.
+This is a single-developer, alpha-quality project. There is no hosted
+service, no paid tier, no API. Just a CLI you install via npm.
 
-## Status
+## Quick start
 
-| | What | Result |
-| --- | --- | --- |
-| ✅ POC #1 | Localhost runner against our own CI | 16.86s end-to-end (3 jobs, 16 steps) |
-| ✅ POC #2 | Compatibility audit of real OSS workflows | hono 94.4%, vite 96.2% of steps executable |
-| ✅ POC #2b | Real run of `honojs/hono` `bun` job | 9.27s warm vs ~120s on GitHub (~13×) |
-| ✅ POC #3 | Container backend with `services: postgres` | 20.12s warm vs ~75s on GitHub (~3.75×) |
-| 🟡 next | Matrix expansion, parallel job scheduler | — |
-| 🟡 next | Real runner package (replace POCs) | — |
-| 🟡 next | Pre-commit / pre-push hook integration | — |
+```bash
+npm install -g @gitgate/runner
 
-See [`poc/RESULTS.md`](poc/RESULTS.md) for the speed numbers and methodology.
+# inside any repo with a .github/workflows/*.yml
+runner run .github/workflows/ci.yml
+runner watch .github/workflows/ci.yml          # re-run on save
+runner install-hook                            # pre-push git hook
+```
+
+## Numbers
+
+Head-to-head against [`nektos/act`](https://github.com/nektos/act) on a
+Windows 11 laptop, warm runs:
+
+| Target | GitGate | act | Speedup |
+| --- | ---: | ---: | ---: |
+| typecheck + 202 tests, 2 parallel jobs | **9.09s** | 30.28s | **3.33×** |
+| node matrix `[18.x, 20.x, 22.x]` | **4.63s** | 24.55s | **5.30×** |
+| `services: postgres:16-alpine` | **20.50s** | timeout (>360s) | act fails |
+| real OSS workflow (honojs/hono `bun` job) | **6.09s** | n/a (act lacks bun) | — |
+
+Full methodology and reproducibility instructions in
+[`bench/RESULTS.md`](bench/RESULTS.md). Cold-vs-cold is much narrower —
+a fresh `pnpm install` dominates everything; the wedge is the warm dev
+pre-push loop.
 
 ## Repo layout
 
 ```
-ts-ci/         — TypeScript SDK that parses + compiles GitHub Actions YAML
-                 (Apache 2.0, npm: @gitgate/ci)
-git-engine/    — Pure-TypeScript git protocol implementation
-                 (Apache 2.0, npm: @gitgate/git-core)
-cli/           — `gg` CLI: compile/init/convert/validate/watch/estimate
-poc/           — Single-file proofs (this is the active surface)
-  run-workflow.ts   — POC #1: localhost backend
-  2-compat.ts       — POC #2: compatibility analyzer
-  3-container.ts    — POC #3: Docker container backend with services
-  fixtures/         — real workflows from hono, vite, plus our own
-  RESULTS.md        — numbers + methodology
-old/           — pre-pivot code kept for reference; not in workspace
+runner/        — @gitgate/runner    — the CLI (binary: `runner`)
+ts-ci/         — @gitgate/ci         — author workflows in TypeScript
+git-engine/    — @gitgate/git-core   — pure-TypeScript git protocol
+cli/           — @gitgate/cli        — `gg` CLI (compile / convert TS pipelines)
+bench/         — runner-vs-act bench harness + results
+poc/           — single-file proofs that informed the runner architecture
+old/           — pre-pivot code, frozen for reference
 .gitgate/      — TypeScript source for this repo's own CI
 .github/       — generated workflow YAML (do not edit by hand)
 ```
 
-## Run the POCs
+## What's supported today
+
+- `run:` steps with `bash` / `pwsh` / `cmd`
+- `uses:` for the top ~15 most-popular actions in-process
+  (checkout, setup-node/python/go/bun, cache, artifacts)
+- `services:` with health checks (Docker network alias wired correctly)
+- `strategy.matrix` (variables × include − exclude)
+- `needs:` with parallel scheduling (across distinct jobs)
+- `if:` on jobs and steps — useful subset of the expression language
+- Local composite actions (`./.github/actions/*`)
+- `${{ matrix… }}`, `${{ env… }}`, `${{ secrets… }}`, `${{ runner… }}`,
+  `${{ needs.<job>.outputs.<n> }}`, `${{ steps.<id>.outputs.<n> }}`,
+  `${{ github.* }}` (subset)
+
+## Known gaps
+
+- **Per-cell matrix workspace isolation** — cells share the host workspace,
+  so they currently run *sequentially* to avoid races on writes (e.g.
+  `coverage/.tmp`). Per-cell git-worktree is on the roadmap and will let
+  cells run in parallel.
+- **JS-action runtime** — composite is supported; `runs.using: node20`
+  actions still skip with a documented "no shim" reason.
+- **Real `actions/upload-artifact` / `download-artifact`** — currently
+  no-op shims. Local-fs implementation is straightforward; not yet wired.
+- **Reusable workflows** (`uses: ./.github/workflows/foo.yml`).
+- **Remote composite actions** (`org/repo/path@ref` — needs git fetch).
+- **OIDC** / `id-token: write`.
+- **`concurrency:` cancellation**.
+
+The roadmap lives on the GitHub issues for the repo.
+
+## Local development
 
 ```bash
+# Requires Node 22+ and pnpm 9+
 pnpm install
-
-# POC #1 — run our own CI on the host
-pnpm tsx poc/run-workflow.ts .github/workflows/ci.yml
-
-# POC #2 — audit any workflow's compatibility
-pnpm tsx poc/2-compat.ts poc/fixtures/hono-ci.yml
-
-# POC #2b — run a real OSS workflow
-git clone --depth 1 https://github.com/honojs/hono.git poc/playground/hono
-pnpm tsx poc/run-workflow.ts poc/playground/hono/.github/workflows/ci.yml bun
-
-# POC #3 — container backend with postgres (requires Docker running)
-pnpm tsx poc/3-container.ts poc/fixtures/service-postgres.yml
+pnpm turbo typecheck       # passes across all 5 workspace packages
+pnpm turbo test             # 264 tests passing
+pnpm --filter @gitgate/runner build
+node runner/dist/cli.js run .github/workflows/ci.yml
 ```
 
-## Speed claim, honestly
+To reproduce the benchmark vs `act`:
 
-The wedge is real but the numbers depend on cache state. The defensible
-public claim today is:
+```bash
+git clone --depth 1 https://github.com/honojs/hono.git poc/playground/hono
+docker pull node:22-bookworm-slim postgres:16-alpine catthehacker/ubuntu:act-latest
+pnpm tsx bench/compare.ts --skip-cold
+```
 
-- **5–13× faster on the warm pre-push loop** — developer's `node_modules`
-  already on disk; we skip VM boot, queue, and fresh install
-- **~3–4× faster for jobs that need containers** (postgres, redis), once
-  images are pulled
-- **~1.5× faster vs cold-cache CI**, because a fresh `pnpm install` /
-  `bun install` is the dominant cost on both ends
+## Open source
 
-The win is the dev pre-push loop, not replacing CI runners.
+All packages are Apache 2.0, published under the `@gitgate` npm scope.
 
-## What's open source
+| Package | Path | What it does |
+| --- | --- | --- |
+| `@gitgate/runner` | [`runner/`](runner) | The local-first runner CLI |
+| `@gitgate/ci` | [`ts-ci/`](ts-ci) | Author workflows in TypeScript |
+| `@gitgate/git-core` | [`git-engine/`](git-engine) | Pure-TypeScript git protocol |
+| `@gitgate/cli` | [`cli/`](cli) | `gg` — compile / convert TS pipelines |
 
-`ts-ci` and `git-engine` are Apache 2.0 and publishable to npm as
-`@gitgate/ci` and `@gitgate/git-core`. See [`LICENSING.md`](LICENSING.md).
-The runner itself, when it ships as a standalone package, will also be
-Apache 2.0.
+## License
 
-## Naming
+Apache 2.0 across the board. See [`LICENSE`](LICENSE) and individual
+package directories for the per-package copies.
 
-The product doesn't have a name yet. Don't ship one until the runner is
-measurably faster than `act` on three real workflows including one with
-containers.
+## Contributing
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md). Issues and PRs welcome at
+<https://github.com/plsft/gitgate>.

@@ -32,12 +32,8 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: Install
         run: pnpm install --frozen-lockfile
-      - name: 'Build @gitgate/git-core'
-        run: 'pnpm --filter @gitgate/git-core build'
-      - name: 'Build @gitgate/ci'
-        run: 'pnpm --filter @gitgate/ci build'
-      - name: Build gg
-        run: pnpm --filter gg build
+      - name: Build all packages
+        run: pnpm turbo build
       - name: 'Publish @gitgate/git-core'
         run: 'pnpm --filter @gitgate/git-core publish --access public --no-git-checks'
         env:
@@ -46,7 +42,11 @@ jobs:
         run: 'pnpm --filter @gitgate/ci publish --access public --no-git-checks'
         env:
           NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
-      - name: Publish gg
-        run: pnpm --filter gg publish --access public --no-git-checks
+      - name: 'Publish @gitgate/cli'
+        run: 'pnpm --filter @gitgate/cli publish --access public --no-git-checks'
+        env:
+          NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
+      - name: 'Publish @gitgate/runner'
+        run: 'pnpm --filter @gitgate/runner publish --access public --no-git-checks'
         env:
           NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'

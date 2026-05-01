@@ -1,7 +1,7 @@
 {
-  "name": "gg",
+  "name": "@gitgate/cli",
   "version": "0.1.0",
-  "description": "GitGate CLI — compile TypeScript pipelines and inspect agent governance",
+  "description": "GitGate CLI — compile and convert TypeScript GitHub Actions pipelines (gg)",
   "license": "Apache-2.0",
   "type": "module",
   "bin": {
@@ -26,5 +26,14 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "keywords": ["github-actions", "ci", "typescript", "pipeline", "cli"],
+  "homepage": "https://github.com/plsft/gitgate/tree/main/cli#readme",
+  "bugs": "https://github.com/plsft/gitgate/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/plsft/gitgate.git",
+    "directory": "cli"
+  },
+  "author": "plsft"
 }
