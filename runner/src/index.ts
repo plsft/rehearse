@@ -9,6 +9,7 @@ export { LocalCache } from './cache.js';
 export { LocalArtifacts } from './artifacts.js';
 export { compat, printReport } from './compat.js';
 export { isJsActionUses, parseGithubOutput } from './js-action.js';
+export { isReusableWorkflowUse, expandReusable } from './reusable.js';
 export { createWorktree, isGitRepo, pruneWorktrees } from './worktree.js';
 export type {
   Backend,

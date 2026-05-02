@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
+import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { runCompile } from './commands/ci/compile.js';
 import { runConvert } from './commands/ci/convert.js';
 import { runEstimate } from './commands/ci/estimate.js';
@@ -7,11 +10,21 @@ import { runInit } from './commands/ci/init.js';
 import { runValidate } from './commands/ci/validate.js';
 import { runWatch } from './commands/ci/watch.js';
 
+function readPackageVersion(): string {
+  try {
+    const here = dirname(fileURLToPath(import.meta.url));
+    const pkg = JSON.parse(readFileSync(resolve(here, '..', 'package.json'), 'utf-8')) as { version?: string };
+    return pkg.version ?? '0.0.0';
+  } catch {
+    return '0.0.0';
+  }
+}
+
 const program = new Command();
 program
   .name('gg')
   .description('TypeScript pipelines for GitHub Actions')
-  .version('0.1.0');
+  .version(readPackageVersion());
 
 const ci = program.command('ci').description('Compile and manage TypeScript pipelines');
 ci.command('compile')

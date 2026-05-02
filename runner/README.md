@@ -88,14 +88,17 @@ you only get host-backend execution.
 - `run:` steps in `bash` / `pwsh` / `cmd`
 - Top ~15 actions in-process: `checkout`, `setup-node`/`python`/`go`/`bun`,
   `cache`, `upload-artifact`, `download-artifact`
-- **JS actions** (`runs.using: node20|18|16`) — clones the action at the
-  requested ref, runs the entrypoint with the standard `INPUT_*` /
-  `GITHUB_OUTPUT` / `GITHUB_ENV` env contract
-- **Local composite actions** (`./.github/actions/*`) — inlined with
-  `${{ inputs.x }}` substitution
+- **JS actions** (`runs.using: node20|18|16`) — auto-cloned at the
+  requested ref, run with the standard `INPUT_*` / `GITHUB_OUTPUT` /
+  `GITHUB_ENV` env contract
+- **Composite actions, local and remote** (`./.github/actions/*` and
+  `owner/repo[/sub-path]@ref`) — inlined with `${{ inputs.x }}` substitution
+- **Local reusable workflows** (`uses: ./.github/workflows/foo.yml` at the
+  job level) — caller's `with:` and `secrets:` substitute into the called
+  workflow's `inputs.*` / `secrets.*` references
 - `services:` with health-check waits and a private Docker network alias
 - `strategy.matrix` — cartesian product, `include`, `exclude`. **Cells run
-  in parallel via per-cell `git worktree`** (since v0.2.0)
+  in parallel via per-cell `git worktree`**
 - `needs:` with parallel scheduling
 - `if:` on jobs and steps (useful expression-language subset)
 - `actions/cache` semantics on local fs (exact-key + restore-key
@@ -104,12 +107,10 @@ you only get host-backend execution.
 
 ## What's not supported yet
 
-- Reusable workflows (`uses: ./.github/workflows/foo.yml`)
-- Remote composite actions (`org/repo/path@ref`)
+- Remote reusable workflows (`org/repo/.github/workflows/foo.yml@ref`) — local form works
+- Docker actions (`runs.using: docker`) — JS-action runtime ships; Docker-action runtime doesn't yet
 - OIDC / `id-token: write`
 - `concurrency:` group cancellation
-- Docker actions (`runs.using: docker`) — the JS-action runtime works;
-  Docker actions are different and not yet hooked up
 
 ## Programmatic API
 

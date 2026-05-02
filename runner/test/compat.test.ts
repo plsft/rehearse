@@ -49,7 +49,7 @@ jobs:
     expect(r.coverage).toBe(0);
   });
 
-  it('flags local composite actions distinctly', () => {
+  it('classifies local composite actions as supported', () => {
     const r = compat(workflow(`
 name: ci
 on: workflow_dispatch
@@ -59,7 +59,10 @@ jobs:
     steps:
       - uses: ./.github/actions/perf
 `));
-    expect(r.byClass['uses-local']).toBe(1);
+    // Local composites are now executed (not just flagged for review),
+    // so they count as supported toward overall coverage.
+    expect(r.byClass['uses-supported']).toBe(1);
+    expect(r.byClass['uses-local']).toBe(0);
   });
 
   it('reports matrix and services flags per job', () => {

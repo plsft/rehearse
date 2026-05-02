@@ -60,6 +60,14 @@ const SUPPORTED_USES: Record<string, string> = {
   'actions/download-artifact': 'local fs (.runner/artifacts/)',
 };
 
+/**
+ * Patterns that are now supported via remote-action runtime (cloned at
+ * ref). Anything matching these is classified as `uses-supported`
+ * rather than `uses-unsupported`. We can't enumerate every JS action
+ * by name, so we accept any well-formed `owner/repo@ref`.
+ */
+const REMOTE_USES_REGEX = /^[^/]+\/[^/@]+(?:\/[^@]+)?@[\w./-]+$/;
+
 const UNSUPPORTED_USES: Record<string, string> = {
   'codecov/codecov-action': 'external service upload — no-op locally',
   'actions/github-script': 'GitHub API — needs real GITHUB_TOKEN',
@@ -88,12 +96,17 @@ function classifyStep(step: ParsedStep, idx: number, defaultBackend: Backend): S
   if (step.uses) {
     const name = actionName(step.uses);
     if (name.startsWith('./')) {
-      return { index: idx, label, class: 'uses-local', reason: `local composite: ${name}`, backend: defaultBackend, features };
+      return { index: idx, label, class: 'uses-supported', reason: `local composite: ${name}`, backend: defaultBackend, features };
     }
     if (KNOWN_NOOP[name]) return { index: idx, label, class: 'uses-noop', reason: KNOWN_NOOP[name], backend: defaultBackend, features };
     if (SUPPORTED_USES[name]) return { index: idx, label, class: 'uses-supported', reason: SUPPORTED_USES[name], backend: defaultBackend, features };
     if (UNSUPPORTED_USES[name]) return { index: idx, label, class: 'uses-unsupported', reason: UNSUPPORTED_USES[name], backend: defaultBackend, features };
-    return { index: idx, label, class: 'uses-unsupported', reason: `unknown action: ${name}`, backend: defaultBackend, features };
+    // Any well-formed remote `owner/repo@ref` — handled by the JS-action
+    // runtime + remote-composite resolver as of v0.2.0+.
+    if (REMOTE_USES_REGEX.test(step.uses)) {
+      return { index: idx, label, class: 'uses-supported', reason: `remote action (JS or composite at ref)`, backend: defaultBackend, features };
+    }
+    return { index: idx, label, class: 'uses-unsupported', reason: `malformed uses: ${step.uses}`, backend: defaultBackend, features };
   }
 
   if (step.run) {

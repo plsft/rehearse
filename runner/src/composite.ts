@@ -41,13 +41,20 @@ export interface CompositeAction {
 }
 
 export interface ResolvedAction {
-  source: 'local';
+  source: 'local' | 'remote';
   path: string;
   action: CompositeAction;
+  ref?: string;
 }
 
-/** Locate an action.yml file from a `uses:` reference, relative to repo root. */
+/** Locate an action.yml file from a `uses:` reference. */
 export function resolveAction(uses: string, repoRoot: string): ResolvedAction | null {
+  // Remote composite — reuse js-action's resolver since it already
+  // git-clones the action repo at the requested ref. We just inspect
+  // the resulting action.yml for `runs.using: composite`.
+  if (!(uses.startsWith('./') || uses.startsWith('.\\'))) {
+    return resolveRemote(uses, repoRoot);
+  }
   if (uses.startsWith('./') || uses.startsWith('.\\')) {
     const dir = resolve(repoRoot, uses);
     for (const candidate of ['action.yml', 'action.yaml']) {
@@ -59,6 +66,46 @@ export function resolveAction(uses: string, repoRoot: string): ResolvedAction | 
         } catch {
           return null;
         }
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Resolve a remote `uses: owner/repo[/sub-path]@ref` reference. Reuses
+ * the same shallow-clone cache the JS-action runtime uses
+ * (`.runner/actions/<slug>/`) so a single composite + JS action repo
+ * is only fetched once.
+ */
+function resolveRemote(uses: string, repoRoot: string): ResolvedAction | null {
+  const m = /^([^/]+)\/([^/@]+)(?:\/([^@]+))?@([\w./-]+)$/.exec(uses);
+  if (!m) return null;
+  const [, owner, repo, subPath, ref] = m;
+  const slug = `${owner}__${repo}__${ref}`.replace(/[^A-Za-z0-9_.-]+/g, '_');
+  const cacheDir = resolve(repoRoot, '.runner', 'actions', slug);
+
+  if (!existsSync(cacheDir)) {
+    const { spawnSync } = require('node:child_process') as typeof import('node:child_process');
+    const url = `https://github.com/${owner}/${repo}.git`;
+    const r = spawnSync('git', ['clone', '--depth', '1', '--branch', ref!, url, cacheDir], { encoding: 'utf-8' });
+    if (r.status !== 0) {
+      // Try full clone + checkout for SHA refs
+      spawnSync('git', ['clone', url, cacheDir], { encoding: 'utf-8' });
+      const co = spawnSync('git', ['checkout', ref!], { cwd: cacheDir, encoding: 'utf-8' });
+      if (co.status !== 0) return null;
+    }
+  }
+
+  const actionRoot = subPath ? resolve(cacheDir, subPath) : cacheDir;
+  for (const candidate of ['action.yml', 'action.yaml']) {
+    const p = resolve(actionRoot, candidate);
+    if (existsSync(p)) {
+      try {
+        const action = parseYaml(readFileSync(p, 'utf-8')) as CompositeAction;
+        return { source: 'remote', path: actionRoot, action, ref };
+      } catch {
+        return null;
       }
     }
   }

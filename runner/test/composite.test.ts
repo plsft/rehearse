@@ -47,8 +47,12 @@ runs:
     expect(resolveAction('./.github/actions/missing', repo)).toBeNull();
   });
 
-  it('returns null for remote refs', () => {
-    expect(resolveAction('actions/checkout@v4', repo)).toBeNull();
+  it('returns null for malformed refs', () => {
+    expect(resolveAction('not-a-valid-uses', repo)).toBeNull();
+  });
+  it('returns null for remote refs to repos that 404 (no network in test)', () => {
+    // Bogus owner/repo so the git-clone fails fast and returns null.
+    expect(resolveAction('this-org-does-not-exist-9z9z9/nor-this-repo@v999', repo)).toBeNull();
   });
 });
 

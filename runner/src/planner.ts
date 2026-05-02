@@ -7,6 +7,7 @@ import type { ParsedJob, ParsedStep, ParsedWorkflow } from '@gitgate/ci';
 import { expandComposite, resolveAction } from './composite.js';
 import { evalExpr } from './expression.js';
 import { cellId, expandMatrix, parseMatrix } from './matrix.js';
+import { expandReusable, isReusableWorkflowUse } from './reusable.js';
 import type { BackendName, ExpressionContext, PlannedJob, PlannedStep, RunOptions } from './types.js';
 
 /** Build an ExpressionContext stub good enough for matrix-time substitution. */
@@ -109,9 +110,11 @@ function planSteps(rawSteps: ParsedStep[], ctx: ExpressionContext, opts: RunOpti
       continueOnError: raw['continue-on-error'] === true,
     };
 
-    // Local composite expansion. The parent step is replaced by the
-    // action's inner steps, with `${{ inputs.x }}` substituted.
-    if (uses && (uses.startsWith('./') || uses.startsWith('.\\'))) {
+    // Composite-action expansion (local or remote). The parent step is
+    // replaced by the action's inner steps, with `${{ inputs.x }}`
+    // substituted from the parent's `with:`. Remote composites are
+    // git-cloned to .runner/actions/<slug>/ on first use.
+    if (uses) {
       const resolved = resolveAction(uses, repoRoot);
       if (resolved && resolved.action.runs?.using === 'composite') {
         out.push(...expandComposite(planned, resolved, ctx));
@@ -124,8 +127,26 @@ function planSteps(rawSteps: ParsedStep[], ctx: ExpressionContext, opts: RunOpti
 }
 
 export function plan(workflow: ParsedWorkflow, opts: RunOptions): PlannedJob[] {
-  const out: PlannedJob[] = [];
+  const repoRoot = opts.cwd ?? process.cwd();
+  // Pre-pass: expand any job-level `uses:` (reusable workflows) into the
+  // caller's job dictionary. We do this before matrix expansion so the
+  // expanded jobs themselves can have matrix strategies.
+  const flat: Record<string, ParsedJob> = {};
   for (const [jobKey, rawJob] of Object.entries(workflow.jobs)) {
+    const j = rawJob as ParsedJob & { uses?: string };
+    if (isReusableWorkflowUse(j.uses)) {
+      const expansion = expandReusable(jobKey, j as never, repoRoot, opts.secrets ?? {});
+      if (expansion) {
+        for (const [k, v] of Object.entries(expansion.jobs)) flat[k] = v;
+        continue;
+      }
+      // Fall through if expansion failed — surfaces as 'no steps' below.
+    }
+    flat[jobKey] = rawJob;
+  }
+
+  const out: PlannedJob[] = [];
+  for (const [jobKey, rawJob] of Object.entries(flat)) {
     if (opts.jobFilter && opts.jobFilter !== jobKey) continue;
     const matrix = parseMatrix(rawJob.strategy?.matrix);
     const cells = expandMatrix(matrix);

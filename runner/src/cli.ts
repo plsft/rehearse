@@ -4,19 +4,32 @@
  */
 import { Command } from 'commander';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import pc from 'picocolors';
 import { compat, printReport } from './compat.js';
 import { run } from './orchestrator.js';
 import { watchWorkflow } from './watch.js';
 import type { BackendName } from './types.js';
 
+// Read the version from our own package.json at runtime so `runner --version`
+// always matches what's installed (vs hardcoding a string that drifts).
+function readPackageVersion(): string {
+  try {
+    const here = dirname(fileURLToPath(import.meta.url));
+    const pkg = JSON.parse(readFileSync(resolve(here, '..', 'package.json'), 'utf-8')) as { version?: string };
+    return pkg.version ?? '0.0.0';
+  } catch {
+    return '0.0.0';
+  }
+}
+
 const program = new Command();
 
 program
   .name('runner')
   .description('Local-first runner for GitHub Actions workflows')
-  .version('0.1.0');
+  .version(readPackageVersion());
 
 program
   .command('run <workflow>', { isDefault: true })

@@ -92,7 +92,7 @@
         <span><span class="ok">●</span> No new config</span>
         <span><span class="ok">●</span> Host + container backends</span>
         <span><span class="ok">●</span> Matrix + services</span>
-        <span><span class="ok">●</span> 94% of real workflows just work</span>
+        <span><span class="ok">●</span> 97% of real workflows just work</span>
       </div>
     </div>
 
@@ -404,7 +404,7 @@
   <div class="max-w-6xl mx-auto px-5">
     <div class="max-w-3xl">
       <div class="eyebrow">// Compatibility</div>
-      <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">94% of real workflows just work.</h2>
+      <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">97% of real workflows just work.</h2>
       <p class="mt-4 text-lg text-[var(--gg-muted)]">
         We audited the public CI of two large OSS projects. The rest is
         documented and tracked.
@@ -421,7 +421,7 @@
         <div class="mt-2 text-sm text-[var(--gg-muted)]"><a href="https://github.com/vitejs/vite" class="link">vitejs/vite</a> ci.yml<div class="text-[11px]">5 jobs · 26 steps</div></div>
       </div>
       <div class="card text-center" style="border-color: rgba(34,197,94,0.4)">
-        <div class="metric text-5xl">94.4%</div>
+        <div class="metric text-5xl">97.2%</div>
         <div class="mt-2 text-sm text-[var(--gg-muted)]"><a href="https://github.com/honojs/hono" class="link">honojs/hono</a> ci.yml<div class="text-[11px]">14 jobs · 71 steps</div></div>
       </div>
     </div>
@@ -436,20 +436,19 @@
           <li><span class="ok">✓</span> <code class="font-mono">needs:</code> with parallel scheduling</li>
           <li><span class="ok">✓</span> <code class="font-mono">if:</code> on jobs and steps (subset)</li>
           <li><span class="ok">✓</span> <code class="font-mono">services:</code> with health checks</li>
-          <li><span class="ok">✓</span> Local composite actions (<code class="font-mono">./.github/actions/*</code>)</li>
+          <li><span class="ok">✓</span> Local <strong>and</strong> remote composite actions (<code class="font-mono">./.github/actions/*</code> + <code class="font-mono">org/repo@ref</code>)</li>
+          <li><span class="ok">✓</span> Local reusable workflows (<code class="font-mono">uses: ./.github/workflows/foo.yml</code> at job level)</li>
+          <li><span class="ok">✓</span> JavaScript actions (<code class="font-mono">runs.using: node20</code>) — auto-cloned at ref</li>
           <li><span class="ok">✓</span> <code class="font-mono">${{ matrix… }}</code>, <code class="font-mono">env</code>, <code class="font-mono">secrets</code>, <code class="font-mono">needs</code>, <code class="font-mono">steps</code>, <code class="font-mono">runner</code></li>
         </ul>
       </div>
       <div class="card">
         <div class="font-mono text-xs text-[var(--gg-amber)] mb-2">NOT YET</div>
         <ul class="text-sm text-[var(--gg-muted)] space-y-1.5">
-          <li><span class="warn">○</span> Per-cell matrix workspace isolation (cells share workspace, run sequentially today)</li>
-          <li><span class="warn">○</span> Reusable workflows (<code class="font-mono">uses: ./.github/workflows/foo.yml</code>)</li>
-          <li><span class="warn">○</span> Remote composite actions (<code class="font-mono">org/repo@ref</code>)</li>
-          <li><span class="warn">○</span> JavaScript-action runtime (<code class="font-mono">runs.using: node20</code>)</li>
+          <li><span class="warn">○</span> Remote reusable workflows (<code class="font-mono">org/repo/.github/workflows/foo.yml@ref</code>) — local form works</li>
+          <li><span class="warn">○</span> Docker actions (<code class="font-mono">runs.using: docker</code>) — JS-action runtime ships, Docker doesn't yet</li>
           <li><span class="warn">○</span> OIDC / <code class="font-mono">id-token: write</code></li>
           <li><span class="warn">○</span> <code class="font-mono">concurrency:</code> cancellation</li>
-          <li><span class="warn">○</span> Real <code class="font-mono">actions/upload-artifact</code> (local fs only today)</li>
         </ul>
       </div>
     </div>
