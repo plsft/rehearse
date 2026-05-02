@@ -21,7 +21,7 @@ import {
   statSync,
   writeFileSync,
 } from 'node:fs';
-import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
+import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:path';
 
 interface ArtifactManifest {
   version: 1;
@@ -64,7 +64,7 @@ export class LocalArtifacts {
       if (!existsSync(src)) continue;
       const rel = relative(cwd, src);
       // For files outside cwd, fall back to the basename so we can still cp.
-      const pathInArtifact = rel.startsWith('..') ? require('node:path').basename(src) : rel;
+      const pathInArtifact = rel.startsWith('..') ? basename(src) : rel;
       const dest = join(dir, 'files', pathInArtifact);
       mkdirSync(dirname(dest), { recursive: true });
       cpSync(src, dest, { recursive: true });

@@ -12,6 +12,7 @@
  *     and execute the action's main.js via @actions/core polyfills
  *   - Docker actions (`runs.using: docker`) — feasible via container backend
  */
+import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { parse as parseYaml } from 'yaml';
@@ -86,7 +87,6 @@ function resolveRemote(uses: string, repoRoot: string): ResolvedAction | null {
   const cacheDir = resolve(repoRoot, '.runner', 'actions', slug);
 
   if (!existsSync(cacheDir)) {
-    const { spawnSync } = require('node:child_process') as typeof import('node:child_process');
     const url = `https://github.com/${owner}/${repo}.git`;
     const r = spawnSync('git', ['clone', '--depth', '1', '--branch', ref!, url, cacheDir], { encoding: 'utf-8' });
     if (r.status !== 0) {
