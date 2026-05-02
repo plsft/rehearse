@@ -48,7 +48,6 @@ git-engine/    — @gitgate/git-core   — pure-TypeScript git protocol
 cli/           — @gitgate/cli        — `gg` CLI (compile / convert TS pipelines)
 bench/         — runner-vs-act bench harness + results
 poc/           — single-file proofs that informed the runner architecture
-old/           — pre-pivot code, frozen for reference
 .gitgate/      — TypeScript source for this repo's own CI
 .github/       — generated workflow YAML (do not edit by hand)
 ```

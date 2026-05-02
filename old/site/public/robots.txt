@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://gitgate.com/sitemap.xml
