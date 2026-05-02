@@ -1,60 +1,120 @@
 # @gitgate/runner
 
-> Local-first runner for GitHub Actions workflows. Same YAML, fast.
+> **Stop pushing CI failures.** Run your `.github/workflows/*.yml` on your
+> laptop in seconds. Same YAML. **6–10× faster than [`act`](https://github.com/nektos/act).**
 
-Run your `.github/workflows/*.yml` on a developer laptop in tens of seconds —
-host backend by default, container backend (Docker) when the job needs
-services or cross-platform parity.
+`@gitgate/runner` is a local-first runner for GitHub Actions workflows.
+Read the YAML you already have, choose a backend per job (host or
+container), execute. Free, Apache 2.0, single binary.
 
-This package is the orchestrator. The pieces it composes:
-
-- **Parser** — uses [`@gitgate/ci`](../ts-ci) for `parseWorkflow`.
-- **Planner** — expands `strategy.matrix` into concrete cells, substitutes
-  `${{ matrix.* }}` references, and picks a backend per job.
-- **Scheduler** — runs jobs in parallel respecting `needs:` and `if:`,
-  bounded by `--max-parallel`.
-- **Backends** — `HostBackend` (subprocess) and `ContainerBackend`
-  (Docker, with services on a private network and a long-lived job
-  container that steps `docker exec` into).
-- **Shims** — in-process replacements for the most common `uses:` actions
-  (checkout, setup-node/python/go/bun, cache, artifacts) so the runner
-  doesn't waste time spinning up containers for them.
+[![npm](https://img.shields.io/npm/v/@gitgate/runner)](https://www.npmjs.com/package/@gitgate/runner)
+[![License](https://img.shields.io/npm/l/@gitgate/runner)](./LICENSE)
+[![Source](https://img.shields.io/badge/source-plsft%2Fgitgate-22c55e)](https://github.com/plsft/gitgate)
 
 ## Install
 
 ```bash
-# As a global tool
 npm install -g @gitgate/runner
-# or pnpm / bun
+# or
 pnpm add -g @gitgate/runner
+# or
 bun add -g @gitgate/runner
 
-# Verify
-runner --version
+runner --version    # 0.2.x
 ```
 
 The package installs a single binary called `runner`.
 
-## CLI
+## Use
 
 ```bash
-runner run <workflow.yml> [options]
+# Run a workflow
+runner run .github/workflows/ci.yml
 
-Options:
-  -j, --job <name>        run only this job (matrix variants of it still all run)
-  -b, --backend <type>    host | container | auto (default: auto)
-  -p, --max-parallel <n>  max concurrent jobs (default: min(cpus, 4))
-  -c, --cwd <dir>         working directory (default: inferred from workflow path)
-      --fail-fast         cancel sibling jobs on first failure
-      --quiet             minimal output
-      --bench             single JSON line on stdout (for the bench harness)
-      --env-file <file>   load env vars from file (KEY=VALUE per line)
+# One job
+runner run .github/workflows/ci.yml --job test
+
+# Force a backend
+runner run … --backend host          # subprocess on the host (fast)
+runner run … --backend container     # docker (parity with GH-hosted)
+
+# Re-run on save (inner-loop dev tool)
+runner watch .github/workflows/ci.yml
+
+# Block bad pushes
+runner install-hook                  # writes .git/hooks/pre-push
+
+# Audit a workflow's compatibility before running
+runner compat .github/workflows/ci.yml
 ```
+
+## Bench (cross-OS, GitHub-hosted runners)
+
+Same workflow, head-to-head against `act` on a fresh `ubuntu-latest`
+runner. Reproducible via `gh workflow run bench.yml`.
+
+| Target | runner | `act` | Speedup |
+| --- | ---: | ---: | ---: |
+| `our-ci` (typecheck + 202 tests, 2 parallel jobs) | **10.58s** | 64.85s | **6.13×** |
+| `node-matrix` (3-cell matrix, parallel via worktrees) | **1.10s** | 11.63s | **10.56×** |
+| `service-postgres` (postgres:16-alpine + 4 psql steps) | **12.00s** | timeout (>360s) | **act fails** |
+| `hono-bun` (real OSS — honojs/hono `bun` job, 26 tests) | **1.72s** | n/a (act image lacks bun) | — |
+| `hono-node-matrix` (real OSS — 3-cell node matrix) | **378ms** | n/a (act image lacks bun) | — |
+
+`act`'s `service-postgres` failure isn't OS-specific — it timed out on
+both Linux and Windows GH runners. `act`'s service-container networking
+is broken across hosts; the runner's `--network-alias <name>` per
+service makes the same workflow run cleanly.
+
+Full methodology + per-OS breakdown:
+[bench/RESULTS.md](https://github.com/plsft/gitgate/blob/main/bench/RESULTS.md).
+
+## Cross-OS support
+
+| | `runner run` | `services:` | act head-to-head |
+| --- | :---: | :---: | :---: |
+| **Linux** (`ubuntu-latest`) | ✓ | ✓ | ✓ |
+| **macOS** (`macos-latest`) | ✓ | ✗ Docker not on GH runner | ✗ |
+| **Windows** (`windows-latest`) | ✓ | ⚠ Linux containers need setup | ⚠ |
+| **Any developer laptop** with Docker Desktop in Linux mode | ✓ | ✓ | ✓ |
+
+Host-backend bench targets work on every OS. Container backend needs
+Docker with Linux containers — that's standard on Linux dev boxes and
+on `ubuntu-latest` GH-hosted runners; on macOS / Windows GH runners
+you only get host-backend execution.
+
+## What's supported
+
+- `run:` steps in `bash` / `pwsh` / `cmd`
+- Top ~15 actions in-process: `checkout`, `setup-node`/`python`/`go`/`bun`,
+  `cache`, `upload-artifact`, `download-artifact`
+- **JS actions** (`runs.using: node20|18|16`) — clones the action at the
+  requested ref, runs the entrypoint with the standard `INPUT_*` /
+  `GITHUB_OUTPUT` / `GITHUB_ENV` env contract
+- **Local composite actions** (`./.github/actions/*`) — inlined with
+  `${{ inputs.x }}` substitution
+- `services:` with health-check waits and a private Docker network alias
+- `strategy.matrix` — cartesian product, `include`, `exclude`. **Cells run
+  in parallel via per-cell `git worktree`** (since v0.2.0)
+- `needs:` with parallel scheduling
+- `if:` on jobs and steps (useful expression-language subset)
+- `actions/cache` semantics on local fs (exact-key + restore-key
+  longest-prefix matching, persistent across runs)
+- `actions/upload-artifact` / `download-artifact` backed by `.runner/artifacts/`
+
+## What's not supported yet
+
+- Reusable workflows (`uses: ./.github/workflows/foo.yml`)
+- Remote composite actions (`org/repo/path@ref`)
+- OIDC / `id-token: write`
+- `concurrency:` group cancellation
+- Docker actions (`runs.using: docker`) — the JS-action runtime works;
+  Docker actions are different and not yet hooked up
 
 ## Programmatic API
 
 ```ts
-import { run } from '@gitgate/runner';
+import { run, compat } from '@gitgate/runner';
 
 const result = await run({
   workflowPath: '.github/workflows/ci.yml',
@@ -63,51 +123,43 @@ const result = await run({
   maxParallel: 4,
 });
 
-console.log(result.status);  // 'success' | 'failure' | 'skipped'
+console.log(result.status);      // 'success' | 'failure' | 'skipped'
 console.log(result.durationMs);
 for (const j of result.jobs) console.log(j.jobName, j.status, j.durationMs);
+
+// Static audit: how much of a workflow would run today?
+const audit = compat('.github/workflows/ci.yml');
+console.log(`${audit.coverage.toFixed(1)}% of ${audit.stepsTotal} steps`);
 ```
 
-## Backend selection
+## CLI flags reference
 
-Per job, the planner chooses:
+```
+runner run <workflow.yml> [options]
 
-- `host` when the job has no `services:`, no `container:`, and `runs-on`
-  matches the developer's OS family (or is generic).
-- `container` otherwise — needed for `services: postgres:` and similar,
-  and when a `runs-on: windows-latest` / `macos-latest` job is being run
-  on a Linux host.
+  -j, --job <name>        run only this job (matrix variants of it still all run)
+  -b, --backend <type>    host | container | auto (default: auto)
+  -p, --max-parallel <n>  max concurrent jobs (default: min(cpus, 4))
+  -c, --cwd <dir>         working directory (default: inferred from workflow path)
+      --fail-fast         cancel sibling jobs on first failure
+      --quiet             minimal output
+      --bench             single JSON line on stdout
+      --env-file <file>   load env vars from file (KEY=VALUE per line)
 
-Override globally with `--backend host|container`.
+runner watch <workflow.yml> [options]
+  Same flags as `run`. Re-runs on file changes (debounced).
 
-## Scope
+runner install-hook
+  -w, --workflow <path>   workflow to gate the push on (default: .github/workflows/ci.yml)
+  -j, --job <name>        restrict to one job
 
-What this runner DOES support today:
+runner compat <workflow.yml>
+  --json                  machine-readable JSON
+```
 
-- ✓ `run:` steps with `bash`/`pwsh`/`cmd` (the GitHub default per OS)
-- ✓ `uses:` for the top ~15 most-popular actions, in-process shims
-  (checkout, setup-*, cache, artifacts)
-- ✓ `services:` with health checks (container backend)
-- ✓ `strategy.matrix` (variables × include − exclude)
-- ✓ `needs:` with parallel scheduling
-- ✓ `if:` on jobs and steps — a useful subset of the expression language
-- ✓ Step-level `working-directory:`, `env:`, `continue-on-error:`,
-  `timeout-minutes:`, `shell:`
-- ✓ `${{ matrix… }}`, `${{ env… }}`, `${{ secrets… }}`,
-  `${{ runner… }}`, `${{ needs.<job>.outputs.<n> }}`,
-  `${{ steps.<id>.outputs.<n> }}`, `${{ github.* }}` (subset)
+## Repo
 
-What it does NOT support yet:
-
-- ✗ Composite / local actions (`./.github/actions/*`)
-- ✗ Reusable workflows (`uses: ./.github/workflows/foo.yml`)
-- ✗ OIDC / `id-token: write`
-- ✗ `concurrency:` group cancellation
-- ✗ Real `actions/cache` semantics (CDN-backed; we use local fs)
-- ✗ Real `actions/upload-artifact` semantics (we write to local fs)
-- ✗ Full GitHub-Actions expression language
-
-These are the known gaps and are tracked on the runner's roadmap.
+Source, issues, roadmap: <https://github.com/plsft/gitgate>.
 
 ## License
 
