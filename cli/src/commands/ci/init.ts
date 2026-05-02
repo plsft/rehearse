@@ -102,14 +102,21 @@ export const ci = pipeline('CI', {
 `,
 };
 
-const CONFIG_TEMPLATE = `import type { GitGateConfig } from 'gg/dist/utils/config.js';
-
-const config = {
+// Use .mjs (extension-explicit ESM) so the config loads regardless of the
+// host project's package.json `type` field.
+const CONFIG_TEMPLATE = `// gitgate.config.mjs
+export default {
   pipelinesDir: '.gitgate/pipelines',
   outputDir: '.github/workflows',
 };
+`;
 
-export default config;
+// Drop a tiny package.json inside .gitgate/ that scopes ESM resolution to
+// the pipelines subtree. This way the user's root project can stay CJS
+// (or unset) and the .ts pipeline files still import cleanly under tsx.
+const PIPELINES_PACKAGE_JSON = `{
+  "type": "module"
+}
 `;
 
 export async function runInit(cwd: string = process.cwd()): Promise<number> {
@@ -129,7 +136,17 @@ export async function runInit(cwd: string = process.cwd()): Promise<number> {
   await fs.writeFile(ciFile, TEMPLATES[stack], 'utf-8');
   success(`Wrote ${path.relative(cwd, ciFile)}`);
 
-  const cfgFile = path.join(cwd, 'gitgate.config.ts');
+  // Scope ESM resolution to .gitgate/ so the .ts pipelines compile
+  // regardless of whether the root project's package.json sets type:module.
+  const pkgJsonFile = path.join(cwd, '.gitgate', 'package.json');
+  try {
+    await fs.access(pkgJsonFile);
+  } catch {
+    await fs.writeFile(pkgJsonFile, PIPELINES_PACKAGE_JSON, 'utf-8');
+    success(`Wrote ${path.relative(cwd, pkgJsonFile)}`);
+  }
+
+  const cfgFile = path.join(cwd, 'gitgate.config.mjs');
   try {
     await fs.access(cfgFile);
   } catch {

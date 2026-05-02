@@ -1,4 +1,11 @@
 #!/usr/bin/env node
+// Register tsx's TS+ESM loader globally so .ts pipelines and configs work
+// regardless of the consuming project's package.json `type` field. This
+// must run before any user-code import, hence the side-effect import at
+// the very top of the CLI entry point.
+import { register } from 'tsx/esm/api';
+register();
+
 import { Command } from 'commander';
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
