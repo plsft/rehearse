@@ -29,7 +29,14 @@ const setup = [
     name: 'Setup Bun (for hono-bun target)',
   }),
   step.run('pnpm install --frozen-lockfile', { name: 'Install', shell: 'bash' }),
-  step.run('pnpm --filter @gitgate/runner build', { name: 'Build runner', shell: 'bash' }),
+  // Build via turbo so workspace deps (@gitgate/ci → @gitgate/runner) build
+  // in dependency order. A bare `pnpm --filter @gitgate/runner build` would
+  // try to typecheck against a `@gitgate/ci` whose `dist/` doesn't exist yet
+  // on a fresh checkout, and fail with TS2307 'Cannot find module @gitgate/ci'.
+  step.run('pnpm turbo build --filter=@gitgate/runner...', {
+    name: 'Build runner (and workspace deps)',
+    shell: 'bash',
+  }),
 ];
 
 // act installs cleanly only where Docker is actually usable for Linux

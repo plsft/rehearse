@@ -43,8 +43,8 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
         shell: bash
-      - name: Build runner
-        run: 'pnpm --filter @gitgate/runner build'
+      - name: Build runner (and workspace deps)
+        run: 'pnpm turbo build --filter=@gitgate/runner...'
         shell: bash
       - name: Install act (Linux only)
         if: 'runner.os == ''Linux'''
