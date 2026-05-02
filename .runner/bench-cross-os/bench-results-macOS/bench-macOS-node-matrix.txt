@@ -1,0 +1,23 @@
+
+environment: darwin arm64, node v22.22.2
+  act installed:  ✗ (act-vs-us comparisons will be skipped)
+  docker running: ✗ (container-backend + service targets will be skipped)
+
+▶ node-matrix — matrix [18.x, 20.x, 22.x] of CPU-bound node steps (act can run this)
+  warm (us)  … 1.19s ✓
+  warm (act) … skipped (no act/docker)
+
+
+════════════════════════════════════════════════════════════════════════════════════════════════
+Benchmark — runner vs act
+════════════════════════════════════════════════════════════════════════════════════════════════
+Target               Ours warm    act warm     Ours cold    act cold     Speedup (warm)    
+────────────────────────────────────────────────────────────────────────────────────────────────
+node-matrix          1.19s        —            —            —            —                 
+════════════════════════════════════════════════════════════════════════════════════════════════
+
+## Markdown table
+
+| Target | Ours warm | act warm | Ours cold | act cold | Warm speedup |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| node-matrix | 1.19s | — | — | — | — |

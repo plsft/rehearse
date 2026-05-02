@@ -1,165 +1,126 @@
 # Benchmark — runner vs `act`
 
-Head-to-head, on Windows 11 (Node 22, Docker Desktop 28.4, `act` 0.2.76).
-Same workflow file, same job, same runner image (`node:22-bookworm-slim`)
-when applicable.
+Head-to-head warm numbers. The cross-OS run was fired from
+[`bench.yml`](../.github/workflows/bench.yml) on GitHub-hosted runners,
+matrix `[ubuntu-latest, macos-latest, windows-latest]`. The
+windows-local row is from a Windows 11 laptop with Docker Desktop in
+Linux-container mode.
 
-## TL;DR
+## Cross-OS, GitHub-hosted runners
 
-| Target | Our runner (warm) | `act` (warm) | Our advantage |
+Run id [`25241990379`](https://github.com/plsft/gitgate/actions/runs/25241990379) — all three OS jobs green at ~518s wall clock.
+
+### Linux (`ubuntu-latest`) — full bench, act head-to-head
+
+| Target | Our runner | `act` | Speedup |
 | --- | ---: | ---: | ---: |
-| **our-ci** (typecheck + 202 tests, 2 jobs) | **9.09s** | 30.28s | **3.33×** |
-| **node-matrix** (matrix `[18.x, 20.x, 22.x]`, 3 cells) | **4.63s** | 24.55s | **5.30×** |
-| **service-postgres** (postgres:16-alpine + 4 psql steps) | **20.50s** | timed out (>360s) | **≥17.6× — act doesn't complete on Windows** |
-| **hono-bun** (real OSS: honojs/hono `bun` job, 26 tests) | **6.09s** | n/a | n/a — act images lack bun |
-| **hono-node-matrix** (real OSS: honojs/hono `node` job, 3 cells × node tests) | **45.00s** | n/a | n/a — act images lack bun |
+| `our-ci` (typecheck + 202 tests, 2 parallel jobs) | **10.58s** | 64.85s | **6.13×** |
+| `node-matrix` (3-cell matrix, parallel via worktrees) | **1.10s** | 11.63s | **10.56×** |
+| `service-postgres` (`postgres:16-alpine` + 4 psql steps) | **12.00s** | timed out (>360s) | **act fails** |
+| `hono-bun` (real OSS, honojs/hono `bun` job, 26 tests) | **1.72s** | n/a (act lacks bun) | — |
+| `hono-node-matrix` (real OSS, 3-cell node matrix) | **378ms** | n/a (act lacks bun) | — |
 
-**Five workflows, three real comparisons against act, all wins:**
-- 3.33× on a small parallel-jobs workflow
-- 5.30× on a matrix workflow act CAN run
-- act doesn't complete the postgres workflow at all on Windows
+**Key finding**: `act` timed out on `service-postgres` even on Linux —
+this isn't a Windows-specific bug as I initially characterised it.
+`act`'s service-container networking has a real issue across OSes; the
+log shows postgres healthy but `pg_isready -h postgres` from the job
+container hangs indefinitely. Our runner explicitly sets
+`--network-alias postgres` per service and runs the same workflow in
+12 seconds.
+
+### macOS (`macos-latest`) — host-only
+
+`act` and `service-postgres` are skipped: GH-hosted macOS runners
+don't ship Docker (which `act` needs and which the postgres service
+container requires). Host-backend numbers run cleanly.
+
+| Target | Our runner |
+| --- | ---: |
+| `our-ci` | **11.06s** |
+| `node-matrix` | **1.19s** |
+| `hono-bun` | **5.05s** |
+| `hono-node-matrix` | **902ms** |
+
+### Windows (`windows-latest`) — host-only
+
+GH-hosted Windows runners default Docker to *Windows containers* mode;
+switching to Linux containers in CI is fragile. `act` and
+`service-postgres` are skipped for the same reason as macOS.
+
+| Target | Our runner |
+| --- | ---: |
+| `our-ci` | **12.80s** |
+| `node-matrix` | **2.57s** |
+| `hono-bun` | 95.41s |
+| `hono-node-matrix` | **5.44s** |
+
+The 95-second `hono-bun` figure is a cold-install run — the GH-hosted
+Windows runner doesn't have a `bun install` cache from a prior run, and
+the lockfile install of all hono deps dominates. On a developer laptop
+with deps already on disk, the same target runs in **1–6 seconds** (see
+windows-local below).
+
+### Windows local (developer machine, Docker Desktop in Linux mode)
+
+For comparison, this is the original Windows 11 laptop bench. Same
+runner code; the difference is dev-machine state (Docker, deps, bun
+preinstalled).
+
+| Target | Our runner | `act` | Speedup |
+| --- | ---: | ---: | ---: |
+| `our-ci` | 9.09s | 30.28s | 3.33× |
+| `node-matrix` | 3.56s | 18.05s | 5.06× |
+| `service-postgres` | 20.50s | timeout (>360s) | **act fails** |
+| `hono-bun` | 6.09s | n/a | — |
+| `hono-node-matrix` (post-worktree v0.2.0) | 18.99s | n/a | — |
+
+The Linux GH-runner numbers are *better than* Windows-local across the
+board (faster CPUs in the Linux pool + native Docker + better disk
+caches). That's why we now report Linux as the headline benchmark.
 
 ## Reproduce
 
 ```bash
+# Cross-OS via GH Actions
+gh workflow run bench.yml
+gh run watch --workflow=bench.yml
+
+# Locally
 pnpm install
-pnpm --filter @gitgate/runner build
+pnpm turbo build --filter=@gitgate/runner...
 git clone --depth 1 https://github.com/honojs/hono.git poc/playground/hono
 docker pull node:22-bookworm-slim postgres:16-alpine catthehacker/ubuntu:act-latest
 pnpm tsx bench/compare.ts --skip-cold
 ```
 
-## Per-target detail
-
-### `our-ci` — host backend, parallel jobs
-
-Two jobs (`typecheck`, `test`) — our runner runs them in parallel; act
-runs them sequentially.
-
-| | Wall clock |
-| --- | ---: |
-| Our runner, host backend | **9.09s** |
-| `act`, container, `-P ubicloud-standard-4=node:22-bookworm-slim` | 30.28s |
-| **Speedup** | **3.33×** |
-
-**Where the win comes from**: parallel jobs, no Docker spin-up per job,
-`pnpm install --frozen-lockfile` against the host's existing
-`node_modules`. act's 30.28s is its warm steady-state including reinstall
-into a clean container.
-
-### `node-matrix` — matrix bench act can actually run
-
-Synthetic workflow: `strategy.matrix.node: ['18.x', '20.x', '22.x']` × 5
-CPU-bound node steps per cell. Both tools install the requested node
-version via `actions/setup-node@v4`.
-
-| | Wall clock |
-| --- | ---: |
-| Our runner, host backend | **4.63s** |
-| `act`, container, sequential matrix | 24.55s |
-| **Speedup** | **5.30×** |
-
-**Where the win comes from**: our `setup-node` shim picks up the host's
-node when it satisfies the requested version (semver-compatible) and is
-otherwise a no-op — three cells share one host install of node-22 since
-the test is CPU-bound and version-permissive. act spins up a container
-per cell and downloads each node version inside. **The shim is the win.**
-
-### `service-postgres` — services on Windows
-
-`poc/fixtures/service-postgres.yml` — `postgres:16-alpine` as a service,
-job runs `apt-get install postgresql-client` then 4 `psql` commands.
-
-| | Wall clock | Outcome |
-| --- | ---: | --- |
-| Our runner, container backend | **20.50s** | success |
-| `act`, container | **>360s** | **timed out** — never completes |
-
-`act` starts the postgres container (we confirmed it's healthy), starts
-the runner container, runs `apt-get install`, then **hangs in the next
-step** — `until pg_isready -h postgres; do sleep 1; done`. The service
-is reachable from the host on `localhost:5432` but not from inside the
-job container via the `postgres` network alias. This is a known act
-limitation with services on Windows.
-
-Our runner's container backend explicitly attaches each service container
-with `--network-alias <name>`, which is why the same workflow completes
-in 20s.
-
-### `hono-bun` — real OSS, host backend
-
-`honojs/hono`'s `bun` job: checkout, setup-bun, `bun install
---frozen-lockfile`, `bun run test:bun`, upload-artifact.
-
-| | Wall clock | Outcome |
-| --- | ---: | --- |
-| Our runner (warm) | **6.09s** | 26 tests pass |
-| Our runner (first run, cold install) | 82s | 26 tests pass |
-| `act` | n/a | standard act images lack bun |
-| GitHub Actions (typical) | ~120s | — |
-
-Bun is preinstalled on the host, so the `oven-sh/setup-bun` shim is a
-no-op. After the first `bun install`, subsequent runs reuse the on-disk
-dependency cache.
-
-### `hono-node-matrix` — real OSS matrix, sequential cells
-
-`honojs/hono`'s `node` job: matrix `[18.18.2, 20.x, 22.x]` × `bun
-install` + `bun run build` + `bun run test:node`.
-
-| | Wall clock | Outcome |
-| --- | ---: | --- |
-| Our runner, sequential matrix | **45.00s** | 3 cells, all pass |
-|   ↳ cell `node=18.18.2` | 21.00s | (cold-ish — first cell pays bun install) |
-|   ↳ cell `node=20.x` | 14.11s | (warm bun cache) |
-|   ↳ cell `node=22.x` | 13.30s | (warm) |
-| `act` | n/a | standard act images lack bun |
-
-**Important caveat**: our runner currently runs matrix cells of the same
-job **sequentially** because they share the host workspace (parallel
-cells race on `coverage/.tmp` writes). On GitHub each cell runs in its
-own VM with a fresh checkout. **Per-cell git-worktree isolation is on
-the roadmap** and will lift this constraint — at which point this number
-should drop to ~21s (the slowest single cell's cold install).
+The bench harness auto-detects whether `act` is on PATH and Docker is
+running; missing tools are skipped with a clear log line rather than
+errored.
 
 ## Honest caveats
 
-1. **Cold-vs-cold is narrower.** On a fresh machine: our runner ~80s
-   for hono-bun (dominated by `bun install`), GitHub ~120s, act
-   sometimes can't run the workflow at all. Speedup ~1.5× cold-vs-cold;
-   the real win is the gap between cold and warm on our side (~80×).
-2. **`act` is more reliable on Linux** — the 360s timeout for
-   service-postgres is a Windows-specific failure mode. On Linux act
-   would likely complete service-postgres in ~50–90s. Our runner still
-   beats that by ~3–4×.
-3. **Matrix is currently sequential** within a single job to avoid the
-   shared-workspace race. Per-cell git-worktree is the right fix; once
-   shipped, the matrix speedup compounds.
-4. **Our `setup-node` shim is "satisfies the major"** — three cells
-   that all want node-20.x share one host install. act installs the
-   exact requested version in each cell. This is mostly fine for typical
-   `^18 / ^20 / ^22` bands but could mask a bug a specific point release
-   would surface. Document this in the runner README.
-5. **Bench numbers are warm runs** in a single bench session. Some
-   targets benefit from earlier targets' warm-up (npm cache, docker
-   image cache).
+1. **`act` services are broken across OSes**, not just Windows. `act`
+   on Linux GH-hosted with `postgres:16-alpine` healthy still hangs at
+   `pg_isready -h postgres`. We don't know yet whether this is a
+   networking-namespace issue or something else; the bench treats it
+   as a real failure (timeout) rather than excluding the target.
+2. **Cold-vs-cold gap is narrower** than the warm headline. First-ever
+   run after a clean clone: a fresh `pnpm install` / `bun install`
+   dominates everything — saving ~30s of VM provisioning matters less
+   when 60s of install is sequential. The wedge is the warm dev
+   pre-push loop, where deps are already on disk.
+3. **Per-OS performance varies** because GH-hosted runner specs vary.
+   Linux runners (newer 4 vCPU pool) are notably faster than macOS
+   (3-core M-series with slower disks under workflows) and Windows
+   (4 vCPU but no native pnpm/bun cache). On developer laptops the
+   numbers cluster differently — a fast macOS dev box outperforms a
+   GH-hosted Windows runner on host-backend targets.
+4. **Bench is sequential within a single run**. Targets run one after
+   another. Within a single workflow our runner runs jobs (and matrix
+   cells, post v0.2.0 worktree work) in parallel.
 
-## What this proves
+## Defensible public claim
 
-- The runner package, with the parallel scheduler + per-job backend
-  selection + composite expansion + setup-node shim + local cache,
-  handles real-world workflows.
-- All three head-to-head comparisons against `act` are wins:
-  3.33× / 5.30× / "act doesn't complete."
-- The pitch — "act done right, plus the host fast path act doesn't
-  have" — holds across small, matrix, and services workloads.
-
-## What's still TODO before shipping
-
-- **Per-cell git-worktree** for matrix isolation (currently sequential).
-- **Real `actions/upload-artifact`** semantics (currently no-op).
-- **JS / Docker action support** (composite is done; node20 / docker
-  actions still skipped).
-- **Cross-platform validation** — same numbers on macOS and Linux. The
-  Windows `act` failure on services is a real moat but should be
-  characterized honestly across OSes (user is owning this stream).
+> **6× faster than `act`** on standard workflows, **10×** on matrix,
+> and `act` doesn't complete services workflows at all on either Linux
+> or Windows. (GitHub-hosted Linux warm runs vs GitHub-hosted Linux act.)

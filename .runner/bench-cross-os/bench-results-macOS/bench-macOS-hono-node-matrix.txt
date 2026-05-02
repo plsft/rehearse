@@ -1,0 +1,23 @@
+
+environment: darwin arm64, node v22.22.2
+  act installed:  ✗ (act-vs-us comparisons will be skipped)
+  docker running: ✗ (container-backend + service targets will be skipped)
+
+▶ hono-node-matrix — matrix over node [18.18.2, 20.x, 22.x] (3 cells, parallel for us)
+  warm (us)  … 902ms ✗
+  warm (act) … skipped (requires bun + multi-version node in image)
+
+
+════════════════════════════════════════════════════════════════════════════════════════════════
+Benchmark — runner vs act
+════════════════════════════════════════════════════════════════════════════════════════════════
+Target               Ours warm    act warm     Ours cold    act cold     Speedup (warm)    
+────────────────────────────────────────────────────────────────────────────────────────────────
+hono-node-matrix     902ms        —            —            —            —                 
+════════════════════════════════════════════════════════════════════════════════════════════════
+
+## Markdown table
+
+| Target | Ours warm | act warm | Ours cold | act cold | Warm speedup |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| hono-node-matrix | 902ms | — | — | — | — |

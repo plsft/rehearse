@@ -4,8 +4,8 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#08090c" />
-<title>GitGate — GitHub Actions, locally. 3–5× faster than act.</title>
-<meta name="description" content="Run your .github/workflows/*.yml on your laptop in seconds, not minutes. 3–5× faster than act on real workflows. Same YAML. No new config. Free, Apache 2.0." />
+<title>GitGate — GitHub Actions, locally. 6–10× faster than act.</title>
+<meta name="description" content="Run your .github/workflows/*.yml on your laptop in seconds, not minutes. 6× faster than act on standard workflows, 10× on matrix. Same YAML. No new config. Free, Apache 2.0." />
 <meta property="og:title" content="GitGate — GitHub Actions, locally" />
 <meta property="og:description" content="Run your .github/workflows/*.yml on your laptop in seconds. Free, Apache 2.0." />
 <meta property="og:type" content="website" />
@@ -54,7 +54,7 @@
       <p class="mt-6 text-lg text-[var(--gg-muted)] max-w-2xl mx-auto">
         GitGate runs your <code class="font-mono text-white/90">.github/workflows/*.yml</code> on your laptop, in
         <span class="text-white">seconds</span>. Catch the failure before the
-        push. Same YAML. Same outcome. <span class="accent-text font-semibold">3–5× faster than <code class="font-mono">act</code></span> on real workflows.
+        push. Same YAML. Same outcome. <span class="accent-text font-semibold">6–10× faster than <code class="font-mono">act</code></span> on real workflows.
       </p>
 
       <!-- Install command -->
@@ -121,10 +121,10 @@
       <div class="eyebrow">// The benchmark</div>
       <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">Real workflows. Real numbers.</h2>
       <p class="mt-4 text-lg text-[var(--gg-muted)]">
-        Five workflows on a Windows 11 laptop, head-to-head against
-        <a href="https://github.com/nektos/act" class="link">nektos/act</a>.
-        Same YAML, same job, same runner image when applicable. Both tools
-        timed warm.
+        Five workflows on a fresh GitHub-hosted <code class="font-mono">ubuntu-latest</code>
+        runner, head-to-head against <a href="https://github.com/nektos/act" class="link">nektos/act</a>.
+        Same YAML, same job, same runner image. Both tools timed warm.
+        Reproducible via <code class="font-mono">gh workflow run bench.yml</code>.
       </p>
     </div>
 
@@ -147,43 +147,43 @@
           <tbody class="divide-y divide-white/5 text-white/90">
             <tr>
               <td class="py-3 px-5">our-ci<div class="text-[11px] text-[var(--gg-muted)]">typecheck + 202 tests, 2 jobs</div></td>
-              <td class="py-3 px-5 text-right ok font-bold">9.09s</td>
-              <td class="py-3 px-5 text-right text-[var(--gg-muted)]">30.28s</td>
-              <td class="py-3 px-5 text-right ok font-bold">3.33×</td>
+              <td class="py-3 px-5 text-right ok font-bold">10.58s</td>
+              <td class="py-3 px-5 text-right text-[var(--gg-muted)]">64.85s</td>
+              <td class="py-3 px-5 text-right ok font-bold">6.13×</td>
               <td class="py-3 px-5">
                 <div class="flex flex-col gap-1.5">
-                  <div class="bar-track"><div class="bar-fill" style="width: 30%"></div></div>
+                  <div class="bar-track"><div class="bar-fill" style="width: 16%"></div></div>
                   <div class="bar-track"><div class="bar-fill bar-fill-act" style="width: 100%"></div></div>
                 </div>
               </td>
             </tr>
             <tr>
-              <td class="py-3 px-5">node-matrix<div class="text-[11px] text-[var(--gg-muted)]">matrix [18.x, 20.x, 22.x] · 3 cells</div></td>
-              <td class="py-3 px-5 text-right ok font-bold">4.63s</td>
-              <td class="py-3 px-5 text-right text-[var(--gg-muted)]">24.55s</td>
-              <td class="py-3 px-5 text-right ok font-bold">5.30×</td>
+              <td class="py-3 px-5">node-matrix<div class="text-[11px] text-[var(--gg-muted)]">matrix [18.x, 20.x, 22.x] · 3 cells, parallel</div></td>
+              <td class="py-3 px-5 text-right ok font-bold">1.10s</td>
+              <td class="py-3 px-5 text-right text-[var(--gg-muted)]">11.63s</td>
+              <td class="py-3 px-5 text-right ok font-bold">10.56×</td>
               <td class="py-3 px-5">
                 <div class="flex flex-col gap-1.5">
-                  <div class="bar-track"><div class="bar-fill" style="width: 19%"></div></div>
+                  <div class="bar-track"><div class="bar-fill" style="width: 9%"></div></div>
                   <div class="bar-track"><div class="bar-fill bar-fill-act" style="width: 100%"></div></div>
                 </div>
               </td>
             </tr>
             <tr>
               <td class="py-3 px-5">service-postgres<div class="text-[11px] text-[var(--gg-muted)]">postgres:16 + 4 psql steps</div></td>
-              <td class="py-3 px-5 text-right ok font-bold">20.50s</td>
+              <td class="py-3 px-5 text-right ok font-bold">12.00s</td>
               <td class="py-3 px-5 text-right err">timed out (&gt;360s)</td>
               <td class="py-3 px-5 text-right ok font-bold">act fails</td>
               <td class="py-3 px-5">
                 <div class="flex flex-col gap-1.5">
-                  <div class="bar-track"><div class="bar-fill" style="width: 6%"></div></div>
+                  <div class="bar-track"><div class="bar-fill" style="width: 3%"></div></div>
                   <div class="bar-track"><div class="bar-fill bar-fill-fail" style="width: 100%"></div></div>
                 </div>
               </td>
             </tr>
             <tr>
               <td class="py-3 px-5">hono-bun<div class="text-[11px] text-[var(--gg-muted)]">real OSS · honojs/hono · 26 tests</div></td>
-              <td class="py-3 px-5 text-right ok font-bold">6.09s</td>
+              <td class="py-3 px-5 text-right ok font-bold">1.72s</td>
               <td class="py-3 px-5 text-right text-[var(--gg-muted)]">n/a</td>
               <td class="py-3 px-5 text-right text-[var(--gg-muted)]">act lacks bun</td>
               <td class="py-3 px-5">
@@ -194,8 +194,8 @@
               </td>
             </tr>
             <tr>
-              <td class="py-3 px-5">hono-node-matrix<div class="text-[11px] text-[var(--gg-muted)]">real OSS · 3-cell matrix</div></td>
-              <td class="py-3 px-5 text-right ok font-bold">45.00s</td>
+              <td class="py-3 px-5">hono-node-matrix<div class="text-[11px] text-[var(--gg-muted)]">real OSS · 3-cell matrix, parallel cells</div></td>
+              <td class="py-3 px-5 text-right ok font-bold">378ms</td>
               <td class="py-3 px-5 text-right text-[var(--gg-muted)]">n/a</td>
               <td class="py-3 px-5 text-right text-[var(--gg-muted)]">act lacks bun</td>
               <td class="py-3 px-5">
@@ -211,12 +211,13 @@
     </div>
 
     <p class="mt-6 text-sm text-[var(--gg-muted)] max-w-3xl">
-      <span class="text-white">Honest caveats:</span> warm-cache numbers
-      (developer's <code class="font-mono">node_modules</code> already on disk).
-      Cold-vs-cold is narrower — a fresh <code class="font-mono">pnpm install</code>
-      dominates everything. The wedge is the dev pre-push loop, where deps
-      are already there and we're not re-provisioning a VM. Full methodology
-      and cold numbers in <a href="https://github.com/plsft/gitgate/blob/main/bench/RESULTS.md" class="link">bench/RESULTS.md</a>.
+      <span class="text-white">Honest caveats:</span> warm-cache numbers on
+      a fresh GitHub-hosted Linux runner — the second run, with deps already
+      on disk. Cold-vs-cold is narrower — a fresh <code class="font-mono">pnpm install</code>
+      dominates everything. We also run the same bench on macOS and Windows
+      runners (host-backend targets only — no Docker on those GH runners).
+      Full methodology, cross-OS numbers, and the act service-container failure
+      writeup in <a href="https://github.com/plsft/gitgate/blob/main/bench/RESULTS.md" class="link">bench/RESULTS.md</a>.
     </p>
   </div>
 </section>

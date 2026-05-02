@@ -1,0 +1,23 @@
+
+environment: darwin arm64, node v22.22.2
+  act installed:  ✗ (act-vs-us comparisons will be skipped)
+  docker running: ✗ (container-backend + service targets will be skipped)
+
+▶ our-ci — our own typecheck + test workflow
+  warm (us)  … 11.06s ✓
+  warm (act) … skipped (no act/docker)
+
+
+════════════════════════════════════════════════════════════════════════════════════════════════
+Benchmark — runner vs act
+════════════════════════════════════════════════════════════════════════════════════════════════
+Target               Ours warm    act warm     Ours cold    act cold     Speedup (warm)    
+────────────────────────────────────────────────────────────────────────────────────────────────
+our-ci               11.06s       —            —            —            —                 
+════════════════════════════════════════════════════════════════════════════════════════════════
+
+## Markdown table
+
+| Target | Ours warm | act warm | Ours cold | act cold | Warm speedup |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| our-ci | 11.06s | — | — | — | — |

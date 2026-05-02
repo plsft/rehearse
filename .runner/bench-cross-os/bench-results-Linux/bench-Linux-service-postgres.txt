@@ -1,0 +1,23 @@
+
+environment: linux x64, node v22.22.2
+  act installed:  ✓
+  docker running: ✓
+
+▶ service-postgres — workflow with postgres:16-alpine service
+  warm (us)  … 12.00s ✓
+  warm (act) … 360.07s ⏱ timeout
+
+
+════════════════════════════════════════════════════════════════════════════════════════════════
+Benchmark — runner vs act
+════════════════════════════════════════════════════════════════════════════════════════════════
+Target               Ours warm    act warm     Ours cold    act cold     Speedup (warm)    
+────────────────────────────────────────────────────────────────────────────────────────────────
+service-postgres     12.00s       360.07s      —            —            30.00× faster     
+════════════════════════════════════════════════════════════════════════════════════════════════
+
+## Markdown table
+
+| Target | Ours warm | act warm | Ours cold | act cold | Warm speedup |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| service-postgres | 12.00s | 360.07s | — | — | 30.00× faster |
