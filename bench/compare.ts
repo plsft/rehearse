@@ -10,7 +10,7 @@
  *   pnpm tsx bench/compare.ts --skip-cold     # warm runs only (faster)
  *   pnpm tsx bench/compare.ts --only our-ci   # one target
  */
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { performance } from 'node:perf_hooks';
 import { resolve } from 'node:path';
@@ -129,8 +129,23 @@ async function runOurs(target: Target): Promise<Run> {
   return spawnTimed('node', [cli, ...args], targetCwd, { timeoutMs: OURS_TIMEOUT_MS });
 }
 
+function commandExists(cmd: string): boolean {
+  const probe = process.platform === 'win32' ? 'where' : 'which';
+  return spawnSync(probe, [cmd], { stdio: 'ignore' }).status === 0;
+}
+
+function dockerRunning(): boolean {
+  if (!commandExists('docker')) return false;
+  return spawnSync('docker', ['version', '--format', '{{.Server.Version}}'], { stdio: 'ignore' }).status === 0;
+}
+
+const HAS_ACT = commandExists('act');
+const HAS_DOCKER = dockerRunning();
+
 async function runAct(target: Target): Promise<Run | null> {
   if (target.actSkip) return null;
+  if (!HAS_ACT) return null; // act not on PATH — silently skip the comparison
+  if (!HAS_DOCKER) return null; // act needs docker; without it, skip
   const image = target.actImage ?? 'node:22-bookworm-slim';
   const wf = resolve(REPO_ROOT, target.workflow);
   const args = ['-W', wf, '--no-cache-server'];
@@ -178,6 +193,18 @@ async function main(): Promise<void> {
     process.exit(2);
   }
 
+  console.log(`\nenvironment: ${process.platform} ${process.arch}, node ${process.version}`);
+  console.log(`  act installed:  ${HAS_ACT ? '✓' : '✗ (act-vs-us comparisons will be skipped)'}`);
+  console.log(`  docker running: ${HAS_DOCKER ? '✓' : '✗ (container-backend + service targets will be skipped)'}`);
+  // Auto-skip targets that need docker when it isn't there.
+  const filtered = targets.filter((t) => {
+    if (t.ourBackend === 'container' && !HAS_DOCKER) {
+      console.log(`  ⊘ ${t.name} — needs docker, skipped`);
+      return false;
+    }
+    return true;
+  });
+
   // Sanity: runner CLI built?
   if (!existsSync(resolve(REPO_ROOT, 'runner/dist/cli.js'))) {
     console.error('runner/dist/cli.js missing — run `pnpm --filter @gitgate/runner build` first');
@@ -189,7 +216,7 @@ async function main(): Promise<void> {
   await spawnTimed('bash', ['-c', 'docker rm -f $(docker ps -aq --filter "name=act-") 2>/dev/null; docker rm -f $(docker ps -aq --filter "name=runner-") 2>/dev/null; true'], REPO_ROOT, { timeoutMs: 30_000 });
 
   const results: Result[] = [];
-  for (const target of targets) {
+  for (const target of filtered) {
     process.stdout.write(`\n▶ ${target.name} — ${target.description}\n`);
 
     let oursCold: Run | undefined;
@@ -202,7 +229,7 @@ async function main(): Promise<void> {
       if (!target.actSkip) {
         process.stdout.write('  cold (act) … ');
         actCold = await runAct(target);
-        process.stdout.write(`${actCold ? fmtMs(actCold.ms) + (actCold.timedOut ? ' ⏱ timeout' : actCold.ok ? ' ✓' : ' ✗') : 'skipped'}\n`);
+        process.stdout.write(`${actCold ? fmtMs(actCold.ms) + (actCold.timedOut ? ' ⏱ timeout' : actCold.ok ? ' ✓' : ' ✗') : (HAS_ACT && HAS_DOCKER ? 'skipped' : 'skipped (no act/docker)')}\n`);
       }
     }
 
@@ -214,7 +241,7 @@ async function main(): Promise<void> {
     if (!target.actSkip) {
       process.stdout.write('  warm (act) … ');
       actWarm = await runAct(target);
-      process.stdout.write(`${actWarm ? fmtMs(actWarm.ms) + (actWarm.timedOut ? ' ⏱ timeout' : actWarm.ok ? ' ✓' : ' ✗') : 'skipped'}\n`);
+      process.stdout.write(`${actWarm ? fmtMs(actWarm.ms) + (actWarm.timedOut ? ' ⏱ timeout' : actWarm.ok ? ' ✓' : ' ✗') : (HAS_ACT && HAS_DOCKER ? 'skipped' : 'skipped (no act/docker)')}\n`);
     } else {
       process.stdout.write(`  warm (act) … skipped (${target.actSkipReason})\n`);
     }

@@ -14,7 +14,7 @@ jobs:
   bench:
     name: bench
     runs-on: '${{ matrix.os }}'
-    timeout-minutes: 25
+    timeout-minutes: 30
     strategy:
       matrix:
         os:
@@ -36,67 +36,52 @@ jobs:
         with:
           node-version: '22'
           cache: pnpm
-      - name: Install
-        run: pnpm install --frozen-lockfile
-      - name: Build runner
-        run: 'pnpm --filter @gitgate/runner build'
-      - name: Install bun (for hono-bun target)
+      - name: Setup Bun (for hono-bun target)
         uses: 'oven-sh/setup-bun@v2'
         with:
           bun-version: latest
-      - name: Install act
-        run: |
-          if [[ "$RUNNER_OS" == "Linux" ]]; then
-            curl -sL https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash -s -- -b /usr/local/bin
-          elif [[ "$RUNNER_OS" == "macOS" ]]; then
-            brew install act || true
-          elif [[ "$RUNNER_OS" == "Windows" ]]; then
-            choco install act-cli -y || true
-          fi
-          act --version
+      - name: Install
+        run: pnpm install --frozen-lockfile
+        shell: bash
+      - name: Build runner
+        run: 'pnpm --filter @gitgate/runner build'
+        shell: bash
+      - name: Install act (Linux only)
+        if: 'runner.os == ''Linux'''
+        run: 'curl -sL https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash -s -- -b /usr/local/bin && act --version'
         shell: bash
       - name: Clone hono fixture
         run: 'git clone --depth 1 https://github.com/honojs/hono.git poc/playground/hono'
         shell: bash
-      - name: Pre-pull Docker images
-        run: |
-          if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
-            docker pull node:22-bookworm-slim &
-            docker pull postgres:16-alpine &
-            docker pull catthehacker/ubuntu:act-latest &
-            wait
-            echo "DOCKER_AVAILABLE=true" >> "$GITHUB_ENV"
-          else
-            echo "::warning::Docker not running on $RUNNER_OS — service-postgres + container bench will skip"
-            echo "DOCKER_AVAILABLE=false" >> "$GITHUB_ENV"
-          fi
+      - name: Pre-pull Docker images (Linux only)
+        if: 'runner.os == ''Linux'''
+        run: 'docker pull node:22-bookworm-slim & docker pull postgres:16-alpine & docker pull catthehacker/ubuntu:act-latest & wait'
         shell: bash
-      - name: 'Bench: host backend (our-ci)'
-        run: 'pnpm tsx bench/compare.ts --skip-cold --only our-ci > "bench-${RUNNER_OS}-host.txt" 2>&1 || true'
+        continue-on-error: true
+      - name: 'Bench: our-ci'
+        run: 'pnpm tsx bench/compare.ts --skip-cold --only our-ci | tee "bench-${RUNNER_OS}-our-ci.txt"'
         shell: bash
-      - name: 'Bench: matrix workflow'
-        run: 'pnpm tsx bench/compare.ts --skip-cold --only node-matrix > "bench-${RUNNER_OS}-matrix.txt" 2>&1 || true'
+        continue-on-error: true
+      - name: 'Bench: node-matrix'
+        run: 'pnpm tsx bench/compare.ts --skip-cold --only node-matrix | tee "bench-${RUNNER_OS}-node-matrix.txt"'
         shell: bash
-      - name: 'Bench: real OSS workflow'
-        run: |
-          if command -v bun >/dev/null 2>&1; then
-            pnpm tsx bench/compare.ts --skip-cold --only hono-bun > "bench-${RUNNER_OS}-hono-bun.txt" 2>&1 || true
-          else
-            echo "skipped: bun not on PATH for $RUNNER_OS" > "bench-${RUNNER_OS}-hono-bun.txt"
-          fi
+        continue-on-error: true
+      - name: 'Bench: hono-bun'
+        run: 'pnpm tsx bench/compare.ts --skip-cold --only hono-bun | tee "bench-${RUNNER_OS}-hono-bun.txt"'
         shell: bash
-      - name: 'Bench: services (postgres)'
-        run: |
-          if [ "$DOCKER_AVAILABLE" = "true" ]; then
-            pnpm tsx bench/compare.ts --skip-cold --only service-postgres > "bench-${RUNNER_OS}-postgres.txt" 2>&1 || true
-          else
-            echo "skipped: Docker not available on $RUNNER_OS" > "bench-${RUNNER_OS}-postgres.txt"
-          fi
+        continue-on-error: true
+      - name: 'Bench: hono-node-matrix'
+        run: 'pnpm tsx bench/compare.ts --skip-cold --only hono-node-matrix | tee "bench-${RUNNER_OS}-hono-node-matrix.txt"'
         shell: bash
-        env:
-          DOCKER_AVAILABLE: '${{ env.DOCKER_AVAILABLE }}'
+        continue-on-error: true
+      - name: 'Bench: service-postgres'
+        if: 'runner.os == ''Linux'''
+        run: 'pnpm tsx bench/compare.ts --skip-cold --only service-postgres | tee "bench-${RUNNER_OS}-service-postgres.txt"'
+        shell: bash
+        continue-on-error: true
       - name: Upload bench results
         uses: 'actions/upload-artifact@v4'
         with:
           name: 'bench-results-${{ runner.os }}'
           path: 'bench-*.txt'
+          if-no-files-found: warn

@@ -1,14 +1,21 @@
 /**
  * Cross-OS bench workflow.
  *
- * Runs the full bench harness on ubuntu, macos, and windows GitHub-hosted
- * runners. Each OS lands a JSON artifact; an aggregator job collects them
- * into a single matrix report we can publish on the marketing site.
+ * Per-OS realities (these are GH-hosted runner constraints, not ours):
+ *   ubuntu-latest   docker (linux containers) ✓, act ✓, bun via setup-bun ✓
+ *                   → full bench: host + container + service-postgres + act head-to-head
  *
- * Triggered manually (workflow_dispatch) or weekly via cron — we don't
- * fire on push because the bench takes ~5 minutes and runs Docker-pulls.
+ *   macos-latest    docker ✗ (not preinstalled), act ✗ (needs docker), bun ✓
+ *                   → host-only bench: our-ci, node-matrix, hono-bun
+ *
+ *   windows-latest  docker ⚠ (defaults to Windows containers, flaky for Linux),
+ *                   act ⚠ (same blocker), bun ✓
+ *                   → host-only bench: our-ci, node-matrix, hono-bun
+ *
+ * Triggered manually (workflow_dispatch) or weekly via cron — the bench
+ * takes ~5 minutes per OS because of docker-pulls on Linux.
  */
-import { Runner, expr, github, job, pipeline, step, triggers } from '@gitgate/ci';
+import { Runner, expr, job, pipeline, step, triggers } from '@gitgate/ci';
 
 const setup = [
   step.checkout({ fetchDepth: 0 }),
@@ -17,20 +24,19 @@ const setup = [
     with: { 'node-version': '22', cache: 'pnpm' },
     name: 'Setup Node 22',
   }),
-  step.run('pnpm install --frozen-lockfile', { name: 'Install' }),
-  step.run('pnpm --filter @gitgate/runner build', { name: 'Build runner' }),
+  step.action('oven-sh/setup-bun@v2', {
+    with: { 'bun-version': 'latest' },
+    name: 'Setup Bun (for hono-bun target)',
+  }),
+  step.run('pnpm install --frozen-lockfile', { name: 'Install', shell: 'bash' }),
+  step.run('pnpm --filter @gitgate/runner build', { name: 'Build runner', shell: 'bash' }),
 ];
 
+// act installs cleanly only where Docker is actually usable for Linux
+// containers. Today that's ubuntu-latest only on GH-hosted runners.
 const installAct = step.run(
-  `if [[ "$RUNNER_OS" == "Linux" ]]; then
-  curl -sL https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash -s -- -b /usr/local/bin
-elif [[ "$RUNNER_OS" == "macOS" ]]; then
-  brew install act || true
-elif [[ "$RUNNER_OS" == "Windows" ]]; then
-  choco install act-cli -y || true
-fi
-act --version`,
-  { name: 'Install act', shell: 'bash' },
+  'curl -sL https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash -s -- -b /usr/local/bin && act --version',
+  { name: 'Install act (Linux only)', shell: 'bash', condition: "runner.os == 'Linux'" },
 );
 
 const cloneHono = step.run(
@@ -38,59 +44,34 @@ const cloneHono = step.run(
   { name: 'Clone hono fixture', shell: 'bash' },
 );
 
+// Linux: pull docker images so the bench's first run isn't dominated by pulls.
+// macOS / Windows: no docker available on GH-hosted runners — skip cleanly.
 const dockerPulls = step.run(
-  `if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
-  docker pull node:22-bookworm-slim &
-  docker pull postgres:16-alpine &
-  docker pull catthehacker/ubuntu:act-latest &
-  wait
-  echo "DOCKER_AVAILABLE=true" >> "$GITHUB_ENV"
-else
-  echo "::warning::Docker not running on $RUNNER_OS — service-postgres + container bench will skip"
-  echo "DOCKER_AVAILABLE=false" >> "$GITHUB_ENV"
-fi`,
-  { name: 'Pre-pull Docker images', shell: 'bash' },
+  'docker pull node:22-bookworm-slim & docker pull postgres:16-alpine & docker pull catthehacker/ubuntu:act-latest & wait',
+  { name: 'Pre-pull Docker images (Linux only)', shell: 'bash', condition: "runner.os == 'Linux'", continueOnError: true },
 );
 
-const benchHostOnly = step.run(
-  'pnpm tsx bench/compare.ts --skip-cold --only our-ci > "bench-${RUNNER_OS}-host.txt" 2>&1 || true',
-  { name: 'Bench: host backend (our-ci)', shell: 'bash' },
-);
-
-const benchMatrix = step.run(
-  'pnpm tsx bench/compare.ts --skip-cold --only node-matrix > "bench-${RUNNER_OS}-matrix.txt" 2>&1 || true',
-  { name: 'Bench: matrix workflow', shell: 'bash' },
-);
-
-const benchPostgres = step.run(
-  `if [ "$DOCKER_AVAILABLE" = "true" ]; then
-  pnpm tsx bench/compare.ts --skip-cold --only service-postgres > "bench-\${RUNNER_OS}-postgres.txt" 2>&1 || true
-else
-  echo "skipped: Docker not available on $RUNNER_OS" > "bench-\${RUNNER_OS}-postgres.txt"
-fi`,
-  { name: 'Bench: services (postgres)', shell: 'bash', env: { DOCKER_AVAILABLE: expr('env.DOCKER_AVAILABLE') } },
-);
-
-const benchHonoBun = step.run(
-  `if command -v bun >/dev/null 2>&1; then
-  pnpm tsx bench/compare.ts --skip-cold --only hono-bun > "bench-\${RUNNER_OS}-hono-bun.txt" 2>&1 || true
-else
-  echo "skipped: bun not on PATH for $RUNNER_OS" > "bench-\${RUNNER_OS}-hono-bun.txt"
-fi`,
-  { name: 'Bench: real OSS workflow', shell: 'bash' },
-);
-
-const installBun = step.action('oven-sh/setup-bun@v2', {
-  with: { 'bun-version': 'latest' },
-  name: 'Install bun (for hono-bun target)',
-});
+const bench = (target: string, extraCondition?: string) =>
+  step.run(
+    `pnpm tsx bench/compare.ts --skip-cold --only ${target} | tee "bench-\${RUNNER_OS}-${target}.txt"`,
+    {
+      name: `Bench: ${target}`,
+      shell: 'bash',
+      condition: extraCondition,
+      continueOnError: true,
+    },
+  );
 
 const upload = step.action('actions/upload-artifact@v4', {
-  with: { name: `bench-results-${expr('runner.os')}`, path: `bench-*.txt` },
+  with: {
+    name: `bench-results-${expr('runner.os')}`,
+    path: 'bench-*.txt',
+    'if-no-files-found': 'warn',
+  },
   name: 'Upload bench results',
 });
 
-export const bench = pipeline('Bench', {
+export const benchPipeline = pipeline('Bench', {
   triggers: [
     triggers.workflowDispatch(),
     triggers.schedule('0 6 * * 1'), // Mondays 06:00 UTC
@@ -99,18 +80,26 @@ export const bench = pipeline('Bench', {
   jobs: [
     job('bench', {
       runner: Runner.custom(expr('matrix.os')),
-      timeoutMinutes: 25,
-      matrix: { variables: { os: ['ubuntu-latest', 'macos-latest', 'windows-latest'] }, failFast: false },
+      timeoutMinutes: 30,
+      matrix: {
+        variables: { os: ['ubuntu-latest', 'macos-latest', 'windows-latest'] },
+        failFast: false,
+      },
       steps: [
         ...setup,
-        installBun,
         installAct,
         cloneHono,
         dockerPulls,
-        benchHostOnly,
-        benchMatrix,
-        benchHonoBun,
-        benchPostgres,
+
+        // Host-backend targets — work on every OS we ship to.
+        bench('our-ci'),
+        bench('node-matrix'),
+        bench('hono-bun'),
+        bench('hono-node-matrix'),
+
+        // Docker-required targets — Linux GH runners only.
+        bench('service-postgres', "runner.os == 'Linux'"),
+
         upload,
       ],
     }),
