@@ -12,6 +12,7 @@
 import { performance } from 'node:perf_hooks';
 import type { Backend, BackendName, JobResult, JobStatus, PlannedJob, PlannedStep, StepResult } from './types.js';
 import { evalCondition } from './expression.js';
+import { substituteEnv, substituteString, substituteWith } from './planner.js';
 
 export interface SchedulerOptions {
   maxParallel: number;
@@ -145,7 +146,18 @@ export async function runJobs(jobs: PlannedJob[], opts: SchedulerOptions): Promi
       }
 
       opts.onEvent?.({ kind: 'step-start', job, step });
-      const r = await backend.exec(session, step);
+      // Re-resolve `${{ ... }}` against the LIVE ctx (which now includes
+      // outputs from prior steps in this job). Plan-time substitution
+      // happened against an empty stepCtx — references like
+      // `${{ steps.foo.outputs.bar }}` would have collapsed to '' at plan
+      // time. Reading from step.raw here keeps later refs honest.
+      const liveStep: PlannedStep = {
+        ...step,
+        run: step.raw.run !== undefined ? substituteString(step.raw.run, ctx) : step.run,
+        env: { ...substituteEnv(step.raw.env as Record<string, string> | undefined, ctx), ...step.env },
+        with: { ...substituteWith(step.raw.with, ctx), ...step.with },
+      };
+      const r = await backend.exec(session, liveStep);
       stepResults.push(r);
       if (step.raw.id) stepCtx[step.raw.id] = { outputs: r.outputs, outcome: r.status, conclusion: step.continueOnError && r.status === 'failure' ? 'success' : r.status };
       Object.assign(aggregateOutputs, r.outputs);

@@ -38,7 +38,7 @@ function matrixContext(matrix: Record<string, unknown>, opts: RunOptions): Expre
   };
 }
 
-function substituteString(s: string | undefined, ctx: ExpressionContext): string | undefined {
+export function substituteString(s: string | undefined, ctx: ExpressionContext): string | undefined {
   if (s === undefined) return undefined;
   if (typeof s !== 'string') return s;
   if (!s.includes('${{')) return s;
@@ -46,7 +46,7 @@ function substituteString(s: string | undefined, ctx: ExpressionContext): string
   return v === null || v === undefined ? '' : typeof v === 'object' ? JSON.stringify(v) : String(v);
 }
 
-function substituteEnv(
+export function substituteEnv(
   env: Record<string, string> | undefined,
   ctx: ExpressionContext,
 ): Record<string, string> {
@@ -57,7 +57,7 @@ function substituteEnv(
   return out;
 }
 
-function substituteWith(w: Record<string, unknown> | undefined, ctx: ExpressionContext): Record<string, unknown> {
+export function substituteWith(w: Record<string, unknown> | undefined, ctx: ExpressionContext): Record<string, unknown> {
   if (!w) return {};
   const out: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(w)) {
