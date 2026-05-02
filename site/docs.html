@@ -58,7 +58,7 @@
 
 <span class="comment"># installs a single binary called `runner`</span>
 <span class="prompt"></span>runner --version
-<span class="comment">0.1.0</span></pre>
+<span class="comment">0.3.0</span></pre>
     </div>
 
     <div class="mt-5 card">
@@ -205,11 +205,11 @@
         and <code class="font-mono">if</code>.
       </p>
       <p class="mt-3 text-sm text-[var(--gg-muted)]">
-        <span class="warn">⚠</span> Matrix cells of the same job currently run
-        sequentially because they share the host workspace (parallel cells
-        race on writes to <code class="font-mono">coverage/</code>, etc.).
-        Per-cell git-worktree isolation is on the roadmap and will lift this
-        constraint.
+        <span class="ok">✓</span> Matrix cells run in <span class="text-white">parallel</span>:
+        each cell gets its own <code class="font-mono">git worktree</code> off
+        the host repo (with <code class="font-mono">node_modules</code> and other
+        toolchain caches symlinked through). No shared-workspace races on
+        <code class="font-mono">coverage/</code>, build artifacts, etc.
       </p>
     </div>
 
