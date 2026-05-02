@@ -1,6 +1,6 @@
 {
   "name": "@gitgate/cli",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "GitGate CLI — compile and convert TypeScript GitHub Actions pipelines (gg)",
   "license": "Apache-2.0",
   "type": "module",
