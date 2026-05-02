@@ -12,3 +12,4 @@ dist
 coverage
 .vitest-cache
 poc/playground
+.runner
