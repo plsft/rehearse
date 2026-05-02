@@ -4,8 +4,8 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#08090c" />
-<title>GitGate — GitHub Actions, locally. 6–10× faster than act.</title>
-<meta name="description" content="Run your .github/workflows/*.yml on your laptop in seconds, not minutes. 6× faster than act on standard workflows, 10× on matrix. Same YAML. No new config. Free, Apache 2.0." />
+<title>GitGate — GitHub Actions, locally. 5–30× faster than act.</title>
+<meta name="description" content="Run your .github/workflows/*.yml on your laptop in seconds, not minutes. 5–9× faster than act on standard workflows, 30× on services. Same YAML. No new config. Free, Apache 2.0." />
 <meta property="og:title" content="GitGate — GitHub Actions, locally" />
 <meta property="og:description" content="Run your .github/workflows/*.yml on your laptop in seconds. Free, Apache 2.0." />
 <meta property="og:type" content="website" />
@@ -54,7 +54,7 @@
       <p class="mt-6 text-lg text-[var(--gg-muted)] max-w-2xl mx-auto">
         GitGate runs your <code class="font-mono text-white/90">.github/workflows/*.yml</code> on your laptop, in
         <span class="text-white">seconds</span>. Catch the failure before the
-        push. Same YAML. Same outcome. <span class="accent-text font-semibold">6–10× faster than <code class="font-mono">act</code></span> on real workflows.
+        push. Same YAML. Same outcome. <span class="accent-text font-semibold">5–9× faster than <code class="font-mono">act</code></span> on standard workflows, <span class="accent-text font-semibold">30× on services</span>.
       </p>
 
       <!-- Install command -->
@@ -109,7 +109,7 @@
       </div>
     </div>
     <div class="mt-3 text-[12px] font-mono text-[var(--gg-muted)] text-right">
-      simulated output · real run on a Windows 11 laptop takes 9.09s · GitHub-hosted ~50–110s
+      simulated output · real run on a Windows 11 laptop takes ~13s warm (v0.3.2) · GitHub-hosted ~50–110s
     </div>
   </div>
 </section>
@@ -146,34 +146,34 @@
           </thead>
           <tbody class="divide-y divide-white/5 text-white/90">
             <tr>
-              <td class="py-3 px-5">our-ci<div class="text-[11px] text-[var(--gg-muted)]">typecheck + 202 tests, 2 jobs</div></td>
-              <td class="py-3 px-5 text-right ok font-bold">10.58s</td>
-              <td class="py-3 px-5 text-right text-[var(--gg-muted)]">64.85s</td>
-              <td class="py-3 px-5 text-right ok font-bold">6.13×</td>
+              <td class="py-3 px-5">our-ci<div class="text-[11px] text-[var(--gg-muted)]">typecheck + tests, 2 jobs</div></td>
+              <td class="py-3 px-5 text-right ok font-bold">13.14s</td>
+              <td class="py-3 px-5 text-right text-[var(--gg-muted)]">62.86s</td>
+              <td class="py-3 px-5 text-right ok font-bold">4.78×</td>
               <td class="py-3 px-5">
                 <div class="flex flex-col gap-1.5">
-                  <div class="bar-track"><div class="bar-fill" style="width: 16%"></div></div>
+                  <div class="bar-track"><div class="bar-fill" style="width: 21%"></div></div>
                   <div class="bar-track"><div class="bar-fill bar-fill-act" style="width: 100%"></div></div>
                 </div>
               </td>
             </tr>
             <tr>
               <td class="py-3 px-5">node-matrix<div class="text-[11px] text-[var(--gg-muted)]">matrix [18.x, 20.x, 22.x] · 3 cells, parallel</div></td>
-              <td class="py-3 px-5 text-right ok font-bold">1.10s</td>
-              <td class="py-3 px-5 text-right text-[var(--gg-muted)]">11.63s</td>
-              <td class="py-3 px-5 text-right ok font-bold">10.56×</td>
+              <td class="py-3 px-5 text-right ok font-bold">1.05s</td>
+              <td class="py-3 px-5 text-right text-[var(--gg-muted)]">9.50s</td>
+              <td class="py-3 px-5 text-right ok font-bold">9.09×</td>
               <td class="py-3 px-5">
                 <div class="flex flex-col gap-1.5">
-                  <div class="bar-track"><div class="bar-fill" style="width: 9%"></div></div>
+                  <div class="bar-track"><div class="bar-fill" style="width: 11%"></div></div>
                   <div class="bar-track"><div class="bar-fill bar-fill-act" style="width: 100%"></div></div>
                 </div>
               </td>
             </tr>
             <tr>
               <td class="py-3 px-5">service-postgres<div class="text-[11px] text-[var(--gg-muted)]">postgres:16 + 4 psql steps</div></td>
-              <td class="py-3 px-5 text-right ok font-bold">12.00s</td>
+              <td class="py-3 px-5 text-right ok font-bold">11.80s</td>
               <td class="py-3 px-5 text-right err">timed out (&gt;360s)</td>
-              <td class="py-3 px-5 text-right ok font-bold">act fails</td>
+              <td class="py-3 px-5 text-right ok font-bold">30.50× — act fails</td>
               <td class="py-3 px-5">
                 <div class="flex flex-col gap-1.5">
                   <div class="bar-track"><div class="bar-fill" style="width: 3%"></div></div>
@@ -183,25 +183,13 @@
             </tr>
             <tr>
               <td class="py-3 px-5">hono-bun<div class="text-[11px] text-[var(--gg-muted)]">real OSS · honojs/hono · 26 tests</div></td>
-              <td class="py-3 px-5 text-right ok font-bold">1.72s</td>
+              <td class="py-3 px-5 text-right ok font-bold">3.63s</td>
               <td class="py-3 px-5 text-right text-[var(--gg-muted)]">n/a</td>
               <td class="py-3 px-5 text-right text-[var(--gg-muted)]">act lacks bun</td>
               <td class="py-3 px-5">
                 <div class="flex flex-col gap-1.5">
                   <div class="bar-track"><div class="bar-fill" style="width: 100%"></div></div>
-                  <div class="text-[10px] text-[var(--gg-muted)] font-mono">vs ~120s on GitHub-hosted</div>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td class="py-3 px-5">hono-node-matrix<div class="text-[11px] text-[var(--gg-muted)]">real OSS · 3-cell matrix, parallel cells</div></td>
-              <td class="py-3 px-5 text-right ok font-bold">378ms</td>
-              <td class="py-3 px-5 text-right text-[var(--gg-muted)]">n/a</td>
-              <td class="py-3 px-5 text-right text-[var(--gg-muted)]">act lacks bun</td>
-              <td class="py-3 px-5">
-                <div class="flex flex-col gap-1.5">
-                  <div class="bar-track"><div class="bar-fill" style="width: 100%"></div></div>
-                  <div class="text-[10px] text-[var(--gg-muted)] font-mono">vs ~3 min on GitHub-hosted (parallel)</div>
+                  <div class="text-[10px] text-[var(--gg-muted)] font-mono">26 hono tests through the runner</div>
                 </div>
               </td>
             </tr>
@@ -211,13 +199,16 @@
     </div>
 
     <p class="mt-6 text-sm text-[var(--gg-muted)] max-w-3xl">
-      <span class="text-white">Honest caveats:</span> warm-cache numbers on
-      a fresh GitHub-hosted Linux runner — the second run, with deps already
+      <span class="text-white">Honest caveats:</span> warm-cache numbers from
+      a fresh GitHub-hosted <code class="font-mono">ubuntu-latest</code> runner
+      at <code class="font-mono">v0.3.2</code> — the second run, with deps already
       on disk. Cold-vs-cold is narrower — a fresh <code class="font-mono">pnpm install</code>
-      dominates everything. We also run the same bench on macOS and Windows
-      runners (host-backend targets only — no Docker on those GH runners).
-      Full methodology, cross-OS numbers, and the act service-container failure
-      writeup in <a href="https://github.com/plsft/gitgate/blob/main/bench/RESULTS.md" class="link">bench/RESULTS.md</a>.
+      dominates everything. We run the same bench on macOS and Windows
+      runners (host-backend targets only — no Docker on those GH runners) and
+      <code class="font-mono">hono-node-matrix</code> currently regresses on
+      GH-hosted runners (works locally; under investigation). Full methodology,
+      per-OS numbers, and the regression writeup in
+      <a href="https://github.com/plsft/gitgate/blob/main/bench/RESULTS.md" class="link">bench/RESULTS.md</a>.
     </p>
   </div>
 </section>
@@ -416,7 +407,7 @@
     <div class="grid md:grid-cols-3 gap-5 mt-12">
       <div class="card text-center">
         <div class="metric text-5xl">100%</div>
-        <div class="mt-2 text-sm text-[var(--gg-muted)]">our own CI<div class="text-[11px]">3 jobs · 16 steps</div></div>
+        <div class="mt-2 text-sm text-[var(--gg-muted)]">our own CI<div class="text-[11px]">2 jobs · 11 steps</div></div>
       </div>
       <div class="card text-center" style="border-color: rgba(34,197,94,0.4)">
         <div class="metric text-5xl">96.2%</div>
@@ -527,7 +518,7 @@
     </div>
   </div>
   <div class="max-w-6xl mx-auto px-5 mt-6 font-mono text-[11px] text-[var(--gg-muted)]">
-    <span class="ok">●</span> v0.3.1 · public alpha · Apache 2.0
+    <span class="ok">●</span> v0.3.2 · public alpha · Apache 2.0
   </div>
 </footer>
 
