@@ -5,6 +5,11 @@ export { HostBackend } from './backends/host.js';
 export { ContainerBackend } from './backends/container.js';
 export { evalBody, evalCondition, evalExpr } from './expression.js';
 export { expandMatrix, parseMatrix, cellId } from './matrix.js';
+export { LocalCache } from './cache.js';
+export { LocalArtifacts } from './artifacts.js';
+export { compat, printReport } from './compat.js';
+export { isJsActionUses, parseGithubOutput } from './js-action.js';
+export { createWorktree, isGitRepo, pruneWorktrees } from './worktree.js';
 export type {
   Backend,
   BackendName,

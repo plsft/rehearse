@@ -8,6 +8,7 @@
  */
 import { performance } from 'node:perf_hooks';
 import type { BackendName, JobSession, PlannedStep, StepResult } from '../types.js';
+import { downloadArtifactShim, uploadArtifactShim } from './artifact-shim.js';
 import { cacheShim } from './cache-shim.js';
 import { setupNodeShim } from './setup-node.js';
 
@@ -38,9 +39,9 @@ const SHIMS: ShimEntry[] = [
   { match: /^actions\/cache\/restore(@|$)/, fn: (s, sess) => cacheShim(s, sess, 'restore') },
   { match: /^actions\/cache(@|$)/, fn: (s, sess) => cacheShim(s, sess, 'restore-and-save') },
 
-  // Artifacts (still no-op; v2 work).
-  { match: /^actions\/upload-artifact(@|$)/, fn: hostNoOp('upload-artifact — local fs (TODO)') },
-  { match: /^actions\/download-artifact(@|$)/, fn: hostNoOp('download-artifact — local fs (TODO)') },
+  // Artifacts — backed by LocalArtifacts under .runner/artifacts/.
+  { match: /^actions\/upload-artifact(@|$)/, fn: uploadArtifactShim },
+  { match: /^actions\/download-artifact(@|$)/, fn: downloadArtifactShim },
 
   // External services: skip with explanation.
   { match: /^codecov\/codecov-action(@|$)/, fn: hostNoOp('codecov — external upload, skipped locally') },

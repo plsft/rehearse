@@ -77,6 +77,11 @@ export interface PlannedStep {
   continueOnError: boolean;
 }
 
+export interface SessionWorktree {
+  path: string;
+  cleanup: () => void;
+}
+
 /**
  * One concrete execution context for a job. Backends create one of these in
  * `prepare()`, hand it to each `exec()` call, and tear it down in `teardown()`.
@@ -94,6 +99,12 @@ export interface JobSession {
   serviceContainers?: string[];
   /** For host backends: a path to a per-job temp dir for outputs. */
   tempDir: string;
+  /**
+   * If set, a per-cell git-worktree was created for this session and
+   * should be torn down when the job finishes. The worktree path is
+   * `workdir`; `hostCwd` still points at the parent repo root.
+   */
+  worktree?: SessionWorktree;
 }
 
 export interface Backend {

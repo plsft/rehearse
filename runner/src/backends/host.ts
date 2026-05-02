@@ -10,20 +10,52 @@ import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { performance } from 'node:perf_hooks';
 import type { Backend, JobSession, PrepareArgs, PlannedStep, StepResult } from '../types.js';
+import { isJsActionUses, runJsAction } from '../js-action.js';
 import { runShim, hasShim } from '../shims/index.js';
+import { createWorktree, isGitRepo } from '../worktree.js';
+
+export interface HostBackendOptions {
+  /**
+   * When a job has a matrix cell, create a per-cell `git worktree` so
+   * cells can run in parallel without racing on shared workspace writes.
+   * Falls back to the parent repo on non-git workspaces or symlink failures.
+   */
+  worktreeForMatrix?: boolean;
+}
 
 export class HostBackend implements Backend {
   readonly name = 'host' as const;
+  constructor(private readonly opts: HostBackendOptions = { worktreeForMatrix: true }) {}
 
   async prepare(args: PrepareArgs): Promise<JobSession> {
     const safeId = args.jobId.replace(/[^A-Za-z0-9_.-]+/g, '_');
     const tempDir = mkdtempSync(resolve(tmpdir(), `runner-${safeId}-`));
+
+    let workdir = args.hostCwd;
+    let worktree: JobSession['worktree'];
+    if (
+      this.opts.worktreeForMatrix !== false &&
+      args.job.matrixCell !== undefined &&
+      isGitRepo(args.hostCwd)
+    ) {
+      try {
+        const wt = createWorktree({ repoRoot: args.hostCwd, jobId: args.jobId });
+        workdir = wt.path;
+        worktree = wt;
+      } catch (err) {
+        // Worktree creation can fail (e.g., shallow clone, weird state).
+        // Falling back to shared workspace + sequential execution is safe.
+        console.error(`[runner] worktree setup failed, falling back to shared workspace: ${(err as Error).message}`);
+      }
+    }
+
     return {
       jobId: args.jobId,
       hostCwd: args.hostCwd,
-      workdir: args.hostCwd,
+      workdir,
       env: args.job.env,
       tempDir,
+      worktree,
     };
   }
 
@@ -32,6 +64,9 @@ export class HostBackend implements Backend {
 
     if (step.uses && hasShim(step.uses)) {
       return runShim(step, session, this.name);
+    }
+    if (step.uses && isJsActionUses(step.uses)) {
+      return runJsAction(step, session);
     }
     if (step.uses) {
       return {
@@ -87,8 +122,9 @@ export class HostBackend implements Backend {
     });
   }
 
-  async teardown(_session: JobSession): Promise<void> {
+  async teardown(session: JobSession): Promise<void> {
     // Leave tempDir for inspection on failure; OS cleans up tmp eventually.
+    if (session.worktree) session.worktree.cleanup();
   }
 }
 

@@ -6,6 +6,7 @@ import { Command } from 'commander';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import pc from 'picocolors';
+import { compat, printReport } from './compat.js';
 import { run } from './orchestrator.js';
 import { watchWorkflow } from './watch.js';
 import type { BackendName } from './types.js';
@@ -71,6 +72,21 @@ program
       env,
       secrets: env,
     });
+  });
+
+program
+  .command('compat <workflow>')
+  .description('Audit a workflow YAML for runner compatibility')
+  .option('--json', 'machine-readable JSON output')
+  .action(async (workflow: string, opts: { json?: boolean }) => {
+    try {
+      const result = compat(workflow);
+      printReport(result, { json: opts.json });
+      process.exit(0);
+    } catch (err) {
+      console.error(pc.red('✗ ' + ((err as Error).message ?? String(err))));
+      process.exit(2);
+    }
   });
 
 program

@@ -166,27 +166,23 @@ export async function runJobs(jobs: PlannedJob[], opts: SchedulerOptions): Promi
     return result;
   }
 
-  // Matrix cells of the SAME jobKey share the host workspace, so by default
-  // we run them sequentially to avoid file races (e.g. coverage/.tmp).
-  // Different jobKeys still run in parallel. Per-cell git-worktree isolation
-  // is on the roadmap and will lift this constraint.
-  const inflightJobKeys = new Set<string>();
+  // Matrix cells of the same jobKey USED to share the host workspace, so we
+  // serialised them. With the host backend's per-cell git-worktree isolation
+  // each cell now runs in its own checkout — they're free to run in parallel.
+  // The container backend always isolates anyway (one container per job).
+  // We retain the serialisation for cells that elected to NOT use a worktree
+  // (non-git workspaces, symlink failures on Windows without admin) since
+  // those still race on shared writes.
 
   while (remaining.size > 0 || inflight.size > 0) {
     const ready = [...remaining].filter(isReady);
     while (ready.length > 0 && inflight.size < opts.maxParallel) {
       if (aborted) break;
-      // Find the first ready job whose jobKey is not already in flight.
-      const idx = ready.findIndex((id) => !inflightJobKeys.has(byId.get(id)!.jobKey));
-      if (idx < 0) break;
-      const id = ready.splice(idx, 1)[0]!;
-      const job = byId.get(id)!;
+      const id = ready.shift()!;
       remaining.delete(id);
-      inflightJobKeys.add(job.jobKey);
       const p = execute(id).then((r) => {
         completed.set(id, r);
         inflight.delete(id);
-        inflightJobKeys.delete(job.jobKey);
         if (r.status === 'failure' && opts.failFast) aborted = true;
         return r;
       });
