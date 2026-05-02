@@ -1,6 +1,14 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "gitgate-site",
+  "name": "gitgate-web",
   "compatibility_date": "2025-04-01",
-  "pages_build_output_dir": "dist"
+  "workers_dev": true,
+  "routes": [
+    { "pattern": "gitgate.com/*", "zone_name": "gitgate.com" }
+  ],
+  "assets": {
+    "directory": "dist",
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash"
+  }
 }

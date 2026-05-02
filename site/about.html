@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#08090c" />
+<title>GitGate — About</title>
+<meta name="description" content="GitGate is built by George Rios at flarefound — Cloudflare-focused development consulting. Apache 2.0, no hosted product." />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script type="module" src="/src/main.ts"></script>
+</head>
+<body class="antialiased" x-data="{ scrolled: false }" x-init="window.addEventListener('scroll', () => scrolled = window.scrollY > 8)">
+
+<header :class="scrolled ? 'border-b border-white/10 backdrop-blur bg-black/55' : 'border-b border-transparent'"
+        class="fixed inset-x-0 top-0 z-50 transition-colors">
+  <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2.5 font-mono group" aria-label="GitGate home">
+      <span class="logo-mark logo-mark-md text-[var(--gg-accent)] transition-transform group-hover:scale-110"></span>
+      <span class="font-semibold tracking-tight text-white">gitgate</span>
+      <span class="hidden sm:inline text-[11px] text-[var(--gg-muted)] border border-white/10 rounded px-1.5 py-0.5">v0.3.2 · alpha</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-7">
+      <a href="/#bench" class="nav-link">Bench</a>
+      <a href="/#features" class="nav-link">Features</a>
+      <a href="/#oss" class="nav-link">Open source</a>
+      <a href="/docs.html" class="nav-link">Docs</a>
+      <a href="/about.html" class="nav-link nav-link-active">About</a>
+      <a href="https://github.com/plsft/gitgate" class="nav-link">GitHub</a>
+    </nav>
+    <a href="/#install" class="btn btn-primary">Install</a>
+  </div>
+</header>
+
+<section class="bg-grid pt-36 pb-12">
+  <div class="max-w-3xl mx-auto px-5">
+    <div class="eyebrow">// About</div>
+    <h1 class="mt-2 text-4xl sm:text-5xl font-semibold tracking-tight gradient-text">
+      Built by someone who's shipped before.
+    </h1>
+    <p class="mt-5 text-lg text-[var(--gg-muted)]">
+      GitGate is a small open-source project. No hosted product, no signup, no
+      account. Just a single CLI on npm and the YAML you already have.
+    </p>
+  </div>
+</section>
+
+<section class="py-16 hairline">
+  <div class="max-w-3xl mx-auto px-5 space-y-8 text-[var(--gg-muted)] leading-relaxed">
+
+    <p>
+      GitGate is built by <strong class="text-white">George Rios</strong>,
+      founder of <a href="https://flarefound.com" class="link">flarefound</a> —
+      a Cloudflare-focused development consultancy. 25+ years of shipping
+      production software: enterprise architecture, distributed systems,
+      high-scale platforms. The kind of experience that comes from shipping
+      across multiple decades of technology shifts — on-prem to cloud,
+      monoliths to microservices, cloud to edge.
+    </p>
+
+    <p>
+      <a href="https://flarefound.com" class="link">flarefound</a> does one
+      thing: builds software on Cloudflare. Not AWS, not Azure, not multi-cloud.
+      Workers, D1, R2, Durable Objects, Containers, Queues, Workers AI — that's
+      the entire stack. Companies come to flarefound when they want to build
+      new products on Cloudflare's edge or migrate existing workloads off
+      traditional infrastructure.
+    </p>
+
+    <p>
+      GitGate started as a question: <em>your CI loop is `git push → wait →
+      fail → repeat`. What if it ran on every save instead?</em> That answer
+      turned into a runner that reads your <code class="font-mono">.github/workflows/*.yml</code>,
+      executes it locally, and finishes 5–9× faster than
+      <code class="font-mono">act</code> on standard workflows — 30× on
+      services, where <code class="font-mono">act</code> doesn't actually
+      complete. Same YAML, no new config.
+    </p>
+
+    <p>
+      The <code class="font-mono">runner</code> CLI, the
+      <code class="font-mono">@gitgate/ci</code> TypeScript pipeline SDK, the
+      <code class="font-mono">@gitgate/git-core</code> pure-TypeScript git
+      engine, and the <code class="font-mono">@gitgate/cli</code> companion
+      tool are all <strong class="text-white">Apache 2.0 on npm</strong>. The
+      generated YAML works standalone — eject any time. There is no hosted
+      product to be locked into.
+    </p>
+
+    <h2 class="text-2xl font-semibold gradient-text tracking-tight pt-6">
+      flarefound
+    </h2>
+
+    <div class="card">
+      <p class="text-sm">
+        Cloudflare development consulting. Architecture reviews, build sprints,
+        and fractional CTO engagements for companies building on Workers, D1,
+        R2, Durable Objects, and Containers.
+      </p>
+      <a href="https://flarefound.com" class="link inline-flex items-center gap-2 mt-3 text-sm">
+        flarefound.com →
+      </a>
+    </div>
+
+    <h2 class="text-2xl font-semibold gradient-text tracking-tight pt-6">
+      Get in touch
+    </h2>
+
+    <p class="text-sm">
+      Bug reports and feature requests:
+      <a href="https://github.com/plsft/gitgate/issues" class="link">github.com/plsft/gitgate/issues</a>.
+    </p>
+    <p class="text-sm">
+      Cloudflare consulting or general questions:
+      <a href="mailto:george@flarefound.com" class="link">george@flarefound.com</a>.
+    </p>
+  </div>
+</section>
+
+<footer class="py-14 hairline">
+  <div class="max-w-6xl mx-auto px-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 font-mono text-sm text-[var(--gg-muted)]">
+    <div class="flex items-center gap-2">
+      <span class="logo-mark logo-mark-sm text-[var(--gg-accent)]"></span>
+      <span class="text-white">gitgate</span> · by <a href="https://github.com/plsft" class="link">plsft</a> · <a href="https://flarefound.com" class="link">flarefound</a>
+    </div>
+    <div class="flex flex-wrap gap-x-6 gap-y-2">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/docs.html" class="nav-link">Docs</a>
+      <a href="https://github.com/plsft/gitgate" class="nav-link">GitHub</a>
+      <a href="https://github.com/plsft/gitgate/issues" class="nav-link">Issues</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
