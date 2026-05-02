@@ -66,13 +66,25 @@ For comparison, this is the original Windows 11 laptop bench. Same
 runner code; the difference is dev-machine state (Docker, deps, bun
 preinstalled).
 
+Re-run on **2026-05-02 against the runner with the v0.3.1 require() fix**
+(see commit fixing the ESM-context crash in `composite.ts` /
+`artifacts.ts`). All five targets executed cleanly via the published
+CLI surface; previously the matrix targets crashed when invoked
+directly because of the require() in composite.ts.
+
 | Target | Our runner | `act` | Speedup |
 | --- | ---: | ---: | ---: |
-| `our-ci` | 9.09s | 30.28s | 3.33× |
-| `node-matrix` | 3.56s | 18.05s | 5.06× |
-| `service-postgres` | 20.50s | timeout (>360s) | **act fails** |
-| `hono-bun` | 6.09s | n/a | — |
-| `hono-node-matrix` (post-worktree v0.2.0) | 18.99s | n/a | — |
+| `our-ci` | **13.32s** | 55.80s | **4.19×** |
+| `node-matrix` | **3.57s** | 18.72s | **5.25×** |
+| `service-postgres` | **20.63s** | timeout (360.02s) | **17.45×** (act fails) |
+| `hono-bun` | **1.58s** | n/a | — |
+| `hono-node-matrix` | **18.47s** | n/a | — |
+
+The earlier v0.2.0 numbers (`9.09s` / `3.56s` / `20.50s` / `6.09s` /
+`18.99s`) drifted under load — laptop background state matters more
+than runner version on the host backend. The v0.3.1 numbers above are
+the steady-state warm read after running `pnpm tsx bench/compare.ts
+--skip-cold` on a quiet machine.
 
 The Linux GH-runner numbers are *better than* Windows-local across the
 board (faster CPUs in the Linux pool + native Docker + better disk
