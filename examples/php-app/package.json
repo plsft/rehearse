@@ -5,6 +5,6 @@
   "description": "GitGate example: PHP + PHPUnit + PHPStan, matrix across PHP versions",
   "type": "module",
   "devDependencies": {
-    "@gitgate/ci": "workspace:*"
+    "@gitgate/ci": "^0.3.2"
   }
 }

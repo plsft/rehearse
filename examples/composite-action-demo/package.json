@@ -8,7 +8,7 @@
     "test": "vitest run"
   },
   "devDependencies": {
-    "@gitgate/ci": "workspace:*",
+    "@gitgate/ci": "^0.3.2",
     "typescript": "^5.8.0",
     "vitest": "^3.0.0"
   }

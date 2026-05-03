@@ -5,6 +5,6 @@
   "description": "GitGate example: FastAPI + pytest + Postgres service",
   "type": "module",
   "devDependencies": {
-    "@gitgate/ci": "workspace:*"
+    "@gitgate/ci": "^0.3.2"
   }
 }
