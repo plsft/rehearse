@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Pro Quickstart — Rehearse</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script type="module" src="/src/main.ts"></script>
+</head>
+<body class="antialiased">
+
+<header class="fixed inset-x-0 top-0 z-50 border-b border-white/10 backdrop-blur bg-black/55">
+  <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2.5 font-mono">
+      <span class="logo-mark logo-mark-md text-[var(--rh-accent)]"></span>
+      <span class="font-semibold tracking-tight text-white">rehearse</span>
+      <span class="hidden sm:inline text-[11px] text-[var(--rh-muted)] border border-white/10 rounded px-1.5 py-0.5">pro</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-7">
+      <a href="/" class="nav-link">OSS runner</a>
+      <a href="/pro" class="nav-link">Pro</a>
+      <a href="/pricing" class="nav-link">Pricing</a>
+      <a href="/catalog" class="nav-link">Catalog</a>
+      <a href="/security" class="nav-link">Security</a>
+      <a href="/docs/pro" class="nav-link text-white">Docs</a>
+    </nav>
+  </div>
+</header>
+
+<section class="pt-32 pb-20">
+  <div class="max-w-3xl mx-auto px-5">
+    <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-2">// docs / pro</div>
+    <h1 class="text-3xl font-semibold mb-3">Pro quickstart.</h1>
+    <p class="text-[var(--rh-muted)] mb-12 max-w-2xl">Set the token, the OSS runner does the rest. No new commands.</p>
+
+    <h2 class="text-xl font-semibold mb-3">01 — sign up</h2>
+    <p class="text-[var(--rh-muted)] mb-3 text-sm">Buy Pro at <a class="underline" href="/pricing">/pricing</a>. Stripe sends you a receipt; we send you the API key (shown once on the success page and in the welcome email). Save it somewhere safe.</p>
+
+    <h2 class="text-xl font-semibold mt-10 mb-3">02 — set the token</h2>
+    <p class="text-[var(--rh-muted)] mb-3 text-sm">Either via env-var or a config file. Both work; env-var wins if both are present.</p>
+    <pre class="terminal">export REHEARSE_TOKEN=rh_pro_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</pre>
+    <p class="text-[var(--rh-muted)] mt-3 mb-3 text-sm">Or in <code class="font-mono">rehearse.config.mjs</code>:</p>
+    <pre class="terminal">export default {
+  images: {
+    source: 'rehearse-pro',
+    apiKey: process.env.REHEARSE_TOKEN,
+    fallback: 'public',
+  },
+};</pre>
+
+    <h2 class="text-xl font-semibold mt-10 mb-3">03 — run as before</h2>
+    <pre class="terminal">rehearse run .github/workflows/ci.yml</pre>
+    <p class="text-[var(--rh-muted)] mt-3 text-sm">The runner pulls warmed images automatically when your workflow uses Node, Python, Go, etc. If anything goes wrong (token invalid, image not in catalog, registry unreachable) the runner falls back to public Docker Hub silently — your CI never fails because of Pro.</p>
+
+    <h2 class="text-xl font-semibold mt-10 mb-3">04 — verify a Pro image (optional)</h2>
+    <p class="text-[var(--rh-muted)] mb-3 text-sm">Every image is cosign-signed via Sigstore. To verify before pulling:</p>
+    <pre class="terminal">cosign verify registry.rehearse.sh/node:20-warm \
+  --certificate-identity-regexp 'https://github.com/rehearse-sh/images/' \
+  --certificate-oidc-issuer 'https://token.actions.githubusercontent.com'</pre>
+
+    <h2 class="text-xl font-semibold mt-10 mb-3">05 — rotate keys</h2>
+    <p class="text-[var(--rh-muted)] mb-3 text-sm">In <a class="underline" href="https://pro.rehearse.sh/dashboard/keys">Dashboard → API keys</a>: create a new key, swap your env-var, revoke the old one. Revocation is immediate; cached tokens expire within 5 minutes.</p>
+
+    <h2 class="text-xl font-semibold mt-10 mb-3">troubleshooting</h2>
+    <ul class="space-y-3 text-[var(--rh-muted)] text-sm">
+      <li>— <span class="text-white">"401 Unauthorized" on pull:</span> token revoked or wrong. Run <code class="font-mono">echo $REHEARSE_TOKEN</code>; create a new key in the dashboard.</li>
+      <li>— <span class="text-white">"image not in catalog":</span> the requested <code class="font-mono">name:tag</code> isn't a Pro image. Check <a class="underline" href="/catalog">/catalog</a>; the runner falls back to public Docker Hub silently.</li>
+      <li>— <span class="text-white">slow pulls:</span> first pull is uncached at the edge — subsequent pulls hit the Worker's cache. If you're seeing &gt;5s on small manifests after the first request, email us.</li>
+    </ul>
+  </div>
+</section>
+
+<style>
+.terminal { background: var(--rh-bg); border: 1px solid rgba(255,255,255,0.14); padding: 14px 16px; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #d8dde6; overflow-x: auto; }
+</style>
+
+<footer class="py-12 hairline">
+  <div class="max-w-6xl mx-auto px-5 flex flex-wrap justify-between gap-6 text-[13px] text-[var(--rh-muted)] font-mono">
+    <div>© Rehearse · Apache 2.0 (OSS) · Pro by Plural Software</div>
+    <div class="flex gap-5"><a href="/">OSS</a><a href="/pro">Pro</a><a href="/pricing">Pricing</a><a href="/catalog">Catalog</a><a href="/security">Security</a><a href="/docs/pro">Docs</a></div>
+  </div>
+</footer>
+
+</body>
+</html>

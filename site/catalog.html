@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#08090c" />
+<title>Catalog — Rehearse Pro</title>
+<meta name="description" content="The Rehearse Pro image catalog: 10 cosign-signed, Trivy-scanned, weekly-rebuilt CI base images. Node, Python, Go, Java, .NET, Bun, Ruby, PHP." />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script type="module" src="/src/main.ts"></script>
+</head>
+<body class="antialiased" x-data="catalogPage()" x-init="load()">
+
+<header class="fixed inset-x-0 top-0 z-50 border-b border-white/10 backdrop-blur bg-black/55">
+  <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2.5 font-mono">
+      <span class="logo-mark logo-mark-md text-[var(--rh-accent)]"></span>
+      <span class="font-semibold tracking-tight text-white">rehearse</span>
+      <span class="hidden sm:inline text-[11px] text-[var(--rh-muted)] border border-white/10 rounded px-1.5 py-0.5">pro</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-7">
+      <a href="/" class="nav-link">OSS runner</a>
+      <a href="/pro" class="nav-link">Pro</a>
+      <a href="/pricing" class="nav-link">Pricing</a>
+      <a href="/catalog" class="nav-link text-white">Catalog</a>
+      <a href="/security" class="nav-link">Security</a>
+      <a href="/docs/pro" class="nav-link">Docs</a>
+    </nav>
+  </div>
+</header>
+
+<section class="pt-32 pb-12">
+  <div class="max-w-6xl mx-auto px-5">
+    <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-2">// catalog</div>
+    <h1 class="text-3xl sm:text-4xl font-semibold tracking-tight mb-3">10 images. 8 languages. All signed.</h1>
+    <p class="text-[var(--rh-muted)] max-w-2xl mb-8">
+      Every image is built weekly via OIDC-signed GitHub Actions and gated on Trivy. Multi-arch (amd64 + arm64). Public catalog page; pulls require a Pro API key.
+    </p>
+
+    <div class="flex flex-wrap gap-2 mb-6 text-[12px] font-mono">
+      <button @click="filter=''" :class="filter==='' ? 'bg-white/10 text-white' : 'text-[var(--rh-muted)]'" class="px-3 py-1.5 border border-white/10 rounded">all</button>
+      <template x-for="lang in languages">
+        <button @click="filter=lang" :class="filter===lang ? 'bg-white/10 text-white' : 'text-[var(--rh-muted)]'" class="px-3 py-1.5 border border-white/10 rounded" x-text="lang"></button>
+      </template>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-4">
+      <template x-for="img in filtered()" :key="img.id">
+        <a :href="`/catalog/${img.id.replace(':','-')}`" class="card p-6 hover:border-[var(--rh-accent)]/30 transition-colors">
+          <div class="flex items-baseline justify-between mb-2">
+            <span class="font-mono font-semibold text-white" x-text="img.id"></span>
+            <span class="text-[11px] font-mono text-[var(--rh-muted)]" x-text="img.language"></span>
+          </div>
+          <p class="text-[var(--rh-muted)] text-sm mb-3" x-text="img.description"></p>
+          <div class="text-[11px] font-mono text-[var(--rh-muted)] flex gap-4">
+            <span>amd64 + arm64</span>
+            <span>cosign signed</span>
+            <span>trivy clean</span>
+          </div>
+        </a>
+      </template>
+    </div>
+  </div>
+</section>
+
+<footer class="py-12 hairline">
+  <div class="max-w-6xl mx-auto px-5 flex flex-wrap justify-between gap-6 text-[13px] text-[var(--rh-muted)] font-mono">
+    <div>© Rehearse · Apache 2.0 (OSS) · Pro by Plural Software</div>
+    <div class="flex gap-5"><a href="/">OSS</a><a href="/pro">Pro</a><a href="/pricing">Pricing</a><a href="/catalog">Catalog</a><a href="/security">Security</a><a href="/docs/pro">Docs</a></div>
+  </div>
+</footer>
+
+<script>
+function catalogPage() {
+  return {
+    filter: '',
+    images: [],
+    languages: [],
+    async load() {
+      try {
+        const res = await fetch('https://api.rehearse.sh/v1/catalog');
+        const body = await res.json();
+        this.images = body.images;
+      } catch (err) {
+        // Fallback to embedded list — keeps the page useful if the API is down.
+        this.images = [
+          { id: 'node:20-warm', language: 'node', description: 'Node 20 + npm/pnpm/yarn caches.' },
+          { id: 'node:20-postgres-warm', language: 'node', description: 'Node 20 + Postgres 16 + warm npm caches.' },
+          { id: 'python:3.12-warm', language: 'python', description: 'Python 3.12 + pip/poetry/uv caches.' },
+          { id: 'python:3.12-postgres-warm', language: 'python', description: 'Python 3.12 + Postgres 16 + psycopg2.' },
+          { id: 'bun:1-warm', language: 'bun', description: 'Bun 1 with warm npm-compatible cache.' },
+          { id: 'go:1.23-warm', language: 'go', description: 'Go 1.23 with curated module cache.' },
+          { id: 'java:21-warm', language: 'java', description: 'Temurin JDK 21 + Maven + Gradle caches.' },
+          { id: 'dotnet:8-warm', language: 'dotnet', description: '.NET 8 SDK + NuGet caches.' },
+          { id: 'ruby:3.3-warm', language: 'ruby', description: 'Ruby 3.3 + Bundler with gem cache.' },
+          { id: 'php:8.3-warm', language: 'php', description: 'PHP 8.3 + Composer with package cache.' },
+        ];
+      }
+      this.languages = [...new Set(this.images.map(i => i.language))];
+    },
+    filtered() {
+      return this.filter ? this.images.filter(i => i.language === this.filter) : this.images;
+    },
+  };
+}
+</script>
+
+</body>
+</html>

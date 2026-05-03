@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#08090c" />
+<title>Security — Rehearse Pro</title>
+<meta name="description" content="What Rehearse Pro stores, what it doesn't, what we do to keep image integrity, and how to talk to us about a security finding." />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script type="module" src="/src/main.ts"></script>
+</head>
+<body class="antialiased">
+
+<header class="fixed inset-x-0 top-0 z-50 border-b border-white/10 backdrop-blur bg-black/55">
+  <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2.5 font-mono">
+      <span class="logo-mark logo-mark-md text-[var(--rh-accent)]"></span>
+      <span class="font-semibold tracking-tight text-white">rehearse</span>
+      <span class="hidden sm:inline text-[11px] text-[var(--rh-muted)] border border-white/10 rounded px-1.5 py-0.5">pro</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-7">
+      <a href="/" class="nav-link">OSS runner</a>
+      <a href="/pro" class="nav-link">Pro</a>
+      <a href="/pricing" class="nav-link">Pricing</a>
+      <a href="/catalog" class="nav-link">Catalog</a>
+      <a href="/security" class="nav-link text-white">Security</a>
+      <a href="/docs/pro" class="nav-link">Docs</a>
+    </nav>
+  </div>
+</header>
+
+<section class="pt-32 pb-16">
+  <div class="max-w-3xl mx-auto px-5">
+    <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-2">// security</div>
+    <h1 class="text-3xl sm:text-4xl font-semibold tracking-tight mb-3">Trust surface: image bytes.</h1>
+    <p class="text-[var(--rh-muted)] mb-12 max-w-2xl">
+      The single sentence we want every CISO to hear: <span class="text-white">Rehearse Pro never holds customer source code, secrets, build artifacts, or run logs. We serve container image bytes. That's the entire surface.</span>
+    </p>
+
+    <div class="card p-7 mb-6">
+      <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// what we store</div>
+      <ul class="space-y-2 text-sm">
+        <li>— Email + Stripe customer ID + Stripe subscription metadata</li>
+        <li>— Hashed API keys (sha256, prefix indexed for lookup)</li>
+        <li>— Per-pull events: team id, key id, image id, byte count, timestamp</li>
+        <li>— Bandwidth usage aggregates per team per month</li>
+        <li>— Audit log entries for privileged actions (key create, key revoke, billing changes)</li>
+      </ul>
+    </div>
+
+    <div class="card p-7 mb-6">
+      <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// what we never store</div>
+      <ul class="space-y-2 text-sm">
+        <li>— Source code</li>
+        <li>— Build artifacts or run logs</li>
+        <li>— CI environment variables or secrets</li>
+        <li>— API key plaintext (shown once at creation, then sha256 only)</li>
+        <li>— IP addresses (we hash to a 16-char prefix for abuse detection)</li>
+      </ul>
+    </div>
+
+    <div class="card p-7 mb-6">
+      <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// image integrity</div>
+      <ul class="space-y-2 text-sm">
+        <li>— <span class="text-white">Cosign-signed</span> via Sigstore keyless OIDC. Verify with <code class="font-mono">cosign verify registry.rehearse.sh/&lt;image&gt;</code>.</li>
+        <li>— <span class="text-white">Trivy-scanned</span> on every build. Build fails on fixed HIGH or CRITICAL CVEs.</li>
+        <li>— <span class="text-white">Multi-arch reproducible</span>: amd64 + arm64 from the same Dockerfile.</li>
+        <li>— <span class="text-white">Weekly rebuild</span>: every Monday 06:00 UTC. Out-of-band rebuilds for critical CVE disclosures.</li>
+        <li>— <span class="text-white">Public Dockerfiles</span>: every image's source lives at <a class="underline" href="https://github.com/rehearse-sh/images">github.com/rehearse-sh/images</a>.</li>
+      </ul>
+    </div>
+
+    <div class="card p-7 mb-6">
+      <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// infrastructure</div>
+      <ul class="space-y-2 text-sm">
+        <li>— Cloudflare Workers + D1 + R2. Single-region for v1.</li>
+        <li>— Stripe handles all card data. We never see PANs.</li>
+        <li>— TLS terminated at Cloudflare. HSTS preload eligible.</li>
+        <li>— No customer data crosses to third parties beyond Stripe (billing) and Resend (transactional email).</li>
+      </ul>
+    </div>
+
+    <div class="card p-7">
+      <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// reporting a finding</div>
+      <p class="text-sm">Email <a class="underline" href="mailto:security@rehearse.sh">security@rehearse.sh</a>. We acknowledge within 24 hours and update you weekly until resolved. We don't yet run a paid bounty program; we will credit reporters in the changelog if requested.</p>
+    </div>
+
+    <p class="text-[12px] font-mono text-[var(--rh-muted)] mt-8">
+      SOC 2 Type 1 in flight; planning Type 2 12 months post-launch. DPA template available on request for Enterprise customers.
+    </p>
+  </div>
+</section>
+
+<footer class="py-12 hairline">
+  <div class="max-w-6xl mx-auto px-5 flex flex-wrap justify-between gap-6 text-[13px] text-[var(--rh-muted)] font-mono">
+    <div>© Rehearse · Apache 2.0 (OSS) · Pro by Plural Software</div>
+    <div class="flex gap-5"><a href="/">OSS</a><a href="/pro">Pro</a><a href="/pricing">Pricing</a><a href="/catalog">Catalog</a><a href="/security">Security</a><a href="/docs/pro">Docs</a></div>
+  </div>
+</footer>
+
+</body>
+</html>

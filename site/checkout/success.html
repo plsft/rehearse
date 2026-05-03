@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>You're in — Rehearse Pro</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script type="module" src="/src/main.ts"></script>
+</head>
+<body class="antialiased" x-data="successPage()" x-init="load()">
+
+<header class="fixed inset-x-0 top-0 z-50 border-b border-white/10 backdrop-blur bg-black/55">
+  <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2.5 font-mono">
+      <span class="logo-mark logo-mark-md text-[var(--rh-accent)]"></span>
+      <span class="font-semibold tracking-tight text-white">rehearse</span>
+      <span class="hidden sm:inline text-[11px] text-[var(--rh-muted)] border border-white/10 rounded px-1.5 py-0.5">pro</span>
+    </a>
+  </div>
+</header>
+
+<section class="pt-32 pb-20">
+  <div class="max-w-2xl mx-auto px-5">
+    <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-accent)] mb-2">// you're in</div>
+    <h1 class="text-3xl font-semibold mb-4">Welcome to Rehearse Pro.</h1>
+
+    <div x-show="loading" class="card p-8 text-center text-[var(--rh-muted)]">
+      Setting up your account…
+    </div>
+
+    <div x-show="error" x-cloak class="card p-8">
+      <p class="error mb-3" x-text="error"></p>
+      <p class="text-[var(--rh-muted)] text-sm">If this persists, email <a class="underline" href="mailto:pro@rehearse.sh">pro@rehearse.sh</a> with your Stripe receipt and I'll sort it.</p>
+    </div>
+
+    <div x-show="apiKey" x-cloak>
+      <div class="card p-7 mb-5 border-[var(--rh-accent)]/40">
+        <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// your API key — copy now, this is the only time it's shown</div>
+        <pre class="terminal break-all" x-text="apiKey"></pre>
+        <button class="btn mt-3" @click="copy()" x-text="copied ? '✓ copied' : 'copy'"></button>
+      </div>
+
+      <div class="card p-7 mb-5">
+        <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// quickstart</div>
+        <pre class="terminal">export REHEARSE_TOKEN=<span x-text="apiKey"></span>
+rehearse run .github/workflows/ci.yml</pre>
+      </div>
+
+      <a href="https://pro.rehearse.sh/dashboard" class="btn btn-primary">go to dashboard →</a>
+    </div>
+
+    <p class="text-[12px] font-mono text-[var(--rh-muted)] mt-8">
+      You can rotate keys, see usage, and manage billing in <a class="underline" href="https://pro.rehearse.sh/dashboard">the dashboard</a>.
+    </p>
+  </div>
+</section>
+
+<style>
+.terminal { background: var(--rh-bg); border: 1px solid rgba(255,255,255,0.14); padding: 14px 16px; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #d8dde6; overflow-x: auto; white-space: pre-wrap; }
+.error { color: var(--rh-red); }
+</style>
+
+<script>
+function successPage() {
+  return {
+    loading: true,
+    error: '',
+    apiKey: '',
+    copied: false,
+    async load() {
+      const params = new URLSearchParams(location.search);
+      const sessionId = params.get('session_id');
+      if (!sessionId) { this.loading = false; this.error = 'No checkout session in URL.'; return; }
+      try {
+        const res = await fetch(`https://api.rehearse.sh/v1/checkout/success?session_id=${encodeURIComponent(sessionId)}`, {
+          credentials: 'include',
+        });
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          throw new Error(body?.error?.message ?? `failed: ${res.status}`);
+        }
+        const body = await res.json();
+        this.apiKey = body.api_key.plaintext || '';
+        this.loading = false;
+        if (!this.apiKey) {
+          this.error = "Looks like you already had a key on this team. Open the dashboard to create a new one.";
+        }
+      } catch (err) {
+        this.error = err.message;
+        this.loading = false;
+      }
+    },
+    copy() {
+      navigator.clipboard.writeText(this.apiKey).catch(() => {});
+      this.copied = true;
+      setTimeout(() => this.copied = false, 2000);
+    },
+  };
+}
+</script>
+
+</body>
+</html>

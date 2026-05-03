@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Checkout — Rehearse Pro</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script type="module" src="/src/main.ts"></script>
+</head>
+<body class="antialiased" x-data="checkoutPage()">
+
+<header class="fixed inset-x-0 top-0 z-50 border-b border-white/10 backdrop-blur bg-black/55">
+  <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2.5 font-mono">
+      <span class="logo-mark logo-mark-md text-[var(--rh-accent)]"></span>
+      <span class="font-semibold tracking-tight text-white">rehearse</span>
+      <span class="hidden sm:inline text-[11px] text-[var(--rh-muted)] border border-white/10 rounded px-1.5 py-0.5">pro</span>
+    </a>
+  </div>
+</header>
+
+<section class="pt-32 pb-20">
+  <div class="max-w-md mx-auto px-5">
+    <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-2">// checkout</div>
+    <h1 class="text-2xl font-semibold mb-6">Start Pro</h1>
+    <div class="card p-6 mb-4">
+      <label class="block mb-3">
+        <span class="text-[12px] font-mono text-[var(--rh-muted)]">// email</span>
+        <input class="input mt-1" type="email" x-model="email" placeholder="you@example.com" required />
+      </label>
+      <label class="block mb-4">
+        <span class="text-[12px] font-mono text-[var(--rh-muted)]">// plan</span>
+        <select class="input mt-1" x-model="plan">
+          <option value="pro_monthly">Pro · $99 / month</option>
+          <option value="pro_yearly">Pro · $999 / year (2 months free)</option>
+        </select>
+      </label>
+      <button class="btn btn-primary w-full justify-center" :disabled="busy" @click="start()">
+        <span x-show="!busy">continue to Stripe →</span>
+        <span x-show="busy" x-cloak>redirecting…</span>
+      </button>
+      <p class="error text-sm mt-3" x-show="error" x-text="error" x-cloak></p>
+    </div>
+    <p class="text-[12px] font-mono text-[var(--rh-muted)]">
+      Stripe handles payment. We see only the email. 14-day refund, cancel anytime.
+    </p>
+  </div>
+</section>
+
+<style>
+.input { background: var(--rh-bg); border: 1px solid rgba(255,255,255,0.14); color: var(--rh-fg); padding: 10px 12px; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 13px; width: 100%; }
+.error { color: var(--rh-red); }
+</style>
+
+<script>
+function checkoutPage() {
+  return {
+    email: '',
+    plan: 'pro_monthly',
+    busy: false,
+    error: '',
+    async start() {
+      this.error = '';
+      if (!this.email.includes('@')) { this.error = 'enter a valid email'; return; }
+      this.busy = true;
+      try {
+        // Step 1: send sign-in link so the user has a session before checkout completes.
+        await fetch('https://api.rehearse.sh/v1/auth/sign-in/magic-link', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: this.email }),
+        });
+        // Step 2: create checkout session and redirect.
+        const res = await fetch('https://api.rehearse.sh/v1/checkout', {
+          method: 'POST', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ plan: this.plan }),
+        });
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          if (res.status === 401) {
+            this.error = "We sent a sign-in link to your email. Click it, then return here.";
+            this.busy = false;
+            return;
+          }
+          throw new Error(body?.error?.message ?? 'failed to start checkout');
+        }
+        const body = await res.json();
+        window.location.href = body.url;
+      } catch (err) {
+        this.error = err.message ?? 'something broke. try again.';
+        this.busy = false;
+      }
+    },
+  };
+}
+</script>
+
+</body>
+</html>
