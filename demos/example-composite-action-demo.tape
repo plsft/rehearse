@@ -1,5 +1,5 @@
-# GitGate examples/composite-action-demo — local composite action expansion
-# Run from C:\Code\gitgate root: `vhs demos/example-composite-action-demo.tape`
+# Rehearse examples/composite-action-demo — local composite action expansion
+# Run from C:\Code\rehearse root: `vhs demos/example-composite-action-demo.tape`
 # Output: demos/example-composite-action-demo.mp4 (~60 seconds)
 #
 # Real output captured today:
@@ -19,7 +19,7 @@ Set Theme        "Catppuccin Mocha"
 Set TypingSpeed  28ms
 
 Hide
-Type "cd /c/Code/gitgate/examples/composite-action-demo && clear" Enter
+Type "cd /c/Code/rehearse/examples/composite-action-demo && clear" Enter
 Sleep 300ms
 Type "npm install --silent > /dev/null 2>&1" Enter
 Sleep 6s
@@ -37,13 +37,13 @@ Type "clear" Enter
 Sleep 200ms
 Type "# Caller pipeline uses step.action() to invoke the composite" Enter
 Sleep 1s
-Type "cat .gitgate/pipelines/ci.ts" Enter
+Type "cat .rehearse/pipelines/ci.ts" Enter
 Sleep 5s
 
 # §3 — compile + compat
 Type "clear" Enter
 Sleep 200ms
-Type "gg ci compile" Enter
+Type "rh ci compile" Enter
 Sleep 1.2s
 Type "runner compat .github/workflows/ci.yml" Enter
 Sleep 5s

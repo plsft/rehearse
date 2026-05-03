@@ -1,5 +1,5 @@
-# GitGate examples/node-app — author in TypeScript, run locally with matrix in parallel
-# Run from C:\Code\gitgate root: `vhs demos/example-node-app.tape`
+# Rehearse examples/node-app — author in TypeScript, run locally with matrix in parallel
+# Run from C:\Code\rehearse root: `vhs demos/example-node-app.tape`
 # Output: demos/example-node-app.mp4 (~75 seconds)
 #
 # Real output captured today:
@@ -21,7 +21,7 @@ Set Theme        "Catppuccin Mocha"
 Set TypingSpeed  28ms
 
 Hide
-Type "cd /c/Code/gitgate/examples/node-app && clear" Enter
+Type "cd /c/Code/rehearse/examples/node-app && clear" Enter
 Sleep 300ms
 # Pre-warm npm so the on-camera numbers are warm
 Type "npm install --silent > /dev/null 2>&1" Enter
@@ -32,7 +32,7 @@ Show
 # §1 — show the source TS pipeline
 Type "# examples/node-app — Node + Vitest, matrix [18.x, 20.x, 22.x]" Enter
 Sleep 1s
-Type "cat .gitgate/pipelines/ci.ts" Enter
+Type "cat .rehearse/pipelines/ci.ts" Enter
 Sleep 7s
 
 # §2 — compile to YAML
@@ -40,7 +40,7 @@ Type "clear" Enter
 Sleep 200ms
 Type "# Compile TS → GitHub Actions YAML" Enter
 Sleep 800ms
-Type "gg ci compile" Enter
+Type "rh ci compile" Enter
 Sleep 1.5s
 Type "cat .github/workflows/ci.yml | head -25" Enter
 Sleep 5s

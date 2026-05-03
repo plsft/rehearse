@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Example\PhpApp;
 
 /**
- * Tiny library for the GitGate PHP example.
+ * Tiny library for the Rehearse PHP example.
  * The interesting part isn't the code — it's the CI pipeline that runs
  * PHPUnit + PHPStan across PHP 8.2 / 8.3 / 8.4 in parallel.
  */

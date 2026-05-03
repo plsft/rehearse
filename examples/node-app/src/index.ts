@@ -1,5 +1,5 @@
 /**
- * Tiny library for the GitGate node-app example.
+ * Tiny library for the Rehearse node-app example.
  * The interesting bit isn't the code — it's the CI pipeline that runs it
  * across three Node versions in parallel.
  */

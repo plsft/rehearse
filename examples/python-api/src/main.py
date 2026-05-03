@@ -1,5 +1,5 @@
 """
-Tiny FastAPI app for the GitGate python-api example.
+Tiny FastAPI app for the Rehearse python-api example.
 
 Exposes one endpoint `POST /items` that writes a row to Postgres and
 returns the row. The interesting bit is the CI pipeline that spins up

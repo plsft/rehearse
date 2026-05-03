@@ -7,8 +7,8 @@ export interface Pipeline {
   concurrency?: Concurrency;
   defaults?: Defaults;
   env?: Record<string, string>;
-  /** GitGate-specific metadata embedded in the YAML header. */
-  gitgate?: GitGateConfig;
+  /** Rehearse-specific metadata embedded in the YAML header. */
+  rehearse?: RehearseConfig;
 }
 
 export interface Job {
@@ -174,8 +174,8 @@ export interface CacheConfig {
   restoreKeys?: string[];
 }
 
-export interface GitGateConfig {
-  /** When set, GitGate Platform applies this minimum confidence threshold. */
+export interface RehearseConfig {
+  /** When set, Rehearse Platform applies this minimum confidence threshold. */
   confidenceMinimum?: number;
   /** Provenance is recorded for agent-authored runs by default. */
   provenance?: boolean;

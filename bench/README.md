@@ -7,7 +7,7 @@ Head-to-head wall-clock timing comparing this repo's runner against
 
 ```bash
 # Build the runner first
-pnpm --filter @gitgate/runner build
+pnpm --filter @rehearse/runner build
 
 # Optional: shallow-clone hono for the third target
 git clone --depth 1 https://github.com/honojs/hono.git poc/playground/hono

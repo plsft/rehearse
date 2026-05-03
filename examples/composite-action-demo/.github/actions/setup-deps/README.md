@@ -19,13 +19,13 @@ A reusable composite action that bundles `actions/setup-node`,
     cache-key-prefix: 'npm-mainline'
 ```
 
-When `@gitgate/runner` encounters this, it inlines the three inner steps
+When `@rehearse/runner` encounters this, it inlines the three inner steps
 into the calling job, substitutes `${{ inputs.* }}` from the parent's
 `with:`, and runs them as if the user had written them directly. No
 separate execution context, no shelling out — composite expansion is a
 plain step rewrite.
 
 To author this with TypeScript instead of YAML, you can use
-`@gitgate/ci`'s `step.action(...)` helper at the call site (see the
+`@rehearse/ci`'s `step.action(...)` helper at the call site (see the
 `ci.ts` in this example) — composite-action *definitions* still live as
 YAML, since GitHub Actions itself reads them that way.

@@ -1,7 +1,7 @@
 # composite-action-demo — local composite action authoring + use
 
 A repo with a reusable composite action and a workflow that uses it. Shows
-how `@gitgate/runner` inlines composite actions at execution time, with
+how `@rehearse/runner` inlines composite actions at execution time, with
 `${{ inputs.* }}` substituted from the parent's `with:`.
 
 ## What this example demonstrates
@@ -30,10 +30,10 @@ composite-action-demo/
 │   └── workflows/
 │       └── ci.yml           # generated — uses the composite
 │
-├── .gitgate/
+├── .rehearse/
 │   ├── package.json
 │   └── pipelines/ci.ts      # the TypeScript pipeline (uses step.action)
-└── gitgate.config.mjs
+└── rehearse.config.mjs
 ```
 
 ## The composite (action.yml)
@@ -65,7 +65,7 @@ runs:
 ## The caller (TypeScript pipeline)
 
 ```typescript
-import { job, pipeline, Runner, step, triggers } from '@gitgate/ci';
+import { job, pipeline, Runner, step, triggers } from '@rehearse/ci';
 
 export const ci = pipeline('Composite action demo', {
   triggers: [triggers.pullRequest(), triggers.push({ branches: ['main'] })],
@@ -115,9 +115,9 @@ You'll see this in the runner's output as labelled steps prefixed with the actio
 cd examples/composite-action-demo
 
 npm install
-npm install -g @gitgate/runner @gitgate/cli
+npm install -g @rehearse/runner @rehearse/cli
 
-gg ci compile
+rh ci compile
 runner run .github/workflows/ci.yml
 ```
 

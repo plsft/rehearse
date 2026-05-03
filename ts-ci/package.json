@@ -1,5 +1,5 @@
 {
-  "name": "@gitgate/ci",
+  "name": "@rehearse/ci",
   "version": "0.3.3",
   "description": "Type-safe GitHub Actions pipelines in TypeScript",
   "license": "Apache-2.0",
@@ -45,11 +45,11 @@
     "pipeline",
     "ubicloud"
   ],
-  "homepage": "https://github.com/plsft/gitgate/tree/main/ts-ci#readme",
-  "bugs": "https://github.com/plsft/gitgate/issues",
+  "homepage": "https://github.com/plsft/rehearse/tree/main/ts-ci#readme",
+  "bugs": "https://github.com/plsft/rehearse/issues",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/plsft/gitgate.git",
+    "url": "git+https://github.com/plsft/rehearse.git",
     "directory": "ts-ci"
   },
   "author": "plsft"

@@ -8,7 +8,7 @@ importers:
 
   .:
     devDependencies:
-      '@gitgate/ci':
+      '@rehearse/ci':
         specifier: workspace:*
         version: link:ts-ci
       '@types/node':
@@ -32,7 +32,7 @@ importers:
 
   cli:
     dependencies:
-      '@gitgate/ci':
+      '@rehearse/ci':
         specifier: workspace:*
         version: link:../ts-ci
       commander:
@@ -73,10 +73,10 @@ importers:
 
   runner:
     dependencies:
-      '@gitgate/ci':
+      '@rehearse/ci':
         specifier: workspace:*
         version: link:../ts-ci
-      '@gitgate/git-core':
+      '@rehearse/git-core':
         specifier: workspace:*
         version: link:../git-engine
       commander:

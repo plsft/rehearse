@@ -4,8 +4,8 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#08090c" />
-<title>GitGate — About</title>
-<meta name="description" content="GitGate is an open-source local-first runner for GitHub Actions, plus three companion packages on npm. Apache 2.0, no hosted product." />
+<title>Rehearse — About</title>
+<meta name="description" content="Rehearse is an open-source local-first runner for GitHub Actions, plus three companion packages on npm. Apache 2.0, no hosted product." />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,10 +17,10 @@
 <header :class="scrolled ? 'border-b border-white/10 backdrop-blur bg-black/55' : 'border-b border-transparent'"
         class="fixed inset-x-0 top-0 z-50 transition-colors">
   <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
-    <a href="/" class="flex items-center gap-2.5 font-mono group" aria-label="GitGate home">
-      <span class="logo-mark logo-mark-md text-[var(--gg-accent)] transition-transform group-hover:scale-110"></span>
-      <span class="font-semibold tracking-tight text-white">gitgate</span>
-      <span class="hidden sm:inline text-[11px] text-[var(--gg-muted)] border border-white/10 rounded px-1.5 py-0.5">v0.3.3 · alpha</span>
+    <a href="/" class="flex items-center gap-2.5 font-mono group" aria-label="Rehearse home">
+      <span class="logo-mark logo-mark-md text-[var(--rh-accent)] transition-transform group-hover:scale-110"></span>
+      <span class="font-semibold tracking-tight text-white">rehearse</span>
+      <span class="hidden sm:inline text-[11px] text-[var(--rh-muted)] border border-white/10 rounded px-1.5 py-0.5">v0.3.3 · alpha</span>
     </a>
     <nav class="hidden md:flex items-center gap-7">
       <a href="/#bench" class="nav-link">Bench</a>
@@ -28,7 +28,7 @@
       <a href="/packages" class="nav-link">Packages</a>
       <a href="/docs" class="nav-link">Docs</a>
       <a href="/about" class="nav-link nav-link-active">About</a>
-      <a href="https://github.com/plsft/gitgate" class="nav-link">GitHub</a>
+      <a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a>
     </nav>
     <a href="/#install" class="btn btn-primary">Install</a>
   </div>
@@ -40,8 +40,8 @@
     <h1 class="mt-2 text-4xl sm:text-5xl font-semibold tracking-tight gradient-text">
       Open-source. No hosted product.
     </h1>
-    <p class="mt-5 text-lg text-[var(--gg-muted)]">
-      GitGate is a small, focused open-source project. Four packages on npm,
+    <p class="mt-5 text-lg text-[var(--rh-muted)]">
+      Rehearse is a small, focused open-source project. Four packages on npm,
       one source repo, no signup, no account, no telemetry. Just a CLI and the
       YAML you already have.
     </p>
@@ -49,12 +49,12 @@
 </section>
 
 <section class="py-16 hairline">
-  <div class="max-w-3xl mx-auto px-5 space-y-8 text-[var(--gg-muted)] leading-relaxed">
+  <div class="max-w-3xl mx-auto px-5 space-y-8 text-[var(--rh-muted)] leading-relaxed">
 
-    <h2 class="text-2xl font-semibold gradient-text tracking-tight">What GitGate is</h2>
+    <h2 class="text-2xl font-semibold gradient-text tracking-tight">What Rehearse is</h2>
 
     <p>
-      GitGate started as a question: <em>your CI loop is `git push → wait →
+      Rehearse started as a question: <em>your CI loop is `git push → wait →
       fail → repeat`. What if it ran on every save instead?</em> That answer
       turned into a runner that reads your <code class="font-mono">.github/workflows/*.yml</code>,
       executes it locally, and finishes 5–9× faster than
@@ -65,23 +65,23 @@
 
     <p>
       Around the runner, three companion packages ship under the same Apache 2.0
-      umbrella: <a href="/packages#ci" class="link">@gitgate/ci</a> (TypeScript
-      pipeline SDK), <a href="/packages#git-core" class="link">@gitgate/git-core</a>
-      (pure-TypeScript git engine), and <a href="/packages#cli" class="link">@gitgate/cli</a>
-      (the <code class="font-mono">gg</code> companion CLI). All four are on
+      umbrella: <a href="/packages#ci" class="link">@rehearse/ci</a> (TypeScript
+      pipeline SDK), <a href="/packages#git-core" class="link">@rehearse/git-core</a>
+      (pure-TypeScript git engine), and <a href="/packages#cli" class="link">@rehearse/cli</a>
+      (the <code class="font-mono">rh</code> companion CLI). All four are on
       npm, all four version in lockstep, all four are independent — install
       only what you need.
     </p>
 
     <h2 class="text-2xl font-semibold gradient-text tracking-tight pt-6">
-      What GitGate isn't
+      What Rehearse isn't
     </h2>
 
     <ul class="space-y-2 list-disc list-outside pl-6">
-      <li>Not a hosted product. There is no <code class="font-mono">gitgate.com</code> backend that runs your CI for you. The runner runs on your laptop or your own infra.</li>
+      <li>Not a hosted product. There is no <code class="font-mono">rehearse.sh</code> backend that runs your CI for you. The runner runs on your laptop or your own infra.</li>
       <li>Not a SaaS. No accounts, no API keys, no monthly fee, no rate limits.</li>
       <li>Not a fork or rewrite of <code class="font-mono">act</code>. Different architecture, different goals — the bench page documents the differences.</li>
-      <li>Not a wrapper around the <code class="font-mono">git</code> binary. <a href="/packages#git-core" class="link">@gitgate/git-core</a> is a from-scratch TypeScript implementation of the git protocol; it has zero native dependencies.</li>
+      <li>Not a wrapper around the <code class="font-mono">git</code> binary. <a href="/packages#git-core" class="link">@rehearse/git-core</a> is a from-scratch TypeScript implementation of the git protocol; it has zero native dependencies.</li>
       <li>Not telemetry-instrumented. The runner doesn't phone home. Compat audits, bench numbers, and provenance information stay on your machine.</li>
     </ul>
 
@@ -91,24 +91,24 @@
 
     <div class="mt-4 grid sm:grid-cols-2 gap-4">
       <a href="/#install" class="card hover:border-white/20 transition">
-        <div class="font-mono text-xs text-[var(--gg-accent)]">RUN A WORKFLOW</div>
-        <div class="mt-2 text-base font-semibold text-white"><code class="font-mono">npm install -g @gitgate/runner</code></div>
-        <p class="mt-2 text-sm text-[var(--gg-muted)]">Then <code class="font-mono">runner run .github/workflows/ci.yml</code>.</p>
+        <div class="font-mono text-xs text-[var(--rh-accent)]">RUN A WORKFLOW</div>
+        <div class="mt-2 text-base font-semibold text-white"><code class="font-mono">npm install -g @rehearse/runner</code></div>
+        <p class="mt-2 text-sm text-[var(--rh-muted)]">Then <code class="font-mono">runner run .github/workflows/ci.yml</code>.</p>
       </a>
       <a href="/packages" class="card hover:border-white/20 transition">
-        <div class="font-mono text-xs text-[var(--gg-accent)]">EXPLORE THE PACKAGES</div>
+        <div class="font-mono text-xs text-[var(--rh-accent)]">EXPLORE THE PACKAGES</div>
         <div class="mt-2 text-base font-semibold text-white">All four, in detail</div>
-        <p class="mt-2 text-sm text-[var(--gg-muted)]">What each package does, how it's used, and how they fit together.</p>
+        <p class="mt-2 text-sm text-[var(--rh-muted)]">What each package does, how it's used, and how they fit together.</p>
       </a>
       <a href="/docs" class="card hover:border-white/20 transition">
-        <div class="font-mono text-xs text-[var(--gg-accent)]">QUICKSTART</div>
+        <div class="font-mono text-xs text-[var(--rh-accent)]">QUICKSTART</div>
         <div class="mt-2 text-base font-semibold text-white">30-second walkthrough</div>
-        <p class="mt-2 text-sm text-[var(--gg-muted)]">Install → run → watch → install-hook.</p>
+        <p class="mt-2 text-sm text-[var(--rh-muted)]">Install → run → watch → install-hook.</p>
       </a>
-      <a href="https://github.com/plsft/gitgate" class="card hover:border-white/20 transition">
-        <div class="font-mono text-xs text-[var(--gg-accent)]">SOURCE</div>
-        <div class="mt-2 text-base font-semibold text-white">github.com/plsft/gitgate</div>
-        <p class="mt-2 text-sm text-[var(--gg-muted)]">All four packages, the bench harness, and the marketing site.</p>
+      <a href="https://github.com/plsft/rehearse" class="card hover:border-white/20 transition">
+        <div class="font-mono text-xs text-[var(--rh-accent)]">SOURCE</div>
+        <div class="mt-2 text-base font-semibold text-white">github.com/plsft/rehearse</div>
+        <p class="mt-2 text-sm text-[var(--rh-muted)]">All four packages, the bench harness, and the marketing site.</p>
       </a>
     </div>
 
@@ -117,25 +117,25 @@
     </h2>
 
     <ul class="space-y-2 list-disc list-outside pl-6">
-      <li>Bug reports and feature requests: <a href="https://github.com/plsft/gitgate/issues" class="link">github.com/plsft/gitgate/issues</a></li>
-      <li>Discussions: <a href="https://github.com/plsft/gitgate/discussions" class="link">github.com/plsft/gitgate/discussions</a></li>
+      <li>Bug reports and feature requests: <a href="https://github.com/plsft/rehearse/issues" class="link">github.com/plsft/rehearse/issues</a></li>
+      <li>Discussions: <a href="https://github.com/plsft/rehearse/discussions" class="link">github.com/plsft/rehearse/discussions</a></li>
       <li>Project owner: <a href="https://github.com/plsft" class="link">plsft</a> on GitHub</li>
     </ul>
   </div>
 </section>
 
 <footer class="py-14 hairline">
-  <div class="max-w-6xl mx-auto px-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 font-mono text-sm text-[var(--gg-muted)]">
+  <div class="max-w-6xl mx-auto px-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 font-mono text-sm text-[var(--rh-muted)]">
     <div class="flex items-center gap-2">
-      <span class="logo-mark logo-mark-sm text-[var(--gg-accent)]"></span>
-      <span class="text-white">gitgate</span> · by <a href="https://github.com/plsft" class="link">plsft</a>
+      <span class="logo-mark logo-mark-sm text-[var(--rh-accent)]"></span>
+      <span class="text-white">rehearse</span> · by <a href="https://github.com/plsft" class="link">plsft</a>
     </div>
     <div class="flex flex-wrap gap-x-6 gap-y-2">
       <a href="/" class="nav-link">Home</a>
       <a href="/packages" class="nav-link">Packages</a>
       <a href="/docs" class="nav-link">Docs</a>
-      <a href="https://github.com/plsft/gitgate" class="nav-link">GitHub</a>
-      <a href="https://github.com/plsft/gitgate/issues" class="nav-link">Issues</a>
+      <a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a>
+      <a href="https://github.com/plsft/rehearse/issues" class="nav-link">Issues</a>
     </div>
   </div>
 </footer>

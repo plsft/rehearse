@@ -1,4 +1,4 @@
-# @gitgate/git-core
+# @rehearse/git-core
 
 > Pure-TypeScript implementation of the git protocol. No native
 > dependencies. Runs on Cloudflare Workers, Node, Bun, Deno, and the
@@ -9,11 +9,11 @@ read and write packfiles, speak the smart-HTTP wire protocol, do diffs
 and three-way merges, manage refs. ~2.4k lines of source, **162 tests
 passing**.
 
-[![npm](https://img.shields.io/npm/v/@gitgate/git-core)](https://www.npmjs.com/package/@gitgate/git-core)
-[![License](https://img.shields.io/npm/l/@gitgate/git-core)](./LICENSE)
-[![Source](https://img.shields.io/badge/source-plsft%2Fgitgate-22c55e)](https://github.com/plsft/gitgate)
+[![npm](https://img.shields.io/npm/v/@rehearse/git-core)](https://www.npmjs.com/package/@rehearse/git-core)
+[![License](https://img.shields.io/npm/l/@rehearse/git-core)](./LICENSE)
+[![Source](https://img.shields.io/badge/source-plsft%2Frehearse-22c55e)](https://github.com/plsft/rehearse)
 
-Used internally by [`@gitgate/runner`](https://www.npmjs.com/package/@gitgate/runner)
+Used internally by [`@rehearse/runner`](https://www.npmjs.com/package/@rehearse/runner)
 to run `actions/checkout` and read repo state without shelling out to
 system git. Standalone-useful for any tool that needs to manipulate
 git objects in-process.
@@ -21,7 +21,7 @@ git objects in-process.
 ## Install
 
 ```bash
-npm install @gitgate/git-core
+npm install @rehearse/git-core
 ```
 
 Single runtime dependency: [`pako`](https://github.com/nodeca/pako) for
@@ -49,7 +49,7 @@ import {
   encodeCommit,
   sha1,
   buildPackfile,
-} from '@gitgate/git-core';
+} from '@rehearse/git-core';
 
 const blob = encodeBlob(new TextEncoder().encode('hello world\n'));
 const blobSha = await sha1(blob);
@@ -79,7 +79,7 @@ const pack = await buildPackfile([
 ## Quickstart — clone a remote in pure TS
 
 ```ts
-import { gitClone } from '@gitgate/git-core';
+import { gitClone } from '@rehearse/git-core';
 
 const result = await gitClone({
   url: 'https://github.com/honojs/hono.git',
@@ -106,7 +106,7 @@ console.log(result.headSha);
 
 ## Repo
 
-Source, issues, roadmap: <https://github.com/plsft/gitgate>.
+Source, issues, roadmap: <https://github.com/plsft/rehearse>.
 
 ## License
 

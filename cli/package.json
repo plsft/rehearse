@@ -1,11 +1,11 @@
 {
-  "name": "@gitgate/cli",
+  "name": "@rehearse/cli",
   "version": "0.3.3",
-  "description": "GitGate CLI — compile and convert TypeScript GitHub Actions pipelines (gg)",
+  "description": "Rehearse CLI — compile and convert TypeScript GitHub Actions pipelines (rh)",
   "license": "Apache-2.0",
   "type": "module",
   "bin": {
-    "gg": "./dist/index.js"
+    "rh": "./dist/index.js"
   },
   "files": [
     "dist",
@@ -18,7 +18,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@gitgate/ci": "workspace:*",
+    "@rehearse/ci": "workspace:*",
     "commander": "^12.1.0",
     "picocolors": "^1.1.1",
     "tsx": "^4.19.2",
@@ -38,11 +38,11 @@
     "pipeline",
     "cli"
   ],
-  "homepage": "https://github.com/plsft/gitgate/tree/main/cli#readme",
-  "bugs": "https://github.com/plsft/gitgate/issues",
+  "homepage": "https://github.com/plsft/rehearse/tree/main/cli#readme",
+  "bugs": "https://github.com/plsft/rehearse/issues",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/plsft/gitgate.git",
+    "url": "git+https://github.com/plsft/rehearse.git",
     "directory": "cli"
   },
   "author": "plsft"

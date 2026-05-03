@@ -14,7 +14,7 @@ export interface ConvertResult {
 
 /**
  * Convert a GitHub Actions YAML workflow string into TypeScript that uses
- * the @gitgate/ci SDK. Returns the generated source and any best-effort
+ * the @rehearse/ci SDK. Returns the generated source and any best-effort
  * warnings about constructs that did not map cleanly.
  */
 export function convert(yamlSource: string, options: ConvertOptions = {}): ConvertResult {
@@ -30,7 +30,7 @@ export function convert(yamlSource: string, options: ConvertOptions = {}): Conve
   const triggerBlock = renderTriggers(wf.on, warnings);
 
   const exportName = options.exportName ?? 'workflow';
-  const importLine = `import { ${Array.from(imports).sort().join(', ')} } from '@gitgate/ci';`;
+  const importLine = `import { ${Array.from(imports).sort().join(', ')} } from '@rehearse/ci';`;
 
   const pipelineCfg: string[] = [`  triggers: [${triggerBlock}],`, `  jobs: [${jobBlocks.join(', ')}],`];
   if (wf.permissions !== undefined) {
@@ -42,7 +42,7 @@ export function convert(yamlSource: string, options: ConvertOptions = {}): Conve
 
   const name = wf.name ?? exportName;
   const source = [
-    `// AUTO-CONVERTED from GitHub Actions YAML by @gitgate/ci`,
+    `// AUTO-CONVERTED from GitHub Actions YAML by @rehearse/ci`,
     importLine,
     '',
     `export const ${exportName} = pipeline(${JSON.stringify(name)}, {`,
@@ -136,7 +136,7 @@ function renderStep(parsed: ParsedStep, warnings: string[]): string {
   }
   if (parsed.uses?.startsWith('actions/setup-node@')) {
     const v = parsed.with?.['node-version'];
-    warnings.push('actions/setup-node mapped to step.action — install @gitgate/ci/presets and use node.setup() for nicer ergonomics');
+    warnings.push('actions/setup-node mapped to step.action — install @rehearse/ci/presets and use node.setup() for nicer ergonomics');
     return v ? `step.action(${JSON.stringify(parsed.uses)}, ${withBlock(parsed)})` : `step.action(${JSON.stringify(parsed.uses)})`;
   }
   if (parsed.uses) {

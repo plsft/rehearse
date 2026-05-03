@@ -2,7 +2,7 @@
  * Top-level orchestration. Glues the parser, planner, scheduler, and
  * backends together, plus a console reporter.
  */
-import { parseWorkflow } from '@gitgate/ci';
+import { parseWorkflow } from '@rehearse/ci';
 import { existsSync, readFileSync } from 'node:fs';
 import { cpus } from 'node:os';
 import { dirname, resolve } from 'node:path';

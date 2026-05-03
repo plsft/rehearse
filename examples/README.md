@@ -1,8 +1,8 @@
-# GitGate examples
+# Rehearse examples
 
 Five small, self-contained sample projects demonstrating real CI pipelines
-authored in TypeScript with `@gitgate/ci`, runnable locally with
-`@gitgate/runner`.
+authored in TypeScript with `@rehearse/ci`, runnable locally with
+`@rehearse/runner`.
 
 | Example | Stack | What it shows |
 | --- | --- | --- |
@@ -22,18 +22,18 @@ cd examples/node-app
 # install the example's deps
 pnpm install
 
-# install the gitgate toolchain locally to this example
-npm install -D @gitgate/ci
-npm install -g @gitgate/runner @gitgate/cli
+# install the rehearse toolchain locally to this example
+npm install -D @rehearse/ci
+npm install -g @rehearse/runner @rehearse/cli
 
 # regenerate the compiled YAML from the TypeScript pipeline
-gg ci compile
+rh ci compile
 
 # run the workflow on your laptop
 runner run .github/workflows/ci.yml
 ```
 
-That's the loop: edit the TS pipeline → `gg ci compile` → `runner run`.
+That's the loop: edit the TS pipeline → `rh ci compile` → `runner run`.
 For watch-mode iteration during dev:
 
 ```bash
@@ -43,7 +43,7 @@ runner watch .github/workflows/ci.yml
 ## Pre-generated YAML is committed
 
 The `.github/workflows/ci.yml` in each example is the actual output of
-`gg ci compile` against the matching `.gitgate/pipelines/ci.ts`. You can
+`rh ci compile` against the matching `.rehearse/pipelines/ci.ts`. You can
 read the TypeScript source and the generated YAML side-by-side. Both are
 checked in so you can push the example directly to GitHub as-is and
 watch CI run there.
@@ -56,5 +56,5 @@ GitHub-hosted instead, swap to `Runner.github('ubuntu-latest')` in the
 TS pipeline and recompile. Locally, the runner treats both labels the
 same — both run via the host backend by default.
 
-See [the package reference](https://gitgate.com/packages) for the full
-runner / `@gitgate/ci` / `gg` surface.
+See [the package reference](https://rehearse.sh/packages) for the full
+runner / `@rehearse/ci` / `rh` surface.

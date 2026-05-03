@@ -1,5 +1,5 @@
-# GitGate watch mode — save → fail → fix → green
-# Run from C:\Code\gitgate root: `vhs demos/watch.tape`
+# Rehearse watch mode — save → fail → fix → green
+# Run from C:\Code\rehearse root: `vhs demos/watch.tape`
 # Output: demos/watch.mp4 (~50s)
 
 Output demos/watch.mp4
@@ -14,7 +14,7 @@ Set Theme        "Catppuccin Mocha"
 Set TypingSpeed  30ms
 
 Hide
-Type "cd /c/Code/gitgate && clear" Enter
+Type "cd /c/Code/rehearse && clear" Enter
 Sleep 200ms
 Type "runner run poc/playground/hono/.github/workflows/ci.yml --cwd poc/playground/hono --job bun > /dev/null 2>&1" Enter
 Sleep 8s

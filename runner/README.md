@@ -1,24 +1,24 @@
-# @gitgate/runner
+# @rehearse/runner
 
 > **Stop pushing CI failures.** Run your `.github/workflows/*.yml` on your
 > laptop in seconds. Same YAML. **6–10× faster than [`act`](https://github.com/nektos/act).**
 
-`@gitgate/runner` is a local-first runner for GitHub Actions workflows.
+`@rehearse/runner` is a local-first runner for GitHub Actions workflows.
 Read the YAML you already have, choose a backend per job (host or
 container), execute. Free, Apache 2.0, single binary.
 
-[![npm](https://img.shields.io/npm/v/@gitgate/runner)](https://www.npmjs.com/package/@gitgate/runner)
-[![License](https://img.shields.io/npm/l/@gitgate/runner)](./LICENSE)
-[![Source](https://img.shields.io/badge/source-plsft%2Fgitgate-22c55e)](https://github.com/plsft/gitgate)
+[![npm](https://img.shields.io/npm/v/@rehearse/runner)](https://www.npmjs.com/package/@rehearse/runner)
+[![License](https://img.shields.io/npm/l/@rehearse/runner)](./LICENSE)
+[![Source](https://img.shields.io/badge/source-plsft%2Frehearse-22c55e)](https://github.com/plsft/rehearse)
 
 ## Install
 
 ```bash
-npm install -g @gitgate/runner
+npm install -g @rehearse/runner
 # or
-pnpm add -g @gitgate/runner
+pnpm add -g @rehearse/runner
 # or
-bun add -g @gitgate/runner
+bun add -g @rehearse/runner
 
 runner --version    # 0.2.x
 ```
@@ -67,7 +67,7 @@ is broken across hosts; the runner's `--network-alias <name>` per
 service makes the same workflow run cleanly.
 
 Full methodology + per-OS breakdown:
-[bench/RESULTS.md](https://github.com/plsft/gitgate/blob/main/bench/RESULTS.md).
+[bench/RESULTS.md](https://github.com/plsft/rehearse/blob/main/bench/RESULTS.md).
 
 ## Cross-OS support
 
@@ -115,7 +115,7 @@ you only get host-backend execution.
 ## Programmatic API
 
 ```ts
-import { run, compat } from '@gitgate/runner';
+import { run, compat } from '@rehearse/runner';
 
 const result = await run({
   workflowPath: '.github/workflows/ci.yml',
@@ -160,7 +160,7 @@ runner compat <workflow.yml>
 
 ## Repo
 
-Source, issues, roadmap: <https://github.com/plsft/gitgate>.
+Source, issues, roadmap: <https://github.com/plsft/rehearse>.
 
 ## License
 

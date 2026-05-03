@@ -6,7 +6,7 @@
  * direct subprocess) and a container backend (Docker, slower but parity-safe).
  */
 
-import type { ParsedJob, ParsedStep } from '@gitgate/ci';
+import type { ParsedJob, ParsedStep } from '@rehearse/ci';
 
 export type StepStatus = 'success' | 'failure' | 'skipped' | 'cancelled';
 export type JobStatus = StepStatus;

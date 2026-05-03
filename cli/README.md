@@ -1,51 +1,51 @@
-# @gitgate/cli
+# @rehearse/cli
 
-> `gg` — command-line tool for authoring GitHub Actions workflows in
+> `rh` — command-line tool for authoring GitHub Actions workflows in
 > TypeScript and compiling them to YAML.
 
-The CLI front-end for [`@gitgate/ci`](https://www.npmjs.com/package/@gitgate/ci).
+The CLI front-end for [`@rehearse/ci`](https://www.npmjs.com/package/@rehearse/ci).
 Initialise a project, compile TypeScript pipelines to `.github/workflows/*.yml`,
 convert existing YAML to TypeScript, watch for changes, estimate Ubicloud
 runner cost.
 
-[![npm](https://img.shields.io/npm/v/@gitgate/cli)](https://www.npmjs.com/package/@gitgate/cli)
-[![License](https://img.shields.io/npm/l/@gitgate/cli)](./LICENSE)
-[![Source](https://img.shields.io/badge/source-plsft%2Fgitgate-22c55e)](https://github.com/plsft/gitgate)
+[![npm](https://img.shields.io/npm/v/@rehearse/cli)](https://www.npmjs.com/package/@rehearse/cli)
+[![License](https://img.shields.io/npm/l/@rehearse/cli)](./LICENSE)
+[![Source](https://img.shields.io/badge/source-plsft%2Frehearse-22c55e)](https://github.com/plsft/rehearse)
 
-> **Note:** This package is `@gitgate/cli`, but the binary it installs is
-> `gg` (so you type `gg ci compile`, not `cli ci compile`). For local
+> **Note:** This package is `@rehearse/cli`, but the binary it installs is
+> `rh` (so you type `rh ci compile`, not `cli ci compile`). For local
 > workflow execution, see the separate
-> [`@gitgate/runner`](https://www.npmjs.com/package/@gitgate/runner)
+> [`@rehearse/runner`](https://www.npmjs.com/package/@rehearse/runner)
 > package, which installs as `runner`.
 
 ## Install
 
 ```bash
-# Per-project (recommended — pin the version alongside @gitgate/ci)
-npm install -D @gitgate/cli
+# Per-project (recommended — pin the version alongside @rehearse/ci)
+npm install -D @rehearse/cli
 
 # Or globally
-npm install -g @gitgate/cli
+npm install -g @rehearse/cli
 
-gg --version
+rh --version
 ```
 
 ## Commands
 
 | Command | What it does |
 | --- | --- |
-| `gg ci init` | Detect your stack (Node / Bun / Rust / Go / Python), scaffold `.gitgate/pipelines/ci.ts` and `gitgate.config.ts`. |
-| `gg ci compile` | Import `.gitgate/pipelines/**/*.ts`, compile to `.github/workflows/*.yml`. |
-| `gg ci convert <yaml>` | Convert a GitHub Actions YAML file to TypeScript. Reports unmapped actions. |
-| `gg ci validate` | Dry-run compile — fail on errors without writing output. |
-| `gg ci watch` | Recompile on change — useful while editing pipeline TS. |
-| `gg ci estimate` | Show Ubicloud cost vs GitHub-hosted runners for the compiled pipelines. |
+| `rh ci init` | Detect your stack (Node / Bun / Rust / Go / Python), scaffold `.rehearse/pipelines/ci.ts` and `rehearse.config.ts`. |
+| `rh ci compile` | Import `.rehearse/pipelines/**/*.ts`, compile to `.github/workflows/*.yml`. |
+| `rh ci convert <yaml>` | Convert a GitHub Actions YAML file to TypeScript. Reports unmapped actions. |
+| `rh ci validate` | Dry-run compile — fail on errors without writing output. |
+| `rh ci watch` | Recompile on change — useful while editing pipeline TS. |
+| `rh ci estimate` | Show Ubicloud cost vs GitHub-hosted runners for the compiled pipelines. |
 
 Use the per-command `--help` for full flag lists:
 
 ```bash
-gg ci compile --help
-gg ci estimate --help
+rh ci compile --help
+rh ci estimate --help
 ```
 
 ## Quick start
@@ -55,26 +55,26 @@ gg ci estimate --help
 mkdir my-project && cd my-project
 git init && npm init -y
 
-npm install -D @gitgate/ci @gitgate/cli
+npm install -D @rehearse/ci @rehearse/cli
 
-# Scaffold .gitgate/pipelines/ci.ts and gitgate.config.ts
-gg ci init
+# Scaffold .rehearse/pipelines/ci.ts and rehearse.config.ts
+rh ci init
 
-# Edit .gitgate/pipelines/ci.ts, then:
-gg ci compile
+# Edit .rehearse/pipelines/ci.ts, then:
+rh ci compile
 # → wrote .github/workflows/ci.yml
 
 # Watch and recompile on save
-gg ci watch
+rh ci watch
 ```
 
 ## Configuration
 
-`gitgate.config.ts` at the repo root (auto-created by `gg ci init`):
+`rehearse.config.ts` at the repo root (auto-created by `rh ci init`):
 
 ```ts
 const config = {
-  pipelinesDir: '.gitgate/pipelines',
+  pipelinesDir: '.rehearse/pipelines',
   outputDir: '.github/workflows',
 };
 
@@ -84,8 +84,8 @@ export default config;
 ## Convert existing YAML
 
 ```bash
-gg ci convert .github/workflows/ci.yml --out .gitgate/pipelines/
-# → .gitgate/pipelines/ci.ts
+rh ci convert .github/workflows/ci.yml --out .rehearse/pipelines/
+# → .rehearse/pipelines/ci.ts
 ```
 
 The converter maps `actions/checkout@v4` to `step.checkout()`,
@@ -97,7 +97,7 @@ warnings list flags anything that needed a fallback.
 ## Estimate runner cost
 
 ```bash
-gg ci estimate --durations '{"test":7,"build":5}' --runs-per-month 200
+rh ci estimate --durations '{"test":7,"build":5}' --runs-per-month 200
 ```
 
 Outputs a per-job table with the Ubicloud cost vs the GitHub-hosted
@@ -106,7 +106,7 @@ equivalent, plus the savings percentage.
 ## Run workflows locally before pushing
 
 For local execution of the YAML you just compiled, install
-[`@gitgate/runner`](https://www.npmjs.com/package/@gitgate/runner) and
+[`@rehearse/runner`](https://www.npmjs.com/package/@rehearse/runner) and
 run:
 
 ```bash
@@ -118,7 +118,7 @@ The runner reads the compiled YAML and executes it on your laptop —
 
 ## Repo
 
-Source, issues, roadmap: <https://github.com/plsft/gitgate>.
+Source, issues, roadmap: <https://github.com/plsft/rehearse>.
 
 ## License
 

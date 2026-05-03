@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * release.mjs — bump all four @gitgate/* packages in lockstep and tag.
+ * release.mjs — bump all four @rehearse/* packages in lockstep and tag.
  *
  * Usage:
  *   node scripts/release.mjs <bump>
@@ -27,7 +27,7 @@
  *   4. git tag v<new-version>.
  *   5. git push && git push --tags.
  *
- * The release.yml workflow on github.com/plsft/gitgate fires on the tag
+ * The release.yml workflow on github.com/plsft/rehearse fires on the tag
  * push, builds all packages, publishes them with the right npm dist-tag
  * (`latest` for stable, `next`/`rc`/`beta` for prereleases), and creates
  * a GitHub Release with auto-generated notes.

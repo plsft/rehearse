@@ -29,20 +29,20 @@ function readPackageVersion(): string {
 
 const program = new Command();
 program
-  .name('gg')
+  .name('rh')
   .description('TypeScript pipelines for GitHub Actions')
   .version(readPackageVersion());
 
 const ci = program.command('ci').description('Compile and manage TypeScript pipelines');
 ci.command('compile')
-  .description('Compile .gitgate/pipelines/**/*.ts → .github/workflows/*.yml')
+  .description('Compile .rehearse/pipelines/**/*.ts → .github/workflows/*.yml')
   .option('--out <dir>', 'Output directory')
   .option('--in <dir>', 'Pipelines directory')
   .action(async (opts: { out?: string; in?: string }) => {
     process.exit(await runCompile({ outDir: opts.out, pipelinesDir: opts.in }));
   });
 ci.command('init')
-  .description('Scaffold .gitgate/pipelines/ci.ts and gitgate.config.ts')
+  .description('Scaffold .rehearse/pipelines/ci.ts and rehearse.config.ts')
   .action(async () => process.exit(await runInit()));
 ci.command('convert <yamlFile>')
   .description('Convert a GitHub Actions YAML file to TypeScript')

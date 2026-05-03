@@ -1,5 +1,5 @@
-# GitGate examples/python-api — FastAPI + pytest + Postgres service container
-# Run from C:\Code\gitgate root: `vhs demos/example-python-api.tape`
+# Rehearse examples/python-api — FastAPI + pytest + Postgres service container
+# Run from C:\Code\rehearse root: `vhs demos/example-python-api.tape`
 # Output: demos/example-python-api.mp4 (~75 seconds)
 #
 # Real output captured today (compat):
@@ -23,19 +23,19 @@ Set Theme        "Catppuccin Mocha"
 Set TypingSpeed  28ms
 
 Hide
-Type "cd /c/Code/gitgate/examples/python-api && clear" Enter
+Type "cd /c/Code/rehearse/examples/python-api && clear" Enter
 Show
 
 # §1 — TS pipeline source
 Type "# examples/python-api — FastAPI + pytest + Postgres service" Enter
 Sleep 1s
-Type "cat .gitgate/pipelines/ci.ts" Enter
+Type "cat .rehearse/pipelines/ci.ts" Enter
 Sleep 8s
 
 # §2 — compile + show services block in YAML
 Type "clear" Enter
 Sleep 200ms
-Type "gg ci compile" Enter
+Type "rh ci compile" Enter
 Sleep 1.5s
 Type "cat .github/workflows/ci.yml | head -25" Enter
 Sleep 5s

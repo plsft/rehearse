@@ -14,12 +14,12 @@
  *   6. Run each step via `docker exec` inside the warmed container.
  *   7. On exit (success or fail), tear down the job container, services, network.
  *
- * Reuses @gitgate/ci's `parseWorkflow` for parsing.
+ * Reuses @rehearse/ci's `parseWorkflow` for parsing.
  *
  * Usage:
  *   pnpm tsx poc/3-container.ts poc/fixtures/service-postgres.yml
  */
-import { parseWorkflow, type ParsedJob, type ParsedStep } from '@gitgate/ci';
+import { parseWorkflow, type ParsedJob, type ParsedStep } from '@rehearse/ci';
 import { spawn, spawnSync } from 'node:child_process';
 import { readFileSync, existsSync } from 'node:fs';
 import { performance } from 'node:perf_hooks';

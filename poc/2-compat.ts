@@ -11,7 +11,7 @@
  *   pnpm tsx poc/2-compat.ts poc/fixtures/vite-ci.yml
  *   pnpm tsx poc/2-compat.ts .github/workflows/ci.yml
  */
-import { parseWorkflow, type ParsedJob, type ParsedStep } from '@gitgate/ci';
+import { parseWorkflow, type ParsedJob, type ParsedStep } from '@rehearse/ci';
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 

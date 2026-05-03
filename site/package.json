@@ -1,5 +1,5 @@
 {
-  "name": "@gitgate/site",
+  "name": "@rehearse/site",
   "version": "0.3.3",
   "private": true,
   "type": "module",

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://gitgate.com/sitemap.xml
+Sitemap: https://rehearse.sh/sitemap.xml

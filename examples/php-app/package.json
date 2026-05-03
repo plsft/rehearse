@@ -2,9 +2,9 @@
   "name": "@example/php-app",
   "version": "1.0.0",
   "private": true,
-  "description": "GitGate example: PHP + PHPUnit + PHPStan, matrix across PHP versions",
+  "description": "Rehearse example: PHP + PHPUnit + PHPStan, matrix across PHP versions",
   "type": "module",
   "devDependencies": {
-    "@gitgate/ci": "^0.3.2"
+    "@rehearse/ci": "^0.3.2"
   }
 }

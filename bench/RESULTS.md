@@ -8,7 +8,7 @@ Linux-container mode.
 
 ## Cross-OS, GitHub-hosted runners — v0.3.2
 
-Run id [`25262157287`](https://github.com/plsft/gitgate/actions/runs/25262157287) — three OS jobs green at ~520s wall clock.
+Run id [`25262157287`](https://github.com/plsft/rehearse/actions/runs/25262157287) — three OS jobs green at ~520s wall clock.
 
 ### Linux (`ubuntu-latest`) — full bench, act head-to-head
 
@@ -96,7 +96,7 @@ gh run watch --workflow=bench.yml
 
 # Locally
 pnpm install
-pnpm turbo build --filter=@gitgate/runner...
+pnpm turbo build --filter=@rehearse/runner...
 git clone --depth 1 https://github.com/honojs/hono.git poc/playground/hono
 docker pull node:22-bookworm-slim postgres:16-alpine catthehacker/ubuntu:act-latest
 pnpm tsx bench/compare.ts --skip-cold

@@ -1,35 +1,35 @@
-# @gitgate/ci
+# @rehearse/ci
 
 > Type-safe GitHub Actions pipelines in TypeScript. Compile to plain
 > YAML on your machine. Zero runtime dependency on us — the YAML is
 > the real artifact.
 
-`@gitgate/ci` is the authoring SDK. Write your workflows in TypeScript,
+`@rehearse/ci` is the authoring SDK. Write your workflows in TypeScript,
 get IDE autocomplete and refactor support, then compile to standard
 GitHub Actions YAML you commit alongside your TS source. The CLI ships
-separately as [`@gitgate/cli`](https://www.npmjs.com/package/@gitgate/cli)
-(binary: `gg`).
+separately as [`@rehearse/cli`](https://www.npmjs.com/package/@rehearse/cli)
+(binary: `rh`).
 
-[![npm](https://img.shields.io/npm/v/@gitgate/ci)](https://www.npmjs.com/package/@gitgate/ci)
-[![License](https://img.shields.io/npm/l/@gitgate/ci)](./LICENSE)
-[![Source](https://img.shields.io/badge/source-plsft%2Fgitgate-22c55e)](https://github.com/plsft/gitgate)
+[![npm](https://img.shields.io/npm/v/@rehearse/ci)](https://www.npmjs.com/package/@rehearse/ci)
+[![License](https://img.shields.io/npm/l/@rehearse/ci)](./LICENSE)
+[![Source](https://img.shields.io/badge/source-plsft%2Frehearse-22c55e)](https://github.com/plsft/rehearse)
 
 ## Install
 
 ```bash
 # The SDK
-npm install -D @gitgate/ci
+npm install -D @rehearse/ci
 
 # Plus the compile/init/convert CLI
-npm install -D @gitgate/cli
+npm install -D @rehearse/cli
 ```
 
 ## Hello, world
 
 ```ts
-// .gitgate/pipelines/ci.ts
-import { pipeline, job, step, triggers, Runner } from '@gitgate/ci';
-import { node } from '@gitgate/ci/presets';
+// .rehearse/pipelines/ci.ts
+import { pipeline, job, step, triggers, Runner } from '@rehearse/ci';
+import { node } from '@rehearse/ci/presets';
 
 export const ci = pipeline('CI', {
   triggers: [triggers.pullRequest(), triggers.push({ branches: ['main'] })],
@@ -48,11 +48,11 @@ export const ci = pipeline('CI', {
 ```
 
 ```bash
-npx gg ci compile
+npx rh ci compile
 # → .github/workflows/ci.yml
 ```
 
-The compiled YAML has zero `@gitgate/ci` dependency at CI time. You can
+The compiled YAML has zero `@rehearse/ci` dependency at CI time. You can
 delete this package after compiling and the YAML still works.
 
 ## API overview
@@ -74,7 +74,7 @@ delete this package after compiling and the YAML still works.
 ### Context helpers
 
 ```ts
-import { secrets, vars, github, env, needs, steps, expr, hashFiles } from '@gitgate/ci';
+import { secrets, vars, github, env, needs, steps, expr, hashFiles } from '@rehearse/ci';
 
 secrets('GITHUB_TOKEN')                  // ${{ secrets.GITHUB_TOKEN }}
 vars('REGION')                           // ${{ vars.REGION }}
@@ -90,11 +90,11 @@ All validate input (throw on empty/whitespace).
 
 ### Presets
 
-`@gitgate/ci/presets` exports small step-constructor objects with
+`@rehearse/ci/presets` exports small step-constructor objects with
 sensible defaults: `node`, `bun`, `python`, `rust`, `go`, `docker`.
 
 ```ts
-import { node, bun, python, rust, go, docker } from '@gitgate/ci/presets';
+import { node, bun, python, rust, go, docker } from '@rehearse/ci/presets';
 
 node.setup('20')        // actions/setup-node@v4 with node-version: '20'
 bun.install()           // run: bun install --frozen-lockfile
@@ -105,19 +105,19 @@ docker.buildPush('myimage:${{ github.sha }}', { push: true })
 ### Convert existing YAML to TypeScript
 
 ```ts
-import { convert } from '@gitgate/ci';
+import { convert } from '@rehearse/ci';
 
 const { source, warnings } = convert(yamlString);
-// source: TypeScript source ready to drop into .gitgate/pipelines/
+// source: TypeScript source ready to drop into .rehearse/pipelines/
 // warnings: array of unmapped actions or constructs
 ```
 
-The CLI command is `gg ci convert <yaml>`.
+The CLI command is `rh ci convert <yaml>`.
 
 ### Runner support
 
 The same `Runner` constants are honored by
-[`@gitgate/runner`](https://www.npmjs.com/package/@gitgate/runner) — the
+[`@rehearse/runner`](https://www.npmjs.com/package/@rehearse/runner) — the
 local runner reads the compiled YAML and executes it on your laptop, 6–10×
 faster than `act`. So you author in TS, compile to YAML, run locally
 before pushing.
@@ -130,13 +130,13 @@ on:
 - GitHub-hosted runners (`ubuntu-latest`, `macos-latest`, `windows-latest`)
 - Self-hosted runners (`Runner.selfHosted(...)`)
 - Ubicloud runners (`Runner.ubicloud('standard-4')` etc.)
-- Locally via `@gitgate/runner` (or `act`, if you prefer)
+- Locally via `@rehearse/runner` (or `act`, if you prefer)
 
 The TypeScript itself runs anywhere Node 18+ does. Tests run on Node 22.
 
 ## Repo
 
-Source, issues, roadmap: <https://github.com/plsft/gitgate>.
+Source, issues, roadmap: <https://github.com/plsft/rehearse>.
 
 ## License
 

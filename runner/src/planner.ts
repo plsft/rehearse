@@ -3,7 +3,7 @@
  * references inside per-cell job/step env, with, run, condition, and runs-on,
  * pick a backend per job. Result: a flat list of PlannedJobs ready to execute.
  */
-import type { ParsedJob, ParsedStep, ParsedWorkflow } from '@gitgate/ci';
+import type { ParsedJob, ParsedStep, ParsedWorkflow } from '@rehearse/ci';
 import { expandComposite, resolveAction } from './composite.js';
 import { evalExpr } from './expression.js';
 import { cellId, expandMatrix, parseMatrix } from './matrix.js';

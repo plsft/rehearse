@@ -2,7 +2,7 @@
  * flowrunna POC — run a GitHub Actions workflow locally, on the host.
  *
  * Single-file proof to validate the speed claim before scoping the platform.
- * Reuses @gitgate/ci's `parseWorkflow` for YAML → typed AST.
+ * Reuses @rehearse/ci's `parseWorkflow` for YAML → typed AST.
  *
  * What it does today:
  * - Reads .github/workflows/<name>.yml
@@ -25,7 +25,7 @@
  *   pnpm tsx poc/run-workflow.ts .github/workflows/ci.yml typecheck
  *   pnpm tsx poc/run-workflow.ts <path> [job-name]
  */
-import { parseWorkflow, type ParsedJob, type ParsedStep } from '@gitgate/ci';
+import { parseWorkflow, type ParsedJob, type ParsedStep } from '@rehearse/ci';
 import { spawn } from 'node:child_process';
 import { readFileSync, existsSync } from 'node:fs';
 import { performance } from 'node:perf_hooks';

@@ -1,5 +1,5 @@
-# GitGate examples/dotnet-app — .NET (C#) + xUnit, multi-target framework matrix
-# Run from C:\Code\gitgate root: `vhs demos/example-dotnet-app.tape`
+# Rehearse examples/dotnet-app — .NET (C#) + xUnit, multi-target framework matrix
+# Run from C:\Code\rehearse root: `vhs demos/example-dotnet-app.tape`
 # Output: demos/example-dotnet-app.mp4 (~75 seconds)
 #
 # Real output captured today (compat):
@@ -23,19 +23,19 @@ Set Theme        "Catppuccin Mocha"
 Set TypingSpeed  28ms
 
 Hide
-Type "cd /c/Code/gitgate/examples/dotnet-app && clear" Enter
+Type "cd /c/Code/rehearse/examples/dotnet-app && clear" Enter
 Show
 
 # §1 — TS pipeline source
 Type "# examples/dotnet-app — multi-target framework matrix [net8.0, net9.0]" Enter
 Sleep 1s
-Type "cat .gitgate/pipelines/ci.ts" Enter
+Type "cat .rehearse/pipelines/ci.ts" Enter
 Sleep 8s
 
 # §2 — compile + show YAML
 Type "clear" Enter
 Sleep 200ms
-Type "gg ci compile" Enter
+Type "rh ci compile" Enter
 Sleep 1.5s
 Type "cat .github/workflows/ci.yml | head -30" Enter
 Sleep 5s

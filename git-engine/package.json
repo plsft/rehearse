@@ -1,5 +1,5 @@
 {
-  "name": "@gitgate/git-core",
+  "name": "@rehearse/git-core",
   "version": "0.3.3",
   "description": "Pure-TypeScript git protocol: objects, packfiles, smart-HTTP, diff, merge, refs",
   "license": "Apache-2.0",
@@ -41,11 +41,11 @@
     "typescript",
     "cloudflare-workers"
   ],
-  "homepage": "https://github.com/plsft/gitgate/tree/main/git-engine#readme",
-  "bugs": "https://github.com/plsft/gitgate/issues",
+  "homepage": "https://github.com/plsft/rehearse/tree/main/git-engine#readme",
+  "bugs": "https://github.com/plsft/rehearse/issues",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/plsft/gitgate.git",
+    "url": "git+https://github.com/plsft/rehearse.git",
     "directory": "git-engine"
   },
   "author": "plsft"

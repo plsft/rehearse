@@ -12,7 +12,7 @@ holds.
 
 ## POC #1 — localhost backend (our own CI)
 
-`poc/run-workflow.ts` parses `.github/workflows/ci.yml` via `@gitgate/ci`,
+`poc/run-workflow.ts` parses `.github/workflows/ci.yml` via `@rehearse/ci`,
 walks every step, runs `run:` scripts on the host (Git-Bash on Windows /
 bash on Unix), no-ops `actions/checkout`, `setup-*`, `cache`, `*-artifact`.
 
@@ -178,7 +178,7 @@ Build the real runner package:
   `max-parallel = navigator.hardwareConcurrency`).
 - Persistent caches under `.runner/cache/` keyed by `actions/cache` keys
   (no CDN — local fs only — but stable across runs on the same machine).
-- Pre-push hook integration: `gg run --pre-push` exits 1 if any required
+- Pre-push hook integration: `rh run --pre-push` exits 1 if any required
   job fails, blocks the push.
 - Smarter `uses:` handling: a small set of TypeScript "action shims" that
   reproduce common actions in-process (artifacts, basic github-script

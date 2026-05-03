@@ -1,4 +1,4 @@
-import { compile, type Pipeline } from '@gitgate/ci';
+import { compile, type Pipeline } from '@rehearse/ci';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -70,7 +70,7 @@ export async function runCompile(flags: CompileFlags = {}): Promise<number> {
       const outPath = path.join(outDir, `${outName}.yml`);
       const yaml = compile(pipeline, {
         sourcePath: path.relative(cwd, file),
-        url: 'https://gitgate.com/docs/ci-quickstart',
+        url: 'https://rehearse.sh/docs/ci-quickstart',
       });
       await fs.writeFile(outPath, yaml, 'utf-8');
       success(`Wrote ${path.relative(cwd, outPath)}`);

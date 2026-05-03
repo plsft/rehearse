@@ -20,9 +20,9 @@ jobs:
 `;
 
 describe('convert', () => {
-  it('produces TypeScript that imports from @gitgate/ci', () => {
+  it('produces TypeScript that imports from @rehearse/ci', () => {
     const { source } = convert(SAMPLE_YAML);
-    expect(source).toContain("from '@gitgate/ci'");
+    expect(source).toContain("from '@rehearse/ci'");
     expect(source).toContain('pipeline');
     expect(source).toContain('triggers.pullRequest');
     expect(source).toContain('triggers.push');

@@ -1,5 +1,5 @@
 {
-  "name": "@gitgate/runner",
+  "name": "@rehearse/runner",
   "version": "0.3.3",
   "description": "Local-first runner for GitHub Actions workflows. Same YAML, fast.",
   "license": "Apache-2.0",
@@ -30,8 +30,8 @@
     "dev": "tsx src/cli.ts"
   },
   "dependencies": {
-    "@gitgate/ci": "workspace:*",
-    "@gitgate/git-core": "workspace:*",
+    "@rehearse/ci": "workspace:*",
+    "@rehearse/git-core": "workspace:*",
     "commander": "^12.1.0",
     "picocolors": "^1.1.1",
     "yaml": "^2.6.1"
@@ -52,11 +52,11 @@
     "local-ci",
     "act-alternative"
   ],
-  "homepage": "https://github.com/plsft/gitgate#readme",
-  "bugs": "https://github.com/plsft/gitgate/issues",
+  "homepage": "https://github.com/plsft/rehearse#readme",
+  "bugs": "https://github.com/plsft/rehearse/issues",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/plsft/gitgate.git",
+    "url": "git+https://github.com/plsft/rehearse.git",
     "directory": "runner"
   },
   "author": "plsft"

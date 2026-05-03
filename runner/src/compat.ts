@@ -10,7 +10,7 @@
  * Hoisted from `poc/2-compat.ts` so it ships in the runner CLI as
  * `runner compat <yml>`.
  */
-import { parseWorkflow, type ParsedJob, type ParsedStep } from '@gitgate/ci';
+import { parseWorkflow, type ParsedJob, type ParsedStep } from '@rehearse/ci';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import pc from 'picocolors';

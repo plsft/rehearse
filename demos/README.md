@@ -1,4 +1,4 @@
-# GitGate demos — VHS tape files
+# Rehearse demos — VHS tape files
 
 Eight [VHS](https://github.com/charmbracelet/vhs) tape scripts that produce
 real `.mp4` videos from a deterministic terminal recording. No screen-capture
@@ -12,7 +12,7 @@ pixel-identical every time you run it.
 | File | Output | Length | What it shows |
 | --- | --- | --- | --- |
 | `runner.tape` | `runner.mp4` | ~2.5 min | End-to-end runner: install / compat / run / matrix / install-hook / services / bench |
-| `ts-pipelines.tape` | `ts-pipelines.mp4` | ~2 min | TypeScript author→compile→view loop: `gg ci init` → vim source → install → compile → vim YAML → `gg ci convert` |
+| `ts-pipelines.tape` | `ts-pipelines.mp4` | ~2 min | TypeScript author→compile→view loop: `rh ci init` → vim source → install → compile → vim YAML → `rh ci convert` |
 | `watch.tape` | `watch.mp4` | ~50 s | Watch-mode magic: start watch → save broken test → FAIL → save fix → PASS |
 
 ### Per-platform examples (one per `examples/` project)
@@ -43,29 +43,29 @@ go install github.com/charmbracelet/vhs@latest
 
 ```bash
 # 1. v0.3.3 of runner + cli (latest at writing)
-npm install -g @gitgate/runner@latest @gitgate/cli@latest
+npm install -g @rehearse/runner@latest @rehearse/cli@latest
 runner --version    # 0.3.3
-gg --version        # 0.3.3
+rh --version        # 0.3.3
 
 # 2. JetBrains Mono (the tapes call for it)
 winget install JetBrains.Mono              # Windows
 brew install --cask font-jetbrains-mono    # macOS
 
 # 3. For runner.tape and watch.tape: hono cloned at the bench-expected location
-cd C:\Code\gitgate
+cd C:\Code\rehearse
 ls poc/playground/hono/.github/workflows/ci.yml
 
 # 4. Per example tapes: install the example's deps once
 cd examples/node-app && npm install              # for example-node-app.tape
 cd examples/composite-action-demo && npm install # for example-composite-action-demo.tape
 # python-api, php-app, dotnet-app tapes don't need their host toolchain
-# installed (they only run gg ci compile + runner compat, not full runner run)
+# installed (they only run rh ci compile + runner compat, not full runner run)
 ```
 
 ## Record
 
 ```bash
-cd C:\Code\gitgate
+cd C:\Code\rehearse
 
 # Product overview
 vhs demos/runner.tape           # → demos/runner.mp4
@@ -89,8 +89,8 @@ the tape sleeps 3s).
 Each per-platform tape exercises three of the runner's surfaces against
 the matching example:
 
-1. **`cat .gitgate/pipelines/ci.ts`** — the TypeScript source
-2. **`gg ci compile`** + **`cat .github/workflows/ci.yml`** — the compiled YAML
+1. **`cat .rehearse/pipelines/ci.ts`** — the TypeScript source
+2. **`rh ci compile`** + **`cat .github/workflows/ci.yml`** — the compiled YAML
 3. **`runner compat .github/workflows/ci.yml`** — what would execute,
    per-job
 
@@ -106,7 +106,7 @@ prerequisites are explained on screen but not required to render the video.
 
 ## Honest notes
 
-- All five per-platform tapes execute *real* `gg ci compile` and `runner
+- All five per-platform tapes execute *real* `rh ci compile` and `runner
   compat` commands. The output you see in the recording is the actual
   output of the v0.3.3 toolchain on the example pipelines.
 - The two end-to-end examples (`node-app`, `composite-action-demo`)
@@ -134,4 +134,4 @@ in tweets, GitHub READMEs, and embeds.
 
 - [`examples/README.md`](../examples/README.md) — the five sample projects each tape demonstrates
 - [`bench/RESULTS.md`](../bench/RESULTS.md) — runner-vs-act benchmark numbers referenced in `runner.tape`
-- [`gitgate.com/packages`](https://gitgate.com/packages) — full package reference
+- [`rehearse.sh/packages`](https://rehearse.sh/packages) — full package reference

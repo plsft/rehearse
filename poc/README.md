@@ -20,7 +20,7 @@ pnpm tsx poc/run-workflow.ts .github/workflows/ci.yml test
 
 ## What it does
 
-- Parses the YAML using `@gitgate/ci` (existing CI SDK).
+- Parses the YAML using `@rehearse/ci` (existing CI SDK).
 - Picks one job (named) or all jobs (sequential).
 - Walks each step:
   - `run:` — spawn the script with bash (Unix or Git Bash on Windows) or

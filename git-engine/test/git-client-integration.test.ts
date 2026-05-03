@@ -1,5 +1,5 @@
 /**
- * Integration tests that verify GitGate's protocol implementation
+ * Integration tests that verify Rehearse's protocol implementation
  * against a real git client.
  *
  * These tests simulate the full server-side flow (ref advertisement,
@@ -8,7 +8,7 @@
  * a real `git` client would send and expect.
  *
  * Unlike unit tests that test individual functions, these tests
- * validate the contract between GitGate and `git` itself.
+ * validate the contract between Rehearse and `git` itself.
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
@@ -94,7 +94,7 @@ class InMemoryObjectStore {
 
 const testAuthor = {
   name: 'Integration Test',
-  email: 'test@gitgate.com',
+  email: 'test@rehearse.sh',
   timestamp: 1700000000,
   tzOffset: '+0000',
 };

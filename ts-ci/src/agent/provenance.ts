@@ -1,10 +1,10 @@
 import type { Step } from '../types.js';
 
 /**
- * Emit a provenance event to the GitGate Platform API. Best-effort: failures
+ * Emit a provenance event to the Rehearse Platform API. Best-effort: failures
  * do not break the job (`continue-on-error: true`).
  *
- * The step expects `secrets.GITGATE_TOKEN` to be configured.
+ * The step expects `secrets.REHEARSE_TOKEN` to be configured.
  */
 export function provenanceEvent(eventType: string, data: Record<string, unknown> = {}): Step {
   if (!eventType || !eventType.trim()) {
@@ -22,8 +22,8 @@ export function provenanceEvent(eventType: string, data: Record<string, unknown>
   const body = JSON.stringify(payload).replace(/'/g, "'\\''");
   const script = [
     'set -e',
-    `curl -sS -X POST https://api.gitgate.com/v1/provenance/events \\`,
-    `  -H "Authorization: Bearer \${{ secrets.GITGATE_TOKEN }}" \\`,
+    `curl -sS -X POST https://api.rehearse.sh/v1/provenance/events \\`,
+    `  -H "Authorization: Bearer \${{ secrets.REHEARSE_TOKEN }}" \\`,
     `  -H "Content-Type: application/json" \\`,
     `  -d '${body}' || true`,
   ].join('\n');

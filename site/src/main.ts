@@ -49,7 +49,7 @@ window.heroDemo = (): HeroDemoState => ({
 
     // Banner
     this.lines = [];
-    push('<span class="comment"># gitgate · CI</span>');
+    push('<span class="comment"># rehearse · CI</span>');
     await sleep(80);
     push('<span class="comment">workflow: .github/workflows/ci.yml</span>');
     await sleep(70);

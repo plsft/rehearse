@@ -1,7 +1,7 @@
 namespace MyApp;
 
 /// <summary>
-/// Tiny library for the GitGate dotnet-app example.
+/// Tiny library for the Rehearse dotnet-app example.
 /// The interesting part is the CI pipeline that targets net8.0 + net9.0
 /// in parallel via the runner's matrix scheduler.
 /// </summary>

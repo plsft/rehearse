@@ -1,10 +1,10 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "gitgate-web",
+  "name": "rehearse-web",
   "compatibility_date": "2025-04-01",
   "workers_dev": true,
   "routes": [
-    { "pattern": "gitgate.com/*", "zone_name": "gitgate.com" }
+    { "pattern": "rehearse.sh/*", "zone_name": "rehearse.sh" }
   ],
   "assets": {
     "directory": "dist",

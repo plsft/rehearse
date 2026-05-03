@@ -1,13 +1,13 @@
 {
-  "name": "gitgate-monorepo",
+  "name": "rehearse-monorepo",
   "version": "0.1.0",
   "private": true,
-  "description": "GitGate — local-first runner for GitHub Actions workflows",
-  "homepage": "https://github.com/plsft/gitgate#readme",
-  "bugs": "https://github.com/plsft/gitgate/issues",
+  "description": "Rehearse — local-first runner for GitHub Actions workflows",
+  "homepage": "https://github.com/plsft/rehearse#readme",
+  "bugs": "https://github.com/plsft/rehearse/issues",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/plsft/gitgate.git"
+    "url": "git+https://github.com/plsft/rehearse.git"
   },
   "type": "module",
   "scripts": {
@@ -21,7 +21,7 @@
     "release": "node scripts/release.mjs"
   },
   "devDependencies": {
-    "@gitgate/ci": "workspace:*",
+    "@rehearse/ci": "workspace:*",
     "@types/node": "^22.10.0",
     "prettier": "^3.4.2",
     "tsx": "^4.19.2",

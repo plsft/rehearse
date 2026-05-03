@@ -4,8 +4,8 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="theme-color" content="#08090c" />
-<title>GitGate — Docs</title>
-<meta name="description" content="GitGate documentation: install, run a workflow locally, watch mode, pre-push hook, matrix, services, caching, TypeScript pipelines." />
+<title>Rehearse — Docs</title>
+<meta name="description" content="Rehearse documentation: install, run a workflow locally, watch mode, pre-push hook, matrix, services, caching, TypeScript pipelines." />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,9 +17,9 @@
 <header :class="scrolled ? 'border-b border-white/10 backdrop-blur bg-black/55' : 'border-b border-transparent'"
         class="fixed inset-x-0 top-0 z-50 transition-colors">
   <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
-    <a href="/" class="flex items-center gap-2.5 font-mono group" aria-label="GitGate home">
-      <span class="logo-mark logo-mark-md text-[var(--gg-accent)] transition-transform group-hover:scale-110"></span>
-      <span class="font-semibold tracking-tight text-white">gitgate</span>
+    <a href="/" class="flex items-center gap-2.5 font-mono group" aria-label="Rehearse home">
+      <span class="logo-mark logo-mark-md text-[var(--rh-accent)] transition-transform group-hover:scale-110"></span>
+      <span class="font-semibold tracking-tight text-white">rehearse</span>
     </a>
     <nav class="hidden md:flex items-center gap-7">
       <a href="/#bench" class="nav-link">Bench</a>
@@ -28,7 +28,7 @@
       <a href="/packages" class="nav-link">Packages</a>
       <a href="/docs" class="nav-link nav-link-active">Docs</a>
       <a href="/about" class="nav-link">About</a>
-      <a href="https://github.com/plsft/gitgate" class="nav-link">GitHub</a>
+      <a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a>
     </nav>
     <a href="/#install" class="btn btn-primary">Install</a>
   </div>
@@ -38,7 +38,7 @@
   <div class="max-w-3xl mx-auto px-5">
     <div class="eyebrow">// Docs</div>
     <h1 class="mt-2 text-4xl sm:text-5xl font-semibold tracking-tight gradient-text">Run your CI locally in 30 seconds.</h1>
-    <p class="mt-5 text-lg text-[var(--gg-muted)]">
+    <p class="mt-5 text-lg text-[var(--rh-muted)]">
       Install, point at a workflow, watch it run. Below: install,
       every-day commands, and the topics that come up once you've used it
       for a week.
@@ -52,11 +52,11 @@
     <h2 id="quickstart" class="text-2xl font-semibold text-white">Quickstart</h2>
 
     <div class="mt-6 card">
-      <div class="font-mono text-xs text-[var(--gg-accent)] mb-2">INSTALL</div>
-      <pre class="font-mono text-[13px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>npm install -g @gitgate/runner
+      <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">INSTALL</div>
+      <pre class="font-mono text-[13px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>npm install -g @rehearse/runner
 <span class="comment"># or via your package manager of choice</span>
-<span class="prompt"></span>pnpm add -g @gitgate/runner
-<span class="prompt"></span>bun add -g @gitgate/runner
+<span class="prompt"></span>pnpm add -g @rehearse/runner
+<span class="prompt"></span>bun add -g @rehearse/runner
 
 <span class="comment"># installs a single binary called `runner`</span>
 <span class="prompt"></span>runner --version
@@ -64,7 +64,7 @@
     </div>
 
     <div class="mt-5 card">
-      <div class="font-mono text-xs text-[var(--gg-accent)] mb-2">RUN A WORKFLOW</div>
+      <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">RUN A WORKFLOW</div>
       <pre class="font-mono text-[13px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>runner run .github/workflows/ci.yml             <span class="comment"># all jobs</span>
 <span class="prompt"></span>runner run .github/workflows/ci.yml --job test   <span class="comment"># one job</span>
 <span class="prompt"></span>runner run … --backend container                 <span class="comment"># force docker</span>
@@ -73,7 +73,7 @@
     </div>
 
     <div class="mt-5 card">
-      <div class="font-mono text-xs text-[var(--gg-accent)] mb-2">INTEGRATE</div>
+      <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">INTEGRATE</div>
       <pre class="font-mono text-[13px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>runner watch .github/workflows/ci.yml             <span class="comment"># inner-loop, re-runs on save</span>
 <span class="prompt"></span>runner install-hook                               <span class="comment"># pre-push git hook</span></pre>
     </div>
@@ -86,49 +86,49 @@
     <h2 class="text-2xl sm:text-3xl font-semibold gradient-text tracking-tight">Topics</h2>
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mt-8">
       <a href="#run" class="card hover:border-white/20 transition">
-        <div class="font-mono text-xs text-[var(--gg-accent)]">CORE</div>
+        <div class="font-mono text-xs text-[var(--rh-accent)]">CORE</div>
         <div class="mt-2 text-lg font-semibold text-white">Run a workflow</div>
-        <p class="mt-2 text-sm text-[var(--gg-muted)]"><code class="font-mono">runner run</code>, backend selection, environment.</p>
+        <p class="mt-2 text-sm text-[var(--rh-muted)]"><code class="font-mono">runner run</code>, backend selection, environment.</p>
       </a>
       <a href="#watch" class="card hover:border-white/20 transition">
-        <div class="font-mono text-xs text-[var(--gg-accent)]">CORE</div>
+        <div class="font-mono text-xs text-[var(--rh-accent)]">CORE</div>
         <div class="mt-2 text-lg font-semibold text-white">Watch mode</div>
-        <p class="mt-2 text-sm text-[var(--gg-muted)]">Inner-loop dev tool. Re-runs on save.</p>
+        <p class="mt-2 text-sm text-[var(--rh-muted)]">Inner-loop dev tool. Re-runs on save.</p>
       </a>
       <a href="#hook" class="card hover:border-white/20 transition">
-        <div class="font-mono text-xs text-[var(--gg-accent)]">CORE</div>
+        <div class="font-mono text-xs text-[var(--rh-accent)]">CORE</div>
         <div class="mt-2 text-lg font-semibold text-white">Pre-push hook</div>
-        <p class="mt-2 text-sm text-[var(--gg-muted)]">Block bad pushes at the source.</p>
+        <p class="mt-2 text-sm text-[var(--rh-muted)]">Block bad pushes at the source.</p>
       </a>
       <a href="#matrix" class="card hover:border-white/20 transition">
-        <div class="font-mono text-xs text-[var(--gg-accent)]">FEATURES</div>
+        <div class="font-mono text-xs text-[var(--rh-accent)]">FEATURES</div>
         <div class="mt-2 text-lg font-semibold text-white">Matrix</div>
-        <p class="mt-2 text-sm text-[var(--gg-muted)]">Cartesian, include, exclude.</p>
+        <p class="mt-2 text-sm text-[var(--rh-muted)]">Cartesian, include, exclude.</p>
       </a>
       <a href="#services" class="card hover:border-white/20 transition">
-        <div class="font-mono text-xs text-[var(--gg-accent)]">FEATURES</div>
+        <div class="font-mono text-xs text-[var(--rh-accent)]">FEATURES</div>
         <div class="mt-2 text-lg font-semibold text-white">Services</div>
-        <p class="mt-2 text-sm text-[var(--gg-muted)]">postgres, redis, mysql via container backend.</p>
+        <p class="mt-2 text-sm text-[var(--rh-muted)]">postgres, redis, mysql via container backend.</p>
       </a>
       <a href="#cache" class="card hover:border-white/20 transition">
-        <div class="font-mono text-xs text-[var(--gg-accent)]">FEATURES</div>
+        <div class="font-mono text-xs text-[var(--rh-accent)]">FEATURES</div>
         <div class="mt-2 text-lg font-semibold text-white">Caching</div>
-        <p class="mt-2 text-sm text-[var(--gg-muted)]"><code class="font-mono">actions/cache</code> on local fs.</p>
+        <p class="mt-2 text-sm text-[var(--rh-muted)]"><code class="font-mono">actions/cache</code> on local fs.</p>
       </a>
       <a href="#ts" class="card hover:border-white/20 transition">
-        <div class="font-mono text-xs text-[var(--gg-accent)]">SDK</div>
+        <div class="font-mono text-xs text-[var(--rh-accent)]">SDK</div>
         <div class="mt-2 text-lg font-semibold text-white">TypeScript pipelines</div>
-        <p class="mt-2 text-sm text-[var(--gg-muted)]"><code class="font-mono">@gitgate/ci</code> — author in TS, compile to YAML.</p>
+        <p class="mt-2 text-sm text-[var(--rh-muted)]"><code class="font-mono">@rehearse/ci</code> — author in TS, compile to YAML.</p>
       </a>
-      <a href="https://github.com/plsft/gitgate/blob/main/runner/README.md" class="card hover:border-white/20 transition">
-        <div class="font-mono text-xs text-[var(--gg-accent)]">REFERENCE</div>
+      <a href="https://github.com/plsft/rehearse/blob/main/runner/README.md" class="card hover:border-white/20 transition">
+        <div class="font-mono text-xs text-[var(--rh-accent)]">REFERENCE</div>
         <div class="mt-2 text-lg font-semibold text-white">CLI reference</div>
-        <p class="mt-2 text-sm text-[var(--gg-muted)]">Full flag list, exit codes, output schema.</p>
+        <p class="mt-2 text-sm text-[var(--rh-muted)]">Full flag list, exit codes, output schema.</p>
       </a>
-      <a href="https://github.com/plsft/gitgate/blob/main/bench/RESULTS.md" class="card hover:border-white/20 transition">
-        <div class="font-mono text-xs text-[var(--gg-accent)]">REFERENCE</div>
+      <a href="https://github.com/plsft/rehearse/blob/main/bench/RESULTS.md" class="card hover:border-white/20 transition">
+        <div class="font-mono text-xs text-[var(--rh-accent)]">REFERENCE</div>
         <div class="mt-2 text-lg font-semibold text-white">Bench methodology</div>
-        <p class="mt-2 text-sm text-[var(--gg-muted)]">Reproducible runner-vs-act numbers.</p>
+        <p class="mt-2 text-sm text-[var(--rh-muted)]">Reproducible runner-vs-act numbers.</p>
       </a>
     </div>
   </div>
@@ -140,7 +140,7 @@
     <div id="run">
       <div class="eyebrow">// Core</div>
       <h2 class="mt-2 text-2xl font-semibold gradient-text">Run a workflow</h2>
-      <p class="mt-3 text-[var(--gg-muted)]">
+      <p class="mt-3 text-[var(--rh-muted)]">
         <code class="font-mono">runner run &lt;path&gt;</code> reads a GitHub
         Actions YAML, plans the jobs, picks a backend per job, and executes.
         The default backend is <code class="font-mono">auto</code>: <span class="text-white">host
@@ -169,7 +169,7 @@
     <div id="watch">
       <div class="eyebrow">// Core</div>
       <h2 class="mt-2 text-2xl font-semibold gradient-text">Watch mode</h2>
-      <p class="mt-3 text-[var(--gg-muted)]">
+      <p class="mt-3 text-[var(--rh-muted)]">
         <code class="font-mono">runner watch &lt;path&gt;</code> re-runs the
         workflow on every change to <code class="font-mono">.yml</code>,
         <code class="font-mono">.ts</code>, <code class="font-mono">.js</code>,
@@ -182,7 +182,7 @@
     <div id="hook">
       <div class="eyebrow">// Core</div>
       <h2 class="mt-2 text-2xl font-semibold gradient-text">Pre-push hook</h2>
-      <p class="mt-3 text-[var(--gg-muted)]">
+      <p class="mt-3 text-[var(--rh-muted)]">
         <code class="font-mono">runner install-hook</code> writes a
         <code class="font-mono">.git/hooks/pre-push</code> that runs your
         workflow first. Push only if green. <span class="text-white">CI minutes spent: zero.</span>
@@ -192,13 +192,13 @@
 <span class="prompt"></span>cat .git/hooks/pre-push
 <span class="comment"># #!/usr/bin/env bash
 # # Auto-generated by 'runner install-hook'.
-# exec npx @gitgate/runner run ".github/workflows/ci.yml" --fail-fast</span></pre>
+# exec npx @rehearse/runner run ".github/workflows/ci.yml" --fail-fast</span></pre>
     </div>
 
     <div id="matrix">
       <div class="eyebrow">// Features</div>
       <h2 class="mt-2 text-2xl font-semibold gradient-text">Matrix</h2>
-      <p class="mt-3 text-[var(--gg-muted)]">
+      <p class="mt-3 text-[var(--rh-muted)]">
         Full <code class="font-mono">strategy.matrix</code> support: cartesian
         product of variables, plus <code class="font-mono">include</code> /
         <code class="font-mono">exclude</code>. <code class="font-mono">${{ matrix.* }}</code>
@@ -206,7 +206,7 @@
         <code class="font-mono">env</code>, <code class="font-mono">with</code>,
         and <code class="font-mono">if</code>.
       </p>
-      <p class="mt-3 text-sm text-[var(--gg-muted)]">
+      <p class="mt-3 text-sm text-[var(--rh-muted)]">
         <span class="ok">✓</span> Matrix cells run in <span class="text-white">parallel</span>:
         each cell gets its own <code class="font-mono">git worktree</code> off
         the host repo (with <code class="font-mono">node_modules</code> and other
@@ -218,7 +218,7 @@
     <div id="services">
       <div class="eyebrow">// Features</div>
       <h2 class="mt-2 text-2xl font-semibold gradient-text">Services</h2>
-      <p class="mt-3 text-[var(--gg-muted)]">
+      <p class="mt-3 text-[var(--rh-muted)]">
         Jobs that declare <code class="font-mono">services:</code> auto-select
         the container backend. Each service starts on a private Docker
         network with <code class="font-mono">--network-alias &lt;name&gt;</code>
@@ -232,7 +232,7 @@
     <div id="cache">
       <div class="eyebrow">// Features</div>
       <h2 class="mt-2 text-2xl font-semibold gradient-text">Caching</h2>
-      <p class="mt-3 text-[var(--gg-muted)]">
+      <p class="mt-3 text-[var(--rh-muted)]">
         <code class="font-mono">actions/cache</code>,
         <code class="font-mono">.../cache/restore</code>, and
         <code class="font-mono">.../cache/save</code> all work. Storage is
@@ -247,14 +247,14 @@
     <div id="ts">
       <div class="eyebrow">// SDK</div>
       <h2 class="mt-2 text-2xl font-semibold gradient-text">TypeScript pipelines</h2>
-      <p class="mt-3 text-[var(--gg-muted)]">
-        Optional. Author your workflow in TypeScript with <code class="font-mono">@gitgate/ci</code>,
+      <p class="mt-3 text-[var(--rh-muted)]">
+        Optional. Author your workflow in TypeScript with <code class="font-mono">@rehearse/ci</code>,
         compile to standard GitHub Actions YAML. Type-safe steps, IDE
         autocomplete, real refactor support. The compiled YAML has zero
-        GitGate dependency at CI time.
+        Rehearse dependency at CI time.
       </p>
-      <pre class="mt-4 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="kw">import</span> { <span class="fn">pipeline</span>, <span class="fn">job</span>, <span class="fn">step</span>, <span class="fn">triggers</span>, <span class="fn">Runner</span> } <span class="kw">from</span> <span class="str">'@gitgate/ci'</span>;
-<span class="kw">import</span> { <span class="fn">node</span> } <span class="kw">from</span> <span class="str">'@gitgate/ci/presets'</span>;
+      <pre class="mt-4 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="kw">import</span> { <span class="fn">pipeline</span>, <span class="fn">job</span>, <span class="fn">step</span>, <span class="fn">triggers</span>, <span class="fn">Runner</span> } <span class="kw">from</span> <span class="str">'@rehearse/ci'</span>;
+<span class="kw">import</span> { <span class="fn">node</span> } <span class="kw">from</span> <span class="str">'@rehearse/ci/presets'</span>;
 
 <span class="kw">export const</span> <span class="var">ci</span> = <span class="fn">pipeline</span>(<span class="str">'CI'</span>, {
   triggers: [<span class="fn">triggers</span>.<span class="fn">pullRequest</span>()],
@@ -265,35 +265,35 @@
     }),
   ],
 });</pre>
-      <p class="mt-3 text-sm text-[var(--gg-muted)]">
-        Convert existing YAML to TypeScript with <code class="font-mono">gg ci convert .github/workflows/ci.yml</code>.
-        Compile back to YAML with <code class="font-mono">gg ci compile</code>.
+      <p class="mt-3 text-sm text-[var(--rh-muted)]">
+        Convert existing YAML to TypeScript with <code class="font-mono">rh ci convert .github/workflows/ci.yml</code>.
+        Compile back to YAML with <code class="font-mono">rh ci compile</code>.
       </p>
     </div>
 
     <div>
       <div class="eyebrow">// Reference</div>
       <h2 class="mt-2 text-2xl font-semibold gradient-text">More</h2>
-      <ul class="mt-4 space-y-2 text-sm text-[var(--gg-muted)]">
-        <li><a href="https://github.com/plsft/gitgate/blob/main/runner/README.md" class="link">runner README</a> — full flag list and architecture</li>
-        <li><a href="https://github.com/plsft/gitgate/blob/main/bench/RESULTS.md" class="link">bench/RESULTS.md</a> — benchmark methodology and numbers</li>
-        <li><a href="https://github.com/plsft/gitgate/blob/main/CONTRIBUTING.md" class="link">CONTRIBUTING.md</a> — set up the repo for development</li>
-        <li><a href="https://github.com/plsft/gitgate/issues" class="link">issues</a> — report bugs, request features</li>
+      <ul class="mt-4 space-y-2 text-sm text-[var(--rh-muted)]">
+        <li><a href="https://github.com/plsft/rehearse/blob/main/runner/README.md" class="link">runner README</a> — full flag list and architecture</li>
+        <li><a href="https://github.com/plsft/rehearse/blob/main/bench/RESULTS.md" class="link">bench/RESULTS.md</a> — benchmark methodology and numbers</li>
+        <li><a href="https://github.com/plsft/rehearse/blob/main/CONTRIBUTING.md" class="link">CONTRIBUTING.md</a> — set up the repo for development</li>
+        <li><a href="https://github.com/plsft/rehearse/issues" class="link">issues</a> — report bugs, request features</li>
       </ul>
     </div>
   </div>
 </section>
 
 <footer class="py-14 hairline">
-  <div class="max-w-6xl mx-auto px-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 font-mono text-sm text-[var(--gg-muted)]">
+  <div class="max-w-6xl mx-auto px-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 font-mono text-sm text-[var(--rh-muted)]">
     <div class="flex items-center gap-2">
-      <span class="logo-mark logo-mark-sm text-[var(--gg-accent)]"></span>
-      <span class="text-white">gitgate</span> · by <a href="https://github.com/plsft" class="link">plsft</a>
+      <span class="logo-mark logo-mark-sm text-[var(--rh-accent)]"></span>
+      <span class="text-white">rehearse</span> · by <a href="https://github.com/plsft" class="link">plsft</a>
     </div>
     <div class="flex flex-wrap gap-x-6 gap-y-2">
       <a href="/" class="nav-link">Home</a>
-      <a href="https://github.com/plsft/gitgate" class="nav-link">GitHub</a>
-      <a href="https://github.com/plsft/gitgate/issues" class="nav-link">Issues</a>
+      <a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a>
+      <a href="https://github.com/plsft/rehearse/issues" class="nav-link">Issues</a>
     </div>
   </div>
 </footer>

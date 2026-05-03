@@ -23,8 +23,8 @@ async function detectStack(cwd: string): Promise<StackKind> {
 }
 
 const TEMPLATES: Record<StackKind, string> = {
-  bun: `import { pipeline, job, step, triggers, Runner } from '@gitgate/ci';
-import { bun } from '@gitgate/ci/presets';
+  bun: `import { pipeline, job, step, triggers, Runner } from '@rehearse/ci';
+import { bun } from '@rehearse/ci/presets';
 
 export const ci = pipeline('CI', {
   triggers: [triggers.pullRequest(), triggers.push({ branches: ['main'] })],
@@ -36,8 +36,8 @@ export const ci = pipeline('CI', {
   ],
 });
 `,
-  node: `import { pipeline, job, step, triggers, Runner } from '@gitgate/ci';
-import { node } from '@gitgate/ci/presets';
+  node: `import { pipeline, job, step, triggers, Runner } from '@rehearse/ci';
+import { node } from '@rehearse/ci/presets';
 
 export const ci = pipeline('CI', {
   triggers: [triggers.pullRequest(), triggers.push({ branches: ['main'] })],
@@ -49,8 +49,8 @@ export const ci = pipeline('CI', {
   ],
 });
 `,
-  rust: `import { pipeline, job, step, triggers, Runner } from '@gitgate/ci';
-import { rust } from '@gitgate/ci/presets';
+  rust: `import { pipeline, job, step, triggers, Runner } from '@rehearse/ci';
+import { rust } from '@rehearse/ci/presets';
 
 export const ci = pipeline('CI', {
   triggers: [triggers.pullRequest(), triggers.push({ branches: ['main'] })],
@@ -62,8 +62,8 @@ export const ci = pipeline('CI', {
   ],
 });
 `,
-  go: `import { pipeline, job, step, triggers, Runner } from '@gitgate/ci';
-import { go } from '@gitgate/ci/presets';
+  go: `import { pipeline, job, step, triggers, Runner } from '@rehearse/ci';
+import { go } from '@rehearse/ci/presets';
 
 export const ci = pipeline('CI', {
   triggers: [triggers.pullRequest(), triggers.push({ branches: ['main'] })],
@@ -75,8 +75,8 @@ export const ci = pipeline('CI', {
   ],
 });
 `,
-  python: `import { pipeline, job, step, triggers, Runner } from '@gitgate/ci';
-import { python } from '@gitgate/ci/presets';
+  python: `import { pipeline, job, step, triggers, Runner } from '@rehearse/ci';
+import { python } from '@rehearse/ci/presets';
 
 export const ci = pipeline('CI', {
   triggers: [triggers.pullRequest(), triggers.push({ branches: ['main'] })],
@@ -88,7 +88,7 @@ export const ci = pipeline('CI', {
   ],
 });
 `,
-  unknown: `import { pipeline, job, step, triggers, Runner } from '@gitgate/ci';
+  unknown: `import { pipeline, job, step, triggers, Runner } from '@rehearse/ci';
 
 export const ci = pipeline('CI', {
   triggers: [triggers.pullRequest(), triggers.push({ branches: ['main'] })],
@@ -104,14 +104,14 @@ export const ci = pipeline('CI', {
 
 // Use .mjs (extension-explicit ESM) so the config loads regardless of the
 // host project's package.json `type` field.
-const CONFIG_TEMPLATE = `// gitgate.config.mjs
+const CONFIG_TEMPLATE = `// rehearse.config.mjs
 export default {
-  pipelinesDir: '.gitgate/pipelines',
+  pipelinesDir: '.rehearse/pipelines',
   outputDir: '.github/workflows',
 };
 `;
 
-// Drop a tiny package.json inside .gitgate/ that scopes ESM resolution to
+// Drop a tiny package.json inside .rehearse/ that scopes ESM resolution to
 // the pipelines subtree. This way the user's root project can stay CJS
 // (or unset) and the .ts pipeline files still import cleanly under tsx.
 const PIPELINES_PACKAGE_JSON = `{
@@ -123,7 +123,7 @@ export async function runInit(cwd: string = process.cwd()): Promise<number> {
   const stack = await detectStack(cwd);
   info(`Detected stack: ${stack}`);
 
-  const pipelinesDir = path.join(cwd, '.gitgate', 'pipelines');
+  const pipelinesDir = path.join(cwd, '.rehearse', 'pipelines');
   await fs.mkdir(pipelinesDir, { recursive: true });
   const ciFile = path.join(pipelinesDir, 'ci.ts');
   try {
@@ -136,9 +136,9 @@ export async function runInit(cwd: string = process.cwd()): Promise<number> {
   await fs.writeFile(ciFile, TEMPLATES[stack], 'utf-8');
   success(`Wrote ${path.relative(cwd, ciFile)}`);
 
-  // Scope ESM resolution to .gitgate/ so the .ts pipelines compile
+  // Scope ESM resolution to .rehearse/ so the .ts pipelines compile
   // regardless of whether the root project's package.json sets type:module.
-  const pkgJsonFile = path.join(cwd, '.gitgate', 'package.json');
+  const pkgJsonFile = path.join(cwd, '.rehearse', 'package.json');
   try {
     await fs.access(pkgJsonFile);
   } catch {
@@ -146,7 +146,7 @@ export async function runInit(cwd: string = process.cwd()): Promise<number> {
     success(`Wrote ${path.relative(cwd, pkgJsonFile)}`);
   }
 
-  const cfgFile = path.join(cwd, 'gitgate.config.mjs');
+  const cfgFile = path.join(cwd, 'rehearse.config.mjs');
   try {
     await fs.access(cfgFile);
   } catch {
@@ -154,6 +154,6 @@ export async function runInit(cwd: string = process.cwd()): Promise<number> {
     success(`Wrote ${path.relative(cwd, cfgFile)}`);
   }
 
-  info('Next: install @gitgate/ci as a devDependency, then run `gg ci compile`.');
+  info('Next: install @rehearse/ci as a devDependency, then run `rh ci compile`.');
   return 0;
 }

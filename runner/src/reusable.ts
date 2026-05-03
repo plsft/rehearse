@@ -24,7 +24,7 @@
  *     children, no transitive resolution yet.
  *   - Caller's `permissions:` / `concurrency:` propagation.
  */
-import type { ParsedJob, ParsedWorkflow } from '@gitgate/ci';
+import type { ParsedJob, ParsedWorkflow } from '@rehearse/ci';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { parse as parseYaml } from 'yaml';

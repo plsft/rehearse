@@ -1,4 +1,4 @@
-import { convert } from '@gitgate/ci';
+import { convert } from '@rehearse/ci';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { error, info, success, warn } from '../../utils/output.js';
@@ -13,7 +13,7 @@ export async function runConvert(input: string, options: { out?: string } = {}):
     return 1;
   }
   const baseName = path.basename(input, path.extname(input));
-  const outDir = options.out ? path.resolve(cwd, options.out) : path.join(cwd, '.gitgate', 'pipelines');
+  const outDir = options.out ? path.resolve(cwd, options.out) : path.join(cwd, '.rehearse', 'pipelines');
   await fs.mkdir(outDir, { recursive: true });
   const outPath = path.join(outDir, `${baseName}.ts`);
 

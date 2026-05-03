@@ -5,7 +5,7 @@
  * - GET /info/refs?service=git-upload-pack (discover remote refs)
  * - POST /git-upload-pack (fetch objects via packfile)
  *
- * Used by GitHub import and mirror sync to pull objects into GitGate.
+ * Used by GitHub import and mirror sync to pull objects into Rehearse.
  *
  * Reference: https://git-scm.com/docs/http-protocol
  * Reference: https://git-scm.com/docs/pack-protocol
@@ -57,7 +57,7 @@ export async function fetchRemoteRefs(
 
   const response = await fetch(url, {
     headers: {
-      'User-Agent': 'GitGate/1.0',
+      'User-Agent': 'Rehearse/1.0',
       ...headers,
     },
   });
@@ -269,7 +269,7 @@ export async function fetchPackfile(
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-git-upload-pack-request',
-      'User-Agent': 'GitGate/1.0',
+      'User-Agent': 'Rehearse/1.0',
       ...headers,
     },
     body,

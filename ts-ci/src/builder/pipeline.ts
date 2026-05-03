@@ -1,4 +1,4 @@
-import type { Concurrency, Defaults, GitGateConfig, Job, Permissions, Pipeline, Trigger } from '../types.js';
+import type { Concurrency, Defaults, RehearseConfig, Job, Permissions, Pipeline, Trigger } from '../types.js';
 
 export interface PipelineConfig {
   triggers: Trigger[];
@@ -7,7 +7,7 @@ export interface PipelineConfig {
   concurrency?: Concurrency;
   defaults?: Defaults;
   env?: Record<string, string>;
-  gitgate?: GitGateConfig;
+  rehearse?: RehearseConfig;
 }
 
 /**
@@ -38,6 +38,6 @@ export function pipeline(name: string, config: PipelineConfig): Pipeline {
     concurrency: config.concurrency,
     defaults: config.defaults,
     env: config.env,
-    gitgate: config.gitgate,
+    rehearse: config.rehearse,
   };
 }
