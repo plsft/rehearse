@@ -1,6 +1,6 @@
 {
   "name": "@gitgate/runner",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Local-first runner for GitHub Actions workflows. Same YAML, fast.",
   "license": "Apache-2.0",
   "type": "module",
