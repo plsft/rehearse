@@ -67,24 +67,15 @@ function checkoutPage() {
       if (!this.email.includes('@')) { this.error = 'enter a valid email'; return; }
       this.busy = true;
       try {
-        // Step 1: send sign-in link so the user has a session before checkout completes.
-        await fetch('https://api.rehearse.sh/v1/auth/sign-in/magic-link', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: this.email }),
-        });
-        // Step 2: create checkout session and redirect.
+        // /v1/checkout is public — pass email + plan, get a Stripe URL back.
+        // The webhook + success page do the rest after payment.
         const res = await fetch('https://api.rehearse.sh/v1/checkout', {
-          method: 'POST', credentials: 'include',
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ plan: this.plan }),
+          body: JSON.stringify({ plan: this.plan, email: this.email }),
         });
         if (!res.ok) {
           const body = await res.json().catch(() => ({}));
-          if (res.status === 401) {
-            this.error = "We sent a sign-in link to your email. Click it, then return here.";
-            this.busy = false;
-            return;
-          }
           throw new Error(body?.error?.message ?? 'failed to start checkout');
         }
         const body = await res.json();
