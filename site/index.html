@@ -18,9 +18,18 @@
 </head>
 <body class="antialiased" x-data="{ scrolled: false, copied: '' }" x-init="window.addEventListener('scroll', () => scrolled = window.scrollY > 8)">
 
+<!-- ============== ANNOUNCEMENT ============== -->
+<a href="/pro" class="block bg-[var(--rh-accent-glow)] border-b border-[var(--rh-accent)]/30 hover:bg-[var(--rh-accent-dim)]/20 transition-colors fixed inset-x-0 top-0 z-[60]">
+  <div class="max-w-6xl mx-auto px-5 h-7 flex items-center justify-center gap-2 text-[12px] font-mono">
+    <span class="text-[var(--rh-accent)]">// new</span>
+    <span class="text-white">Rehearse Pro — signed, scanned, curated CI base images.</span>
+    <span class="text-[var(--rh-muted)]">$99/mo →</span>
+  </div>
+</a>
+
 <!-- ============== NAV ============== -->
 <header :class="scrolled ? 'border-b border-white/10 backdrop-blur bg-black/55' : 'border-b border-transparent'"
-        class="fixed inset-x-0 top-0 z-50 transition-colors">
+        class="fixed inset-x-0 top-7 z-50 transition-colors">
   <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
     <a href="/" class="flex items-center gap-2.5 font-mono group" aria-label="Rehearse home">
       <span class="logo-mark logo-mark-md text-[var(--rh-accent)] transition-transform group-hover:scale-110"></span>
