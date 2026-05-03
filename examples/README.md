@@ -1,14 +1,16 @@
 # GitGate examples
 
-Three small, self-contained sample projects demonstrating real CI pipelines
+Five small, self-contained sample projects demonstrating real CI pipelines
 authored in TypeScript with `@gitgate/ci`, runnable locally with
 `@gitgate/runner`.
 
-| Example | What it shows |
-| --- | --- |
-| [`node-app/`](node-app) | Node + Vitest, **matrix across `[18.x, 20.x, 22.x]` parallel via per-cell git worktree**, `actions/cache`, `upload-artifact` for coverage. Targets Ubicloud (`Runner.ubicloud('standard-4')`). |
-| [`python-api/`](python-api) | FastAPI + pytest + **Postgres service** via the container backend with `--network-alias`. Demonstrates the service-container path that `act` doesn't complete. |
-| [`composite-action-demo/`](composite-action-demo) | A local composite action (`./.github/actions/setup-deps`) and a workflow that uses it. Shows how composite expansion + input substitution works. |
+| Example | Stack | What it shows |
+| --- | --- | --- |
+| [`node-app/`](node-app) | Node + Vitest | **matrix `[18.x, 20.x, 22.x]` parallel via per-cell git worktree**, `actions/cache`, `upload-artifact` for coverage. Targets Ubicloud (`Runner.ubicloud('standard-4')`). |
+| [`python-api/`](python-api) | FastAPI + pytest | **Postgres `services:` block** via the container backend with `--network-alias`. The workflow class `act` doesn't complete. |
+| [`php-app/`](php-app) | PHP + PHPUnit + PHPStan | **Remote JS action** (`shivammathur/setup-php@v2`) auto-cloned and executed via the runner's JS-action runtime. Matrix `[8.2, 8.3, 8.4]`. |
+| [`dotnet-app/`](dotnet-app) | .NET (C#) + xUnit | **Multi-target framework matrix** `[net8.0, net9.0]` with shimmed `actions/setup-dotnet` (host no-op locally). NuGet cache, TRX test artifacts. |
+| [`composite-action-demo/`](composite-action-demo) | Node + Vitest | A local composite action (`./.github/actions/setup-deps`) and a workflow that uses it. Shows composite expansion + `${{ inputs.* }}` substitution. |
 
 ## Run any of them
 
