@@ -58,7 +58,7 @@
     <h2 class="text-xl font-semibold mt-10 mb-3">04 — verify a Pro image (optional)</h2>
     <p class="text-[var(--rh-muted)] mb-3 text-sm">Every image is cosign-signed via Sigstore. To verify before pulling:</p>
     <pre class="terminal">cosign verify registry.rehearse.sh/node:20-warm \
-  --certificate-identity-regexp 'https://github.com/rehearse-sh/images/' \
+  --certificate-identity-regexp 'https://github.com/plsft/rehearse-images/' \
   --certificate-oidc-issuer 'https://token.actions.githubusercontent.com'</pre>
 
     <h2 class="text-xl font-semibold mt-10 mb-3">05 — rotate keys</h2>
