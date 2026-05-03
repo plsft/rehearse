@@ -12,6 +12,7 @@ export default defineConfig({
         main: resolve(__dirname, 'index.html'),
         docs: resolve(__dirname, 'docs.html'),
         about: resolve(__dirname, 'about.html'),
+        packages: resolve(__dirname, 'packages.html'),
       },
     },
   },

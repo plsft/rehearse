@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#08090c" />
+<title>GitGate — Packages</title>
+<meta name="description" content="The four @gitgate/* packages on npm: @gitgate/runner, @gitgate/ci, @gitgate/git-core, @gitgate/cli. All Apache 2.0. Independent — install only what you need." />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script type="module" src="/src/main.ts"></script>
+</head>
+<body class="antialiased" x-data="{ scrolled: false }" x-init="window.addEventListener('scroll', () => scrolled = window.scrollY > 8)">
+
+<header :class="scrolled ? 'border-b border-white/10 backdrop-blur bg-black/55' : 'border-b border-transparent'"
+        class="fixed inset-x-0 top-0 z-50 transition-colors">
+  <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2.5 font-mono group" aria-label="GitGate home">
+      <span class="logo-mark logo-mark-md text-[var(--gg-accent)] transition-transform group-hover:scale-110"></span>
+      <span class="font-semibold tracking-tight text-white">gitgate</span>
+      <span class="hidden sm:inline text-[11px] text-[var(--gg-muted)] border border-white/10 rounded px-1.5 py-0.5">v0.3.2 · alpha</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-7">
+      <a href="/#bench" class="nav-link">Bench</a>
+      <a href="/#features" class="nav-link">Features</a>
+      <a href="/packages" class="nav-link nav-link-active">Packages</a>
+      <a href="/docs" class="nav-link">Docs</a>
+      <a href="/about" class="nav-link">About</a>
+      <a href="https://github.com/plsft/gitgate" class="nav-link">GitHub</a>
+    </nav>
+    <a href="/#install" class="btn btn-primary">Install</a>
+  </div>
+</header>
+
+<!-- ================ HERO ================ -->
+<section class="bg-grid pt-36 pb-12">
+  <div class="max-w-3xl mx-auto px-5">
+    <div class="eyebrow">// Packages</div>
+    <h1 class="mt-2 text-4xl sm:text-5xl font-semibold tracking-tight gradient-text">
+      Four packages on npm. All Apache 2.0.
+    </h1>
+    <p class="mt-5 text-lg text-[var(--gg-muted)]">
+      Each one is independent — you can install just one. They compose well
+      when you want them to. No hosted product, no signup, no telemetry.
+      Versions move in lockstep.
+    </p>
+  </div>
+</section>
+
+<!-- ================ AT A GLANCE ================ -->
+<section class="py-12 hairline">
+  <div class="max-w-6xl mx-auto px-5">
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-sm font-mono">
+        <thead class="bg-white/[0.02] text-[var(--gg-muted)] text-left">
+          <tr>
+            <th class="py-3 px-5 font-semibold">Package</th>
+            <th class="py-3 px-5 font-semibold">Binary</th>
+            <th class="py-3 px-5 font-semibold">What it does</th>
+            <th class="py-3 px-5 font-semibold text-right">Tests</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-white/5 text-white/90">
+          <tr>
+            <td class="py-3 px-5"><a href="#runner" class="link">@gitgate/runner</a></td>
+            <td class="py-3 px-5"><code class="font-mono">runner</code></td>
+            <td class="py-3 px-5 text-[var(--gg-muted)]">Local-first GitHub Actions runner</td>
+            <td class="py-3 px-5 text-right ok font-bold">96</td>
+          </tr>
+          <tr>
+            <td class="py-3 px-5"><a href="#ci" class="link">@gitgate/ci</a></td>
+            <td class="py-3 px-5 text-[var(--gg-muted)]">(library)</td>
+            <td class="py-3 px-5 text-[var(--gg-muted)]">TypeScript SDK → GitHub Actions YAML</td>
+            <td class="py-3 px-5 text-right ok font-bold">snapshots</td>
+          </tr>
+          <tr>
+            <td class="py-3 px-5"><a href="#git-core" class="link">@gitgate/git-core</a></td>
+            <td class="py-3 px-5 text-[var(--gg-muted)]">(library)</td>
+            <td class="py-3 px-5 text-[var(--gg-muted)]">Pure-TypeScript git protocol — no native deps</td>
+            <td class="py-3 px-5 text-right ok font-bold">162</td>
+          </tr>
+          <tr>
+            <td class="py-3 px-5"><a href="#cli" class="link">@gitgate/cli</a></td>
+            <td class="py-3 px-5"><code class="font-mono">gg</code></td>
+            <td class="py-3 px-5 text-[var(--gg-muted)]">Companion CLI for <code class="font-mono">@gitgate/ci</code></td>
+            <td class="py-3 px-5 text-right text-[var(--gg-muted)]">—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="mt-6 text-sm text-[var(--gg-muted)] max-w-3xl">
+      Versions across all four move together via <code class="font-mono">pnpm release patch|minor|major</code>
+      — you can always trust <code class="font-mono">0.3.2 ↔ 0.3.2 ↔ 0.3.2 ↔ 0.3.2</code>.
+    </p>
+  </div>
+</section>
+
+<!-- ================ @gitgate/runner ================ -->
+<section id="runner" class="py-20 hairline">
+  <div class="max-w-3xl mx-auto px-5">
+    <div class="font-mono text-xs text-[var(--gg-accent)]">PACKAGE</div>
+    <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">@gitgate/runner</h2>
+    <p class="mt-2 font-mono text-sm text-[var(--gg-muted)]">binary: <code class="text-white">runner</code> · <a href="https://www.npmjs.com/package/@gitgate/runner" class="link">npm</a> · <a href="https://github.com/plsft/gitgate/tree/main/runner" class="link">source</a></p>
+
+    <p class="mt-5 text-[var(--gg-muted)] leading-relaxed">
+      The headline product. Reads your existing
+      <code class="font-mono">.github/workflows/*.yml</code> and executes them on
+      your laptop in seconds — same YAML, no edits.
+      <span class="text-white">5–9× faster than <code class="font-mono">act</code>
+      on standard workflows, 30× on services where act doesn't finish.</span>
+    </p>
+
+    <h3 class="mt-10 text-lg font-semibold text-white">Why it exists</h3>
+    <p class="mt-2 text-[var(--gg-muted)] leading-relaxed">
+      <code class="font-mono">git push</code> → wait 90 seconds → CI fails → fix
+      → push → wait → fail. That's the slowest inner loop developers have. The
+      runner reads the same YAML and runs it locally so the loop closes in
+      seconds.
+    </p>
+
+    <h3 class="mt-8 text-lg font-semibold text-white">What it does</h3>
+    <ul class="mt-3 space-y-2 text-[var(--gg-muted)] leading-relaxed">
+      <li><span class="ok">✓</span> Two backends per job: <span class="text-white">host</span> (subprocess, fast, reuses your <code class="font-mono">node_modules</code>) and <span class="text-white">container</span> (Docker, parity with GH-hosted)</li>
+      <li><span class="ok">✓</span> <span class="text-white">Matrix in parallel</span> via per-cell <code class="font-mono">git worktree</code> — three Node versions in three isolated checkouts, no shared-workspace races</li>
+      <li><span class="ok">✓</span> <code class="font-mono">services:</code> on a private Docker network with <code class="font-mono">--network-alias</code>; health-check waiting included</li>
+      <li><span class="ok">✓</span> <code class="font-mono">actions/cache</code> semantics on local fs — exact-key + restore-key longest-prefix; <code class="font-mono">cache-hit</code> / <code class="font-mono">cache-primary-key</code> / <code class="font-mono">cache-matched-key</code> outputs</li>
+      <li><span class="ok">✓</span> <code class="font-mono">actions/upload-artifact</code> / <code class="font-mono">download-artifact</code> backed by <code class="font-mono">.runner/artifacts/</code></li>
+      <li><span class="ok">✓</span> Composite actions — local <code class="font-mono">./.github/actions/*</code> and remote <code class="font-mono">org/repo[/sub]@ref</code>, auto-cloned</li>
+      <li><span class="ok">✓</span> Local reusable workflows (<code class="font-mono">uses: ./.github/workflows/foo.yml</code> at job level) with <code class="font-mono">with:</code> + <code class="font-mono">secrets: inherit</code></li>
+      <li><span class="ok">✓</span> JS actions (<code class="font-mono">runs.using: node20|18|16</code>) — auto-cloned at the requested ref, full <code class="font-mono">INPUT_*</code> / <code class="font-mono">GITHUB_OUTPUT</code> contract</li>
+      <li><span class="ok">✓</span> 16 in-process shims: <code class="font-mono">checkout</code>, <code class="font-mono">setup-{node,python,go,java,dotnet,bun}</code>, <code class="font-mono">setup-pnpm</code>, <code class="font-mono">setup-deno</code>, <code class="font-mono">rust-toolchain</code>, <code class="font-mono">setup-ruby</code>, <code class="font-mono">cache</code>, <code class="font-mono">upload/download-artifact</code>, <code class="font-mono">codecov</code>, <code class="font-mono">github-script</code></li>
+      <li><span class="ok">✓</span> <code class="font-mono">if:</code> on jobs and steps with <code class="font-mono">${{ matrix.* }}</code>, <code class="font-mono">env</code>, <code class="font-mono">secrets</code>, <code class="font-mono">needs</code>, <code class="font-mono">steps</code>, <code class="font-mono">runner</code>, <code class="font-mono">github</code>, <code class="font-mono">inputs</code></li>
+      <li><span class="ok">✓</span> <code class="font-mono">needs:</code> with topological scheduling and bounded parallelism</li>
+    </ul>
+
+    <h3 class="mt-8 text-lg font-semibold text-white">Four CLI subcommands</h3>
+    <pre class="mt-4 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>runner run &lt;workflow.yml&gt;     <span class="comment"># execute a workflow</span>
+<span class="prompt"></span>runner watch &lt;workflow.yml&gt;   <span class="comment"># re-run on every save (debounced, queue-coalesced)</span>
+<span class="prompt"></span>runner install-hook           <span class="comment"># write .git/hooks/pre-push that runs your workflow</span>
+<span class="prompt"></span>runner compat &lt;workflow.yml&gt;  <span class="comment"># static audit: how much would actually execute</span></pre>
+
+    <h3 class="mt-8 text-lg font-semibold text-white">Programmatic API</h3>
+    <pre class="mt-4 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="kw">import</span> { <span class="fn">run</span>, <span class="fn">compat</span> } <span class="kw">from</span> <span class="str">'@gitgate/runner'</span>;
+
+<span class="kw">const</span> <span class="var">result</span> = <span class="kw">await</span> <span class="fn">run</span>({
+  workflowPath: <span class="str">'.github/workflows/ci.yml'</span>,
+  jobFilter:    <span class="str">'test'</span>,
+  backend:      <span class="str">'auto'</span>,
+  maxParallel:  <span class="num">4</span>,
+});
+
+<span class="kw">const</span> <span class="var">audit</span> = <span class="fn">compat</span>(<span class="str">'.github/workflows/ci.yml'</span>);
+<span class="comment">// → { coverage, jobs, stepsTotal }</span></pre>
+
+    <h3 class="mt-8 text-lg font-semibold text-white">Numbers</h3>
+    <ul class="mt-3 space-y-1 text-sm text-[var(--gg-muted)]">
+      <li><strong class="text-white">96 tests</strong> across 10 suites, all green</li>
+      <li>Compat: <strong class="text-white">100%</strong> on our own CI · <strong class="text-white">96.15%</strong> on <code class="font-mono">vitejs/vite</code> · <strong class="text-white">97.18%</strong> on <code class="font-mono">honojs/hono</code></li>
+      <li>vs <code class="font-mono">act</code> (Linux GH-runner v0.3.2 warm): <strong class="text-white">4.78×</strong> on our-ci, <strong class="text-white">9.09×</strong> on node-matrix, <strong class="text-white">30.50×</strong> on service-postgres</li>
+      <li>Runtime deps: <code class="font-mono">commander</code>, <code class="font-mono">picocolors</code>, <code class="font-mono">yaml</code> (plus workspace siblings)</li>
+    </ul>
+
+    <h3 class="mt-8 text-lg font-semibold text-white">Honest limits</h3>
+    <ul class="mt-3 space-y-1 text-sm text-[var(--gg-muted)]">
+      <li><span class="warn">○</span> Remote reusable workflows (<code class="font-mono">org/repo/.github/workflows/foo.yml@ref</code>) — local form works</li>
+      <li><span class="warn">○</span> Docker actions (<code class="font-mono">runs.using: docker</code>) — JS-action runtime ships</li>
+      <li><span class="warn">○</span> OIDC / <code class="font-mono">id-token: write</code></li>
+      <li><span class="warn">○</span> <code class="font-mono">concurrency:</code> cancellation</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================ @gitgate/ci ================ -->
+<section id="ci" class="py-20 hairline">
+  <div class="max-w-3xl mx-auto px-5">
+    <div class="font-mono text-xs text-[var(--gg-accent)]">PACKAGE</div>
+    <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">@gitgate/ci</h2>
+    <p class="mt-2 font-mono text-sm text-[var(--gg-muted)]">library · <a href="https://www.npmjs.com/package/@gitgate/ci" class="link">npm</a> · <a href="https://github.com/plsft/gitgate/tree/main/ts-ci" class="link">source</a></p>
+
+    <p class="mt-5 text-[var(--gg-muted)] leading-relaxed">
+      Author GitHub Actions pipelines in TypeScript with type safety and IDE
+      autocomplete, then compile to plain GitHub Actions YAML. <span class="text-white">The
+      generated YAML has zero runtime dependency on us — you can eject any time.</span>
+    </p>
+
+    <h3 class="mt-10 text-lg font-semibold text-white">Why it exists</h3>
+    <p class="mt-2 text-[var(--gg-muted)] leading-relaxed">
+      YAML for CI is unmaintainable past a few hundred lines. No types, no
+      autocomplete, copy-paste errors that fail in CI 90 seconds later. This
+      SDK gives you typed builders that compile to standard GitHub Actions
+      YAML.
+    </p>
+
+    <h3 class="mt-8 text-lg font-semibold text-white">What it does</h3>
+    <ul class="mt-3 space-y-2 text-[var(--gg-muted)] leading-relaxed">
+      <li><span class="ok">✓</span> Typed builders: <code class="font-mono">pipeline()</code>, <code class="font-mono">job()</code>, <code class="font-mono">step.run() / .checkout() / .action()</code>, <code class="font-mono">triggers.push() / .pullRequest() / .schedule()</code>, <code class="font-mono">Runner.ubicloud() / .github()</code></li>
+      <li><span class="ok">✓</span> Context helpers: <code class="font-mono">secrets()</code>, <code class="font-mono">vars()</code>, <code class="font-mono">github()</code>, <code class="font-mono">env()</code>, <code class="font-mono">needs()</code>, <code class="font-mono">steps()</code>, <code class="font-mono">expr()</code>, <code class="font-mono">hashFiles()</code> — all validated, throw on empty/whitespace</li>
+      <li><span class="ok">✓</span> Language presets: <code class="font-mono">node</code>, <code class="font-mono">bun</code>, <code class="font-mono">python</code>, <code class="font-mono">rust</code>, <code class="font-mono">go</code>, <code class="font-mono">docker</code> — each exporting <code class="font-mono">setup() / install() / test() / build() / lint()</code> with correct action references</li>
+      <li><span class="ok">✓</span> Hand-rolled YAML serializer — no external YAML library at runtime</li>
+      <li><span class="ok">✓</span> YAML → TypeScript converter (<code class="font-mono">convert()</code>) for migrating existing workflows</li>
+      <li><span class="ok">✓</span> Cost estimator (<code class="font-mono">estimate()</code>) — Ubicloud vs GitHub-hosted price per run</li>
+    </ul>
+
+    <h3 class="mt-8 text-lg font-semibold text-white">How it's used</h3>
+    <pre class="mt-4 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="comment">// .gitgate/pipelines/ci.ts</span>
+<span class="kw">import</span> { <span class="fn">pipeline</span>, <span class="fn">job</span>, <span class="fn">step</span>, <span class="fn">triggers</span>, <span class="fn">Runner</span> } <span class="kw">from</span> <span class="str">'@gitgate/ci'</span>;
+<span class="kw">import</span> { <span class="fn">node</span> } <span class="kw">from</span> <span class="str">'@gitgate/ci/presets'</span>;
+
+<span class="kw">export const</span> <span class="var">ci</span> = <span class="fn">pipeline</span>(<span class="str">'CI'</span>, {
+  triggers: [<span class="fn">triggers</span>.<span class="fn">pullRequest</span>(), <span class="fn">triggers</span>.<span class="fn">push</span>({ branches: [<span class="str">'main'</span>] })],
+  jobs: [
+    <span class="fn">job</span>(<span class="str">'test'</span>, {
+      runner: <span class="fn">Runner</span>.<span class="fn">ubicloud</span>(<span class="str">'standard-4'</span>),
+      steps: [<span class="fn">step</span>.<span class="fn">checkout</span>(), <span class="fn">node</span>.<span class="fn">setup</span>(<span class="str">'20'</span>), <span class="fn">node</span>.<span class="fn">install</span>(), <span class="fn">node</span>.<span class="fn">test</span>()],
+    }),
+  ],
+});</pre>
+    <p class="mt-3 text-sm text-[var(--gg-muted)]">
+      Compile via <code class="font-mono">gg ci compile</code> (uses
+      <a href="#cli" class="link">@gitgate/cli</a>) → produces
+      <code class="font-mono">.github/workflows/ci.yml</code>.
+    </p>
+
+    <h3 class="mt-8 text-lg font-semibold text-white">Numbers</h3>
+    <ul class="mt-3 space-y-1 text-sm text-[var(--gg-muted)]">
+      <li>Snapshot tests covering every preset and the YAML compiler — every output is committed</li>
+      <li><strong class="text-white">Zero runtime dependencies.</strong> The <code class="font-mono">yaml</code> package is a dev-only dep used by the converter (YAML → TS direction)</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================ @gitgate/git-core ================ -->
+<section id="git-core" class="py-20 hairline">
+  <div class="max-w-3xl mx-auto px-5">
+    <div class="font-mono text-xs text-[var(--gg-accent)]">PACKAGE</div>
+    <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">@gitgate/git-core</h2>
+    <p class="mt-2 font-mono text-sm text-[var(--gg-muted)]">library · <a href="https://www.npmjs.com/package/@gitgate/git-core" class="link">npm</a> · <a href="https://github.com/plsft/gitgate/tree/main/git-engine" class="link">source</a></p>
+
+    <p class="mt-5 text-[var(--gg-muted)] leading-relaxed">
+      Full git protocol implementation in TypeScript with <span class="text-white">zero
+      native dependencies</span>. Runs on Cloudflare Workers, Node, Bun, and the
+      browser. Powers <code class="font-mono">actions/checkout</code> in the
+      runner.
+    </p>
+
+    <h3 class="mt-10 text-lg font-semibold text-white">Why it exists</h3>
+    <p class="mt-2 text-[var(--gg-muted)] leading-relaxed">
+      Most git tooling shells out to the <code class="font-mono">git</code>
+      binary. That doesn't work inside Cloudflare Workers, the browser, or any
+      sandboxed runtime. It's also slow (process spawn per operation) and
+      inflexible (you get whatever the user's git version supports).
+      <code class="font-mono">@gitgate/git-core</code> is a complete from-scratch
+      reimplementation in TypeScript.
+    </p>
+
+    <h3 class="mt-8 text-lg font-semibold text-white">What it does</h3>
+    <ul class="mt-3 space-y-2 text-[var(--gg-muted)] leading-relaxed">
+      <li><span class="ok">✓</span> <strong class="text-white">Git objects:</strong> read/write blobs, trees, commits, tags. Loose-object format and SHA-1 hashing. zlib via <code class="font-mono">pako</code></li>
+      <li><span class="ok">✓</span> <strong class="text-white">Refs:</strong> <code class="font-mono">refs/heads/</code>, <code class="font-mono">refs/tags/</code>, <code class="font-mono">refs/remotes/</code>, packed-refs file format — read, write, list, dereference</li>
+      <li><span class="ok">✓</span> <strong class="text-white">Packfiles:</strong> parse v2 packfiles (REF_DELTA + OFS_DELTA), write packfiles, packfile index v2 (.idx)</li>
+      <li><span class="ok">✓</span> <strong class="text-white">Diff &amp; merge:</strong> Myers diff, three-way merge, patch generation, hunk-based representation, conflict markers</li>
+      <li><span class="ok">✓</span> <strong class="text-white">Smart HTTP protocol:</strong> clone over <code class="font-mono">git-upload-pack</code> and <code class="font-mono">git-receive-pack</code> v2 — capability advertisement, want/have negotiation, sideband-64k chunking</li>
+      <li><span class="ok">✓</span> <strong class="text-white">HTTP client</strong> via plain <code class="font-mono">fetch()</code> — Workers, browsers, Node, Bun</li>
+    </ul>
+
+    <h3 class="mt-8 text-lg font-semibold text-white">Programmatic API</h3>
+    <pre class="mt-4 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="kw">import</span> { <span class="fn">GitClient</span> } <span class="kw">from</span> <span class="str">'@gitgate/git-core'</span>;
+
+<span class="kw">const</span> <span class="var">client</span> = <span class="kw">new</span> <span class="fn">GitClient</span>({ fetch });
+<span class="kw">const</span> <span class="var">result</span> = <span class="kw">await</span> <span class="var">client</span>.<span class="fn">clone</span>({
+  url:   <span class="str">'https://github.com/honojs/hono.git'</span>,
+  ref:   <span class="str">'main'</span>,
+  depth: <span class="num">1</span>,
+});
+<span class="comment">// → { objects, refs, head }</span>
+
+<span class="comment">// or compose lower-level primitives</span>
+<span class="kw">import</span> { <span class="fn">parseTree</span>, <span class="fn">parsePackfile</span>, <span class="fn">computeDiff</span> } <span class="kw">from</span> <span class="str">'@gitgate/git-core'</span>;</pre>
+
+    <h3 class="mt-8 text-lg font-semibold text-white">Numbers</h3>
+    <ul class="mt-3 space-y-1 text-sm text-[var(--gg-muted)]">
+      <li><strong class="text-white">162 tests</strong> across 8 suites — refs, merge, diff, protocol, objects, packfile, http-flow, client-integration</li>
+      <li><strong class="text-white">One runtime dep:</strong> <code class="font-mono">pako</code> (zlib in JS)</li>
+      <li>No native deps, no shellout, no <code class="font-mono">git</code> binary required</li>
+    </ul>
+
+    <h3 class="mt-8 text-lg font-semibold text-white">Where it's used</h3>
+    <ul class="mt-3 space-y-1 text-sm text-[var(--gg-muted)]">
+      <li><a href="#runner" class="link">@gitgate/runner</a> — the <code class="font-mono">actions/checkout</code> shim, no <code class="font-mono">git clone</code> subprocess</li>
+      <li>Anywhere you need git inside a JS-only sandbox: edge workers, browser-based code editors, embedded VCS UIs</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================ @gitgate/cli ================ -->
+<section id="cli" class="py-20 hairline">
+  <div class="max-w-3xl mx-auto px-5">
+    <div class="font-mono text-xs text-[var(--gg-accent)]">PACKAGE</div>
+    <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">@gitgate/cli</h2>
+    <p class="mt-2 font-mono text-sm text-[var(--gg-muted)]">binary: <code class="text-white">gg</code> · <a href="https://www.npmjs.com/package/@gitgate/cli" class="link">npm</a> · <a href="https://github.com/plsft/gitgate/tree/main/cli" class="link">source</a></p>
+
+    <p class="mt-5 text-[var(--gg-muted)] leading-relaxed">
+      The <code class="font-mono">gg</code> command — companion CLI for the
+      TypeScript-pipeline workflow. Scaffold, compile, convert, validate,
+      watch, estimate.
+    </p>
+
+    <h3 class="mt-10 text-lg font-semibold text-white">Why it's separate from @gitgate/ci</h3>
+    <p class="mt-2 text-[var(--gg-muted)] leading-relaxed">
+      <code class="font-mono">@gitgate/ci</code> is a library — you
+      <code class="font-mono">import</code> from it and write TypeScript. The
+      CLI wraps that library in commands that handle the file-system side:
+      walking <code class="font-mono">.gitgate/pipelines/</code>, importing
+      <code class="font-mono">.ts</code> files via <code class="font-mono">tsx</code>,
+      writing <code class="font-mono">.github/workflows/*.yml</code>, parsing
+      existing YAML for the reverse direction. Separating these means
+      <code class="font-mono">@gitgate/ci</code> stays runtime-dep-free —
+      <code class="font-mono">tsx</code> would otherwise pull in chokidar,
+      esbuild, and others.
+    </p>
+
+    <h3 class="mt-8 text-lg font-semibold text-white">Six subcommands</h3>
+    <pre class="mt-4 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>gg ci init      <span class="comment"># scaffold .gitgate/pipelines/ci.ts + .gitgate/package.json + gitgate.config.mjs</span>
+<span class="prompt"></span>gg ci compile   <span class="comment"># .gitgate/pipelines/**/*.ts → .github/workflows/*.yml</span>
+<span class="prompt"></span>gg ci convert   <span class="comment"># existing .github/workflows/foo.yml → .gitgate/pipelines/foo.ts</span>
+<span class="prompt"></span>gg ci validate  <span class="comment"># type-check pipelines without writing output</span>
+<span class="prompt"></span>gg ci watch     <span class="comment"># recompile on save (inner loop for pipeline authoring)</span>
+<span class="prompt"></span>gg ci estimate  <span class="comment"># Ubicloud vs GitHub-hosted cost per run, given step durations</span></pre>
+
+    <h3 class="mt-8 text-lg font-semibold text-white">Stack detection</h3>
+    <p class="mt-2 text-[var(--gg-muted)] leading-relaxed">
+      <code class="font-mono">gg ci init</code> detects your project
+      (<code class="font-mono">bun.lockb</code> → Bun, <code class="font-mono">Cargo.toml</code> →
+      Rust, <code class="font-mono">go.mod</code> → Go, etc.) and scaffolds an
+      appropriate template. Falls back to a generic template for unknown stacks.
+    </p>
+
+    <h3 class="mt-8 text-lg font-semibold text-white">Module-resolution decoupling</h3>
+    <p class="mt-2 text-[var(--gg-muted)] leading-relaxed">
+      <code class="font-mono">gg ci init</code> writes a
+      <code class="font-mono">.gitgate/package.json</code> with
+      <code class="font-mono">{"type": "module"}</code> to scope ESM resolution
+      to the pipelines subtree — your host project's <code class="font-mono">package.json</code>
+      can be CJS, ESM, or unset and <code class="font-mono">gg ci compile</code>
+      still works. The config file is <code class="font-mono">gitgate.config.mjs</code>
+      (extension-explicit ESM) for the same reason.
+    </p>
+  </div>
+</section>
+
+<!-- ================ HOW THEY FIT ================ -->
+<section class="py-20 hairline bg-grid">
+  <div class="max-w-3xl mx-auto px-5">
+    <div class="eyebrow">// How they fit together</div>
+    <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">Two pipelines, one engine.</h2>
+    <p class="mt-5 text-[var(--gg-muted)] leading-relaxed">
+      The runner reads YAML and executes it. It uses git-core internally for
+      <code class="font-mono">checkout</code> without shelling out. Separately,
+      the <code class="font-mono">gg</code> CLI compiles TypeScript pipelines
+      down to YAML — and that YAML feeds back to the runner, or to GitHub
+      directly, or both.
+    </p>
+    <pre class="mt-8 font-mono text-[11.5px] text-white/85 whitespace-pre overflow-x-auto leading-relaxed">┌──────────────────────────────────────────────────────────┐
+│              .github/workflows/*.yml                     │
+│            (the YAML you already have)                   │
+└────────────────┬─────────────────────────────────────────┘
+                 │
+                 ▼  reads
+┌──────────────────────────────────────────────────────────┐
+│  @gitgate/runner   (the runner CLI: `runner`)            │
+│  • parses YAML                                           │
+│  • plans jobs + matrix cells                             │
+│  • picks backend per job (host vs container)             │
+│  • executes via the planner + scheduler                  │
+│  • uses @gitgate/git-core for actions/checkout           │
+└────────────────┬─────────────────────────────────────────┘
+                 │
+                 ▼  delegates
+                 ┌────────────────────────────────────────┐
+                 │  @gitgate/git-core  (zero native deps) │
+                 │  • clone, parse objects, diff, merge   │
+                 └────────────────────────────────────────┘
+
+
+┌──────────────────────────────────────────────────────────┐
+│  .gitgate/pipelines/*.ts                                 │
+│  (TypeScript pipelines — typed, autocomplete, refactor)  │
+└────────────────┬─────────────────────────────────────────┘
+                 │
+                 ▼  compiled by `gg ci compile` (cli wraps ci)
+┌──────────────────────────────────────────────────────────┐
+│  @gitgate/cli  (the gg CLI binary)                       │
+│  • scaffolds, compiles, converts, watches, estimates     │
+│  • imports the .ts files via tsx                         │
+└────────────────┬─────────────────────────────────────────┘
+                 │
+                 ▼  via
+                 ┌────────────────────────────────────────┐
+                 │  @gitgate/ci  (the SDK)                │
+                 │  • pipeline()/job()/step()/triggers()  │
+                 │  • Runner.ubicloud()/github()          │
+                 │  • presets: node, bun, python, rust... │
+                 │  • compile() → YAML string             │
+                 └─────────────┬──────────────────────────┘
+                               │
+                               ▼  writes
+                  .github/workflows/*.yml  ← back to top</pre>
+  </div>
+</section>
+
+<!-- ================ PICK A PACKAGE ================ -->
+<section class="py-20 hairline">
+  <div class="max-w-3xl mx-auto px-5">
+    <div class="eyebrow">// Pick a package</div>
+    <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">Install just what you need.</h2>
+    <div class="mt-8 overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead class="bg-white/[0.02] text-[var(--gg-muted)] text-left font-mono">
+          <tr>
+            <th class="py-3 px-5 font-semibold">If you want to…</th>
+            <th class="py-3 px-5 font-semibold">Install</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-white/5 text-white/90">
+          <tr>
+            <td class="py-3 px-5">Run your existing GitHub Actions workflow locally</td>
+            <td class="py-3 px-5 font-mono"><code class="font-mono">@gitgate/runner</code></td>
+          </tr>
+          <tr>
+            <td class="py-3 px-5">Write CI in TypeScript instead of YAML</td>
+            <td class="py-3 px-5 font-mono"><code class="font-mono">@gitgate/ci</code> + <code class="font-mono">@gitgate/cli</code></td>
+          </tr>
+          <tr>
+            <td class="py-3 px-5">Implement git inside a Worker / browser / sandboxed JS runtime</td>
+            <td class="py-3 px-5 font-mono"><code class="font-mono">@gitgate/git-core</code></td>
+          </tr>
+          <tr>
+            <td class="py-3 px-5">All of the above</td>
+            <td class="py-3 px-5 font-mono">all four (binaries: <code class="font-mono">runner</code>, <code class="font-mono">gg</code>)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ================ CTA ================ -->
+<section class="py-24 hairline">
+  <div class="max-w-3xl mx-auto px-5 text-center">
+    <h2 class="text-3xl sm:text-4xl font-semibold gradient-text tracking-tight">Ready to run?</h2>
+    <p class="mt-3 text-[var(--gg-muted)]">Apache 2.0. Free forever. No account.</p>
+    <div class="mt-8 inline-flex flex-wrap justify-center gap-3">
+      <a href="/#install" class="btn btn-primary">Install GitGate →</a>
+      <a href="/docs" class="btn btn-ghost">Read the quickstart</a>
+    </div>
+  </div>
+</section>
+
+<footer class="py-14 hairline">
+  <div class="max-w-6xl mx-auto px-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 font-mono text-sm text-[var(--gg-muted)]">
+    <div class="flex items-center gap-2">
+      <span class="logo-mark logo-mark-sm text-[var(--gg-accent)]"></span>
+      <span class="text-white">gitgate</span> · by <a href="https://github.com/plsft" class="link">plsft</a>
+    </div>
+    <div class="flex flex-wrap gap-x-6 gap-y-2">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/packages" class="nav-link">Packages</a>
+      <a href="/docs" class="nav-link">Docs</a>
+      <a href="/about" class="nav-link">About</a>
+      <a href="https://github.com/plsft/gitgate" class="nav-link">GitHub</a>
+      <a href="https://github.com/plsft/gitgate/issues" class="nav-link">Issues</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
