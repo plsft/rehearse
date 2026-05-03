@@ -1,0 +1,58 @@
+# GitGate examples
+
+Three small, self-contained sample projects demonstrating real CI pipelines
+authored in TypeScript with `@gitgate/ci`, runnable locally with
+`@gitgate/runner`.
+
+| Example | What it shows |
+| --- | --- |
+| [`node-app/`](node-app) | Node + Vitest, **matrix across `[18.x, 20.x, 22.x]` parallel via per-cell git worktree**, `actions/cache`, `upload-artifact` for coverage. Targets Ubicloud (`Runner.ubicloud('standard-4')`). |
+| [`python-api/`](python-api) | FastAPI + pytest + **Postgres service** via the container backend with `--network-alias`. Demonstrates the service-container path that `act` doesn't complete. |
+| [`composite-action-demo/`](composite-action-demo) | A local composite action (`./.github/actions/setup-deps`) and a workflow that uses it. Shows how composite expansion + input substitution works. |
+
+## Run any of them
+
+Each example is fully self-contained. To run an example locally:
+
+```bash
+cd examples/node-app
+
+# install the example's deps
+pnpm install
+
+# install the gitgate toolchain locally to this example
+npm install -D @gitgate/ci
+npm install -g @gitgate/runner @gitgate/cli
+
+# regenerate the compiled YAML from the TypeScript pipeline
+gg ci compile
+
+# run the workflow on your laptop
+runner run .github/workflows/ci.yml
+```
+
+That's the loop: edit the TS pipeline → `gg ci compile` → `runner run`.
+For watch-mode iteration during dev:
+
+```bash
+runner watch .github/workflows/ci.yml
+```
+
+## Pre-generated YAML is committed
+
+The `.github/workflows/ci.yml` in each example is the actual output of
+`gg ci compile` against the matching `.gitgate/pipelines/ci.ts`. You can
+read the TypeScript source and the generated YAML side-by-side. Both are
+checked in so you can push the example directly to GitHub as-is and
+watch CI run there.
+
+## Targeting Ubicloud
+
+Every example uses `Runner.ubicloud('standard-4')` by default, so the
+generated YAML has `runs-on: ubicloud-standard-4`. To run on
+GitHub-hosted instead, swap to `Runner.github('ubuntu-latest')` in the
+TS pipeline and recompile. Locally, the runner treats both labels the
+same — both run via the host backend by default.
+
+See [the package reference](https://gitgate.com/packages) for the full
+runner / `@gitgate/ci` / `gg` surface.

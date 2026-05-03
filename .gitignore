@@ -13,3 +13,4 @@ coverage
 .vitest-cache
 poc/playground
 .runner
+examples/*/node_modules

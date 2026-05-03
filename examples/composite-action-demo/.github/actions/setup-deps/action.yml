@@ -1,0 +1,34 @@
+name: setup-deps
+description: |
+  Reusable composite action: sets up Node, restores npm cache, runs `npm ci`.
+  Used by the workflow at .github/workflows/ci.yml in this repo, but you
+  can copy this directory into any other repo and reuse it.
+
+inputs:
+  node-version:
+    description: 'Node.js version (e.g. 20.x)'
+    required: false
+    default: '20.x'
+  cache-key-prefix:
+    description: 'Prefix for the npm cache key — change to invalidate'
+    required: false
+    default: 'npm'
+
+runs:
+  using: composite
+  steps:
+    - name: 'Setup Node.js ${{ inputs.node-version }}'
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Restore npm cache
+      uses: actions/cache@v4
+      with:
+        path: ~/.npm
+        key: '${{ inputs.cache-key-prefix }}-${{ runner.os }}-${{ hashFiles(''**/package-lock.json'') }}'
+        restore-keys: '${{ inputs.cache-key-prefix }}-${{ runner.os }}-'
+
+    - name: Install dependencies
+      shell: bash
+      run: npm ci

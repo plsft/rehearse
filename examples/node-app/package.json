@@ -1,0 +1,17 @@
+{
+  "name": "@example/node-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "GitGate example: Node + Vitest with matrix CI",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run --coverage",
+    "build": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@gitgate/ci": "workspace:*",
+    "@vitest/coverage-v8": "^3.0.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.0.0"
+  }
+}

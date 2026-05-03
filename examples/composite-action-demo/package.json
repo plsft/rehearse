@@ -1,0 +1,15 @@
+{
+  "name": "@example/composite-action-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "GitGate example: local composite action authoring + use",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@gitgate/ci": "workspace:*",
+    "typescript": "^5.8.0",
+    "vitest": "^3.0.0"
+  }
+}
