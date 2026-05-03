@@ -4,10 +4,10 @@
  * Selection criteria (handled by the planner): job has no services, no
  * `container:` block, runs-on label matches the host OS family or is generic.
  */
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { existsSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { resolve } from 'node:path';
+import { relative, resolve } from 'node:path';
 import { performance } from 'node:perf_hooks';
 import type { Backend, JobSession, PrepareArgs, PlannedStep, StepResult } from '../types.js';
 import { isJsActionUses, runJsAction } from '../js-action.js';
@@ -40,7 +40,21 @@ export class HostBackend implements Backend {
     ) {
       try {
         const wt = createWorktree({ repoRoot: args.hostCwd, jobId: args.jobId });
-        workdir = wt.path;
+        // `git worktree add` checks out the WHOLE repo at the worktree
+        // path, even when hostCwd is a sub-directory of the repo. Map
+        // the cell's workdir to the equivalent sub-directory inside the
+        // worktree so examples in monorepos see their package.json /
+        // lockfile, not the git root's. Falls back to wt.path on error.
+        const top = spawnSync('git', ['rev-parse', '--show-toplevel'], {
+          cwd: args.hostCwd, encoding: 'utf-8',
+        });
+        if (top.status === 0) {
+          const gitRoot = top.stdout.trim();
+          const relCwd = relative(gitRoot, args.hostCwd);
+          workdir = relCwd && !relCwd.startsWith('..') ? resolve(wt.path, relCwd) : wt.path;
+        } else {
+          workdir = wt.path;
+        }
         worktree = wt;
       } catch (err) {
         // Worktree creation can fail (e.g., shallow clone, weird state).
