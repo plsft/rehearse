@@ -13,7 +13,7 @@
 
 Output demos/example-php-app.mp4
 
-Set Shell        "bash"
+Set Shell        "bash --noprofile --norc"
 Set FontSize     15
 Set FontFamily   "JetBrains Mono"
 Set Width        1280

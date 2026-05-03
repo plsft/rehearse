@@ -4,7 +4,7 @@
 
 Output demos/watch.mp4
 
-Set Shell        "bash"
+Set Shell        "bash --noprofile --norc"
 Set FontSize     16
 Set FontFamily   "JetBrains Mono"
 Set Width        1280
