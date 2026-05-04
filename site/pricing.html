@@ -124,6 +124,10 @@
         <p class="font-semibold mb-1">Is the OSS runner the same binary as Pro?</p>
         <p class="text-[var(--rh-muted)]">Yes. <code class="font-mono">@rehearse/runner</code> on npm is one Apache 2.0 binary. Run it locally for free; pass <code class="font-mono">--remote</code> with a Pro token and the same binary ships your workflow to your sprite. Nothing about Pro changes the OSS runner — Pro is a hosted execution target, not a fork.</p>
       </div>
+      <div>
+        <p class="font-semibold mb-1">What languages does the Pro sprite support?</p>
+        <p class="text-[var(--rh-muted)]">Pro v0 runs on Sprites.dev microVMs, which natively manage <span class="text-white">Node, Bun, Deno, Python, Go, Java, Ruby, Rust, Elixir, Erlang</span>. Workflows that use <code class="font-mono">actions/setup-{node,python,go,java,ruby,bun,deno}</code>, <code class="font-mono">dtolnay/rust-toolchain</code>, etc., work out of the box. <span class="text-white">.NET and PHP aren't yet supported on Pro</span> — those workflows still run great on the OSS runner locally. Workflows that declare <code class="font-mono">services:</code> (Postgres, Redis) need Docker on the sprite, which isn't available on the default tier; same recommendation — use the OSS container backend locally.</p>
+      </div>
     </div>
   </div>
 </section>

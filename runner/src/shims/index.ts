@@ -10,6 +10,7 @@ import { performance } from 'node:perf_hooks';
 import type { BackendName, JobSession, PlannedStep, StepResult } from '../types.js';
 import { downloadArtifactShim, uploadArtifactShim } from './artifact-shim.js';
 import { cacheShim } from './cache-shim.js';
+import { setupDotnetShim } from './setup-dotnet.js';
 import { setupNodeShim } from './setup-node.js';
 
 type ShimFn = (step: PlannedStep, session: JobSession, backend: BackendName) => Promise<StepResult>;
@@ -27,7 +28,9 @@ const SHIMS: ShimEntry[] = [
   { match: /^actions\/setup-python(@|$)/, fn: hostNoOp('setup-python — using host python') },
   { match: /^actions\/setup-go(@|$)/, fn: hostNoOp('setup-go — using host go') },
   { match: /^actions\/setup-java(@|$)/, fn: hostNoOp('setup-java — using host java') },
-  { match: /^actions\/setup-dotnet(@|$)/, fn: hostNoOp('setup-dotnet — using host dotnet') },
+  // setup-dotnet: real shim that runs Microsoft's dotnet-install.sh/.ps1
+  // when the requested SDK isn't already on the persistent install dir.
+  { match: /^actions\/setup-dotnet(@|$)/, fn: setupDotnetShim },
   { match: /^oven-sh\/setup-bun(@|$)/, fn: hostNoOp('setup-bun — using host bun') },
   { match: /^pnpm\/action-setup(@|$)/, fn: hostNoOp('setup-pnpm — using host pnpm') },
   { match: /^denoland\/setup-deno(@|$)/, fn: hostNoOp('setup-deno — using host deno') },

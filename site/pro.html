@@ -165,7 +165,7 @@ npm install -g @rehearse/runner@latest
 <span class="comment"># 2. set your token (after Stripe checkout)</span>
 export REHEARSE_TOKEN=rh_pro_live_…
 
-<span class="comment"># 3. run any workflow you already have</span>
+<span class="comment"># 3. run any workflow that targets a supported language (see below)</span>
 runner run --remote .github/workflows/ci.yml</code></pre>
     <p class="text-[12px] font-mono text-[var(--rh-muted)] mt-3">Same command without <code class="font-mono">--remote</code> runs locally. Drop the flag any time — there's no lock-in.</p>
   </div>
@@ -176,6 +176,8 @@ runner run --remote .github/workflows/ci.yml</code></pre>
     <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-2">// honest caveats</div>
     <h2 class="text-2xl font-semibold mb-8">What Pro is not.</h2>
     <ul class="space-y-3 text-[var(--rh-muted)] max-w-3xl">
+      <li>— <span class="text-white">Not every language yet.</span> Pro v0 supports workflows in the languages Sprites.dev ships natively: <span class="text-white">Node, Bun, Deno, Python, Go, Java, Ruby, Rust, Elixir, Erlang</span>. .NET, PHP, and other toolchains aren't on the sprite by default — those workflows still run great on the OSS runner locally.</li>
+      <li>— <span class="text-white">No service containers (yet).</span> Workflows that declare <code class="font-mono">services:</code> (Postgres, Redis, etc.) need Docker on the sprite, which isn't available on the default tier. Use the OSS runner with the container backend locally for those.</li>
       <li>— <span class="text-white">First run isn't faster.</span> The cache populates on run 1; runs 2-N benefit. If your project sees its first CI run on Pro and never again, you'll see no win.</li>
       <li>— <span class="text-white">Not a parallel-matrix multiplier.</span> One sprite per team in v0. Matrix jobs run sequentially on your sprite. Team plans add parallelism in v1.</li>
       <li>— <span class="text-white">Caches are private to your sprite.</span> No cross-team sharing — that's the security boundary. If you have 5 unrelated repos, all 5 share one cache, but no other customer touches yours.</li>
