@@ -78,10 +78,9 @@ program
   });
 
 /**
- * --remote: ship the workflow YAML to api.rehearse.sh/v1/runs and stream the
- * result back. The Pro API forwards the workflow to the team's dedicated
- * Sprite microVM, executes it there with caches preserved between runs, and
- * returns the same kind of output you'd get locally.
+ * --remote: ship the workflow YAML to api.rehearse.sh/v1/runs/stream and
+ * stream stdout/stderr back as it happens. The Pro API forwards to the
+ * team's dedicated Sprite microVM with persistent caches.
  */
 async function runRemote(args: {
   workflowPath: string;
@@ -101,9 +100,9 @@ async function runRemote(args: {
     return 2;
   }
 
-  process.stderr.write(pc.dim(`[remote] POST ${args.apiUrl}/v1/runs\n`));
+  process.stderr.write(pc.dim(`[remote] POST ${args.apiUrl}/v1/runs/stream\n`));
   const start = Date.now();
-  const res = await fetch(`${args.apiUrl}/v1/runs`, {
+  const res = await fetch(`${args.apiUrl}/v1/runs/stream`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${args.token}`,
@@ -111,27 +110,45 @@ async function runRemote(args: {
     },
     body: JSON.stringify({ workflow, workflow_path: args.workflowPath }),
   });
-  const text = await res.text();
-  if (!res.ok) {
+  if (!res.ok || !res.body) {
+    const text = await res.text().catch(() => '');
     process.stderr.write(pc.red(`remote API ${res.status}: ${text}\n`));
     return 2;
   }
-  const body = JSON.parse(text) as {
-    run_id: string;
-    status: 'success' | 'failure';
-    exit_code: number;
-    duration_ms: number;
-    log: string;
-  };
-  process.stdout.write(body.log);
-  if (!body.log.endsWith('\n')) process.stdout.write('\n');
+  const runId = res.headers.get('X-Run-Id') ?? '';
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buf = '';
+  let finalExit = -1;
+  let finalDuration = 0;
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buf += decoder.decode(value, { stream: true });
+    const lines = buf.split('\n');
+    buf = lines.pop() ?? '';
+    for (const line of lines) {
+      if (!line) continue;
+      let obj: { t?: string; d?: string; exit?: number; duration_ms?: number };
+      try { obj = JSON.parse(line); } catch { continue; }
+      if (obj.t === 'out' && obj.d !== undefined) process.stdout.write(obj.d + '\n');
+      else if (obj.t === 'err' && obj.d !== undefined) process.stderr.write(obj.d + '\n');
+      else if (obj.t === 'done') {
+        finalExit = typeof obj.exit === 'number' ? obj.exit : -1;
+        finalDuration = typeof obj.duration_ms === 'number' ? obj.duration_ms : 0;
+      }
+    }
+  }
+
   const wallSeconds = ((Date.now() - start) / 1000).toFixed(1);
-  const color = body.status === 'success' ? pc.green : pc.red;
+  const status = finalExit === 0 ? 'success' : 'failure';
+  const color = finalExit === 0 ? pc.green : pc.red;
   process.stderr.write(
-    color(`[remote] ${body.status} · exit=${body.exit_code} · sprite=${body.duration_ms}ms · wall=${wallSeconds}s\n`),
+    color(`[remote] ${status} · exit=${finalExit} · sprite=${finalDuration}ms · wall=${wallSeconds}s\n`),
   );
-  process.stderr.write(pc.dim(`[remote] run id: ${body.run_id}\n`));
-  return body.status === 'success' ? 0 : 1;
+  if (runId) process.stderr.write(pc.dim(`[remote] run id: ${runId}\n`));
+  return finalExit === 0 ? 0 : 1;
 }
 
 program
