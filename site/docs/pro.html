@@ -35,32 +35,32 @@
   <div class="max-w-3xl mx-auto px-5">
     <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-2">// docs / pro</div>
     <h1 class="text-3xl font-semibold mb-3">Pro quickstart.</h1>
-    <p class="text-[var(--rh-muted)] mb-12 max-w-2xl">Pass <code class="font-mono">--remote</code> to the OSS runner with your Pro token set. Workflow ships to your dedicated sprite; cache survives between runs.</p>
+    <p class="text-[var(--rh-muted)] mb-12 max-w-2xl">Pass <code class="font-mono">--remote</code> to the OSS runner with your Pro token set. Workflow ships to your dedicated VM; cache survives between runs.</p>
 
     <h2 class="text-xl font-semibold mb-3">01 — sign up</h2>
     <p class="text-[var(--rh-muted)] mb-3 text-sm">Buy Pro at <a class="underline" href="/pricing">/pricing</a>. Stripe sends you a receipt; we send you the API key (shown once on the success page and in the welcome email). Save it somewhere safe.</p>
-    <p class="text-[var(--rh-muted)] mb-3 text-sm">Right after checkout we provision your dedicated microVM. Takes 60–120 seconds. The welcome email goes out only when your sprite is up and ready to accept runs.</p>
+    <p class="text-[var(--rh-muted)] mb-3 text-sm">Right after checkout we provision your dedicated microVM. Takes 60–120 seconds. The welcome email goes out only when your VM is up and ready to accept runs.</p>
 
     <h2 class="text-xl font-semibold mt-10 mb-3">02 — set the token</h2>
     <pre class="terminal">export REHEARSE_TOKEN=rh_pro_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</pre>
 
     <h2 class="text-xl font-semibold mt-10 mb-3">03 — run remote</h2>
     <pre class="terminal">runner run --remote .github/workflows/ci.yml</pre>
-    <p class="text-[var(--rh-muted)] mt-3 text-sm">The runner POSTs your workflow YAML to <code class="font-mono">api.rehearse.sh/v1/runs/stream</code>, which forwards to your sprite. The sprite executes the same YAML you'd run locally and streams logs back line-by-line as the run progresses.</p>
+    <p class="text-[var(--rh-muted)] mt-3 text-sm">The runner POSTs your workflow YAML to <code class="font-mono">api.rehearse.sh/v1/runs/stream</code>, which forwards to your VM. The VM executes the same YAML you'd run locally and streams logs back line-by-line as the run progresses.</p>
     <p class="text-[var(--rh-muted)] mt-3 text-sm">Drop the <code class="font-mono">--remote</code> flag and you're back to local execution. Same workflow file, same output format. No lock-in.</p>
 
     <h2 class="text-xl font-semibold mt-10 mb-3">04 — caches accumulate</h2>
-    <p class="text-[var(--rh-muted)] mb-3 text-sm">Your sprite's <code class="font-mono">/home/sprite/.npm</code> persists across runs. After the first run, subsequent runs that touch the same packages skip the network. We measured a typical install dropping <span class="text-white">10.5s → 5.1s</span> (~2×).</p>
-    <p class="text-[var(--rh-muted)] mb-3 text-sm">Other caches that persist for free: <code class="font-mono">~/.cache/pip</code>, <code class="font-mono">~/.cargo/registry</code>, <code class="font-mono">~/.gradle</code>, <code class="font-mono">~/.bun/install/cache</code>, your <code class="font-mono">node_modules</code>, the cloned repo. Anything you write to disk under <code class="font-mono">/home/sprite/</code> survives.</p>
+    <p class="text-[var(--rh-muted)] mb-3 text-sm">Your VM's <code class="font-mono">~/.npm</code> persists across runs. After the first run, subsequent runs that touch the same packages skip the network. We measured a typical install dropping <span class="text-white">10.5s → 5.1s</span> (~2×).</p>
+    <p class="text-[var(--rh-muted)] mb-3 text-sm">Other caches that persist for free: <code class="font-mono">~/.cache/pip</code>, <code class="font-mono">~/.cargo/registry</code>, <code class="font-mono">~/.gradle</code>, <code class="font-mono">~/.bun/install/cache</code>, your <code class="font-mono">node_modules</code>, the cloned repo. Anything you write to disk under your VM's home directory survives.</p>
 
     <h2 class="text-xl font-semibold mt-10 mb-3">05 — manage from the dashboard</h2>
     <p class="text-[var(--rh-muted)] mb-3 text-sm">At <a class="underline" href="https://pro.rehearse.sh/dashboard">pro.rehearse.sh/dashboard</a>: rotate API keys, see recent runs, hit Stripe Customer Portal to manage billing.</p>
 
     <h2 class="text-xl font-semibold mt-10 mb-3">troubleshooting</h2>
     <ul class="space-y-3 text-[var(--rh-muted)] text-sm">
-      <li>— <span class="text-white">"runner not provisioned":</span> your sprite is still spinning up after signup. Provisioning takes 60–120s after Stripe checkout. Wait, then retry. If it persists, email <a class="underline" href="mailto:pro@rehearse.sh">pro@rehearse.sh</a>.</li>
+      <li>— <span class="text-white">"runner not provisioned":</span> your VM is still spinning up after signup. Provisioning takes 60–120s after Stripe checkout. Wait, then retry. If it persists, email <a class="underline" href="mailto:pro@rehearse.sh">pro@rehearse.sh</a>.</li>
       <li>— <span class="text-white">"401 Unauthorized":</span> token revoked or wrong. Check <code class="font-mono">echo $REHEARSE_TOKEN</code>; create a new key in the dashboard.</li>
-      <li>— <span class="text-white">slow first run:</span> expected — your sprite has no cache yet. Run 2 onward is ~2× faster on install steps.</li>
+      <li>— <span class="text-white">slow first run:</span> expected — your VM has no cache yet. Run 2 onward is ~2× faster on install steps.</li>
       <li>— <span class="text-white">need to clear cache:</span> currently a manual ask — email <a class="underline" href="mailto:pro@rehearse.sh">pro@rehearse.sh</a> and we'll wipe and re-provision. Self-serve reset lands in v1.</li>
     </ul>
   </div>

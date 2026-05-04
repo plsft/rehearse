@@ -78,12 +78,12 @@
       <div class="card p-7">
         <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// isolated</div>
         <h3 class="font-semibold text-lg mb-2">Hardware-isolated microVM.</h3>
-        <p class="text-[var(--rh-muted)] text-sm">One dedicated microVM per team — not a shared host, not a container on someone else's kernel. Hardware-level isolation, persistent ext4 filesystem, 100 GB of storage. Compute provisioned at Sprites.dev's default tier.</p>
+        <p class="text-[var(--rh-muted)] text-sm">One dedicated microVM per team — not a shared host, not a container on someone else's kernel. Hardware-level isolation, persistent ext4 filesystem, 100 GB of storage.</p>
       </div>
       <div class="card p-7">
         <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// same cli, local + cloud</div>
         <h3 class="font-semibold text-lg mb-2">One binary, two backends.</h3>
-        <p class="text-[var(--rh-muted)] text-sm"><code class="font-mono">runner run</code> executes locally; <code class="font-mono">runner run --remote</code> ships the same workflow to your sprite. Same YAML, same output format, same command. Switch with one flag — no config files, no second tool to learn.</p>
+        <p class="text-[var(--rh-muted)] text-sm"><code class="font-mono">runner run</code> executes locally; <code class="font-mono">runner run --remote</code> ships the same workflow to your VM. Same YAML, same output format, same command. Switch with one flag — no config files, no second tool to learn.</p>
       </div>
       <div class="card p-7">
         <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// streaming logs</div>
@@ -98,7 +98,7 @@
   <div class="max-w-6xl mx-auto px-5">
     <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-2">// supported languages</div>
     <h2 class="text-3xl font-semibold tracking-tight mb-3">11 languages, verified end-to-end.</h2>
-    <p class="text-[var(--rh-muted)] mb-8 max-w-2xl">Every language listed below was bench-tested against a real Pro account. The toolchain is preinstalled on the sprite (or auto-installed and cached on first use, in the case of .NET). Same workflow YAML you'd run on GitHub-hosted runners.</p>
+    <p class="text-[var(--rh-muted)] mb-8 max-w-2xl">Every language listed below was bench-tested against a real Pro account. The toolchain is preinstalled on the VM (or auto-installed and cached on first use, in the case of .NET). Same workflow YAML you'd run on GitHub-hosted runners.</p>
     <div class="space-y-6">
       <div>
         <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-2">// JavaScript runtimes</div>
@@ -112,7 +112,7 @@
         <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-2">// JVM &amp; .NET</div>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
           <div class="card p-4 text-sm" style="border-left: 3px solid #f89820"><span class="ok">✓</span> <span class="text-white font-mono">Java</span> <span class="text-[var(--rh-muted)] text-xs block mt-1">setup-java · OpenJDK 25</span></div>
-          <div class="card p-4 text-sm" style="border-left: 3px solid #512bd4"><span class="ok">✓</span> <span class="text-white font-mono">.NET</span> <span class="text-[var(--rh-muted)] text-xs block mt-1">setup-dotnet · auto-installed via dotnet-install.sh, cached on sprite</span></div>
+          <div class="card p-4 text-sm" style="border-left: 3px solid #512bd4"><span class="ok">✓</span> <span class="text-white font-mono">.NET</span> <span class="text-[var(--rh-muted)] text-xs block mt-1">setup-dotnet · auto-installed via dotnet-install.sh, cached on VM</span></div>
         </div>
       </div>
       <div>
@@ -134,7 +134,7 @@
       <div>
         <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-amber)] mb-2">// not yet on Pro (works fine on OSS runner locally)</div>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-          <div class="card p-4 text-sm border-[var(--rh-amber)]/40" style="border-left: 3px solid #777bb4"><span class="warn">○</span> <span class="text-white font-mono">PHP</span> <span class="text-[var(--rh-muted)] text-xs block mt-1">no managed install path on Sprites; tracked on roadmap</span></div>
+          <div class="card p-4 text-sm border-[var(--rh-amber)]/40" style="border-left: 3px solid #777bb4"><span class="warn">○</span> <span class="text-white font-mono">PHP</span> <span class="text-[var(--rh-muted)] text-xs block mt-1">no managed install path on the VM; tracked on roadmap</span></div>
         </div>
       </div>
     </div>
@@ -173,12 +173,12 @@
       <div class="card p-6">
         <div class="font-mono text-xs text-[var(--rh-accent)] mb-3">ACTIONS · 5/6</div>
         <ul class="text-sm text-[var(--rh-muted)] space-y-1.5">
-          <li><span class="ok">✓</span> <code class="font-mono">actions/checkout</code> (host has the repo / sprite gets a real clone)</li>
+          <li><span class="ok">✓</span> <code class="font-mono">actions/checkout</code> (host has the repo / VM gets a real clone)</li>
           <li><span class="ok">✓</span> <code class="font-mono">actions/setup-*</code> for all 11 supported languages</li>
           <li><span class="ok">✓</span> <code class="font-mono">actions/cache</code> + <code class="font-mono">/save</code> + <code class="font-mono">/restore</code> with all 3 outputs</li>
           <li><span class="ok">✓</span> <code class="font-mono">actions/upload-artifact</code> + <code class="font-mono">download-artifact</code></li>
           <li><span class="ok">✓</span> JS actions (<code class="font-mono">runs.using: node12-25</code>) with full <code class="font-mono">INPUT_*</code> contract</li>
-          <li><span class="warn">○</span> <code class="font-mono">services:</code> on Pro (works locally; sprite needs Docker — roadmap)</li>
+          <li><span class="warn">○</span> <code class="font-mono">services:</code> on Pro (works locally; VM needs Docker — roadmap)</li>
         </ul>
       </div>
 
@@ -203,7 +203,7 @@
   <div class="max-w-6xl mx-auto px-5">
     <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-2">// roadmap</div>
     <h2 class="text-3xl font-semibold tracking-tight mb-3">The four open gaps, with a plan for each.</h2>
-    <p class="text-[var(--rh-muted)] mb-8 max-w-2xl">Every item here is in active design or scoping. None of them block the OSS runner locally — they're specifically about what Pro's hosted sprite can run today vs. what a GH-hosted runner can run.</p>
+    <p class="text-[var(--rh-muted)] mb-8 max-w-2xl">Every item here is in active design or scoping. None of them block the OSS runner locally — they're specifically about what Pro's hosted VM can run today vs. what a GH-hosted runner can run.</p>
 
     <div class="grid md:grid-cols-2 gap-5">
       <div class="card p-6">
@@ -212,7 +212,7 @@
           <div class="font-mono text-xs text-[var(--rh-amber)]">SERVICES ON PRO</div>
         </div>
         <div class="text-lg font-semibold text-white mb-2">Postgres / Redis / MySQL service containers.</div>
-        <p class="text-sm text-[var(--rh-muted)] mb-3"><code class="font-mono">jobs.<id>.services:</code> works locally on the OSS runner via the container backend, but Pro sprites don't expose Docker today. Need either Docker-in-sprite or a per-team service-broker.</p>
+        <p class="text-sm text-[var(--rh-muted)] mb-3"><code class="font-mono">jobs.<id>.services:</code> works locally on the OSS runner via the container backend, but Pro VMs don't expose Docker today. Need either Docker-in-VM or a per-team service-broker.</p>
         <div class="font-mono text-[12px] text-[var(--rh-muted)]"><span class="text-[var(--rh-accent)]">target:</span> v1 · <span class="text-[var(--rh-accent)]">workaround:</span> use OSS runner locally for service workflows</div>
       </div>
 
@@ -222,7 +222,7 @@
           <div class="font-mono text-xs text-[var(--rh-amber)]">CONCURRENCY: CANCELLATION</div>
         </div>
         <div class="text-lg font-semibold text-white mb-2"><code class="font-mono">concurrency: deploy-prod</code> with cancel-in-progress.</div>
-        <p class="text-sm text-[var(--rh-muted)] mb-3">The <code class="font-mono">concurrency:</code> block is parsed but not enforced — runs don't cancel each other when a new run lands in the same group. Required for safe deploy queues. Single-sprite v0 makes this naturally serialized; the cancel-in-progress semantics need orchestrator work.</p>
+        <p class="text-sm text-[var(--rh-muted)] mb-3">The <code class="font-mono">concurrency:</code> block is parsed but not enforced — runs don't cancel each other when a new run lands in the same group. Required for safe deploy queues. Single-VM v0 makes this naturally serialized; the cancel-in-progress semantics need orchestrator work.</p>
         <div class="font-mono text-[12px] text-[var(--rh-muted)]"><span class="text-[var(--rh-accent)]">target:</span> v1 · <span class="text-[var(--rh-accent)]">workaround:</span> sequential dispatch, dedup before invoking</div>
       </div>
 
@@ -242,7 +242,7 @@
           <div class="font-mono text-xs text-[var(--rh-amber)]">OIDC TOKEN ISSUER</div>
         </div>
         <div class="text-lg font-semibold text-white mb-2"><code class="font-mono">permissions: id-token: write</code> + <code class="font-mono">role-to-assume</code>.</div>
-        <p class="text-sm text-[var(--rh-muted)] mb-3"><code class="font-mono">aws-actions/configure-aws-credentials@v4</code> with role-to-assume needs a JWT from an OIDC issuer that AWS trusts. GitHub-hosted runs get this from <code class="font-mono">token.actions.githubusercontent.com</code>; Pro sprites don't have that. Plan: stand up <code class="font-mono">oidc.rehearse.sh</code> with a Pro-team-scoped issuer that customers add to AWS / Azure / GCP as a trusted IdP. One-time setup per cloud.</p>
+        <p class="text-sm text-[var(--rh-muted)] mb-3"><code class="font-mono">aws-actions/configure-aws-credentials@v4</code> with role-to-assume needs a JWT from an OIDC issuer that AWS trusts. GitHub-hosted runs get this from <code class="font-mono">token.actions.githubusercontent.com</code>; Pro VMs don't have that. Plan: stand up <code class="font-mono">oidc.rehearse.sh</code> with a Pro-team-scoped issuer that customers add to AWS / Azure / GCP as a trusted IdP. One-time setup per cloud.</p>
         <div class="font-mono text-[12px] text-[var(--rh-muted)]"><span class="text-[var(--rh-accent)]">target:</span> v1.1 · <span class="text-[var(--rh-accent)]">workaround:</span> long-lived IAM keys via <code class="font-mono">--env-file</code> (works today)</div>
       </div>
     </div>
@@ -257,7 +257,7 @@
   <div class="max-w-3xl mx-auto px-5">
     <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-2">// deploy anywhere</div>
     <h2 class="text-3xl font-semibold tracking-tight mb-3">Deploy from your CI, not just build.</h2>
-    <p class="text-[var(--rh-muted)] mb-5">Pass long-lived credentials with <code class="font-mono">--env-file</code>; they ship to your sprite and become <code class="font-mono">${{ secrets.* }}</code> for workflow expansion. Install whatever cloud CLI you need on-demand inside the workflow (pip wheel, npm install). Verified end-to-end against AWS STS today.</p>
+    <p class="text-[var(--rh-muted)] mb-5">Pass long-lived credentials with <code class="font-mono">--env-file</code>; they ship to your VM and become <code class="font-mono">${{ secrets.* }}</code> for workflow expansion. Install whatever cloud CLI you need on-demand inside the workflow (pip wheel, npm install). Verified end-to-end against AWS STS today.</p>
     <pre class="font-mono text-[12.5px] text-white/85 bg-black/40 p-4 rounded border border-white/10 overflow-x-auto"><span class="text-[var(--rh-muted)]"># 1. Put your cloud creds in a local .env (NEVER commit it)</span>
 $ cat .env
 AWS_ACCESS_KEY_ID=AKIA...
@@ -267,10 +267,10 @@ AWS_DEFAULT_REGION=us-east-1
 <span class="text-[var(--rh-muted)]"># 2. Same workflow you'd run on GitHub-hosted</span>
 $ runner run --remote --env-file .env .github/workflows/deploy.yml</pre>
     <p class="text-[var(--rh-muted)] text-sm mt-5">
-      <span class="text-white">Cloud CLIs:</span> sprite ships <code class="font-mono">curl</code>, <code class="font-mono">wget</code>, <code class="font-mono">rsync</code>, <code class="font-mono">ssh</code>. Install <code class="font-mono">aws</code>/<code class="font-mono">az</code>/<code class="font-mono">gcloud</code>/<code class="font-mono">kubectl</code>/<code class="font-mono">terraform</code> in the workflow itself — pip-wheel installs (~5s) cache to your persistent rootfs after the first run.
+      <span class="text-white">Cloud CLIs:</span> the VM ships <code class="font-mono">curl</code>, <code class="font-mono">wget</code>, <code class="font-mono">rsync</code>, <code class="font-mono">ssh</code>. Install <code class="font-mono">aws</code>/<code class="font-mono">az</code>/<code class="font-mono">gcloud</code>/<code class="font-mono">kubectl</code>/<code class="font-mono">terraform</code> in the workflow itself — pip-wheel installs (~5s) cache to your persistent rootfs after the first run.
     </p>
     <p class="text-[var(--rh-muted)] text-sm mt-3">
-      <span class="text-white">Honest gap:</span> OIDC-based auth (<code class="font-mono">permissions: id-token: write</code> + <code class="font-mono">aws-actions/configure-aws-credentials</code> with <code class="font-mono">role-to-assume</code>) doesn't work — there's no GitHub OIDC issuer in front of your sprite. Use long-lived credentials for now. OIDC bridge is a v1 candidate.
+      <span class="text-white">Honest gap:</span> OIDC-based auth (<code class="font-mono">permissions: id-token: write</code> + <code class="font-mono">aws-actions/configure-aws-credentials</code> with <code class="font-mono">role-to-assume</code>) doesn't work — there's no GitHub OIDC issuer in front of your VM. Use long-lived credentials for now. OIDC bridge is a v1 candidate.
     </p>
   </div>
 </section>
@@ -307,7 +307,7 @@ $ runner run --remote --env-file .env .github/workflows/deploy.yml</pre>
             <td class="py-3 px-5">Pro <span class="text-[var(--rh-amber)]">cold cache</span></td>
             <td class="text-right py-3 px-5 text-white">10.5s</td>
             <td class="text-right py-3 px-5 text-white">12.5s</td>
-            <td class="py-3 px-5 text-[var(--rh-muted)]">first run on a fresh sprite</td>
+            <td class="py-3 px-5 text-[var(--rh-muted)]">first run on a fresh VM</td>
           </tr>
           <tr class="border-b border-white/5">
             <td class="py-3 px-5">Pro <span class="accent-text">warm cache</span></td>
@@ -357,11 +357,11 @@ runner run --remote .github/workflows/ci.yml</code></pre>
     <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-2">// honest caveats</div>
     <h2 class="text-2xl font-semibold mb-8">What Pro is not.</h2>
     <ul class="space-y-3 text-[var(--rh-muted)] max-w-3xl">
-      <li>— <span class="text-white">11 languages today, PHP not yet.</span> Pro v0 verified end-to-end against your Pro account on <span class="text-white">Node, Bun, Deno, Python, Go, Java, Ruby, Rust, Elixir, Erlang, and .NET</span>. PHP is the only language not yet supported (Sprites.dev doesn't ship PHP and there's no clean install path); those workflows still run great on the OSS runner locally.</li>
-      <li>— <span class="text-white">No service containers (yet).</span> Workflows that declare <code class="font-mono">services:</code> (Postgres, Redis, etc.) need Docker on the sprite, which isn't available on the default tier. Use the OSS runner with the container backend locally for those.</li>
+      <li>— <span class="text-white">11 languages today, PHP not yet.</span> Pro v0 verified end-to-end against your Pro account on <span class="text-white">Node, Bun, Deno, Python, Go, Java, Ruby, Rust, Elixir, Erlang, and .NET</span>. PHP is the only language not yet supported (no managed install path on the VM today); those workflows still run great on the OSS runner locally.</li>
+      <li>— <span class="text-white">No service containers (yet).</span> Workflows that declare <code class="font-mono">services:</code> (Postgres, Redis, etc.) need Docker on the VM, which isn't available on the default tier. Use the OSS runner with the container backend locally for those.</li>
       <li>— <span class="text-white">First run isn't faster.</span> The cache populates on run 1; runs 2-N benefit. If your project sees its first CI run on Pro and never again, you'll see no win.</li>
-      <li>— <span class="text-white">Not a parallel-matrix multiplier.</span> One sprite per team in v0. Matrix jobs run sequentially on your sprite. Team plans add parallelism in v1.</li>
-      <li>— <span class="text-white">Caches are private to your sprite.</span> No cross-team sharing — that's the security boundary. If you have 5 unrelated repos, all 5 share one cache, but no other customer touches yours.</li>
+      <li>— <span class="text-white">Not a parallel-matrix multiplier.</span> One VM per team in v0. Matrix jobs run sequentially on your VM. Team plans add parallelism in v1.</li>
+      <li>— <span class="text-white">Caches are private to your VM.</span> No cross-team sharing — that's the security boundary. If you have 5 unrelated repos, all 5 share one cache, but no other customer touches yours.</li>
       <li>— <span class="text-white">Not free.</span> $49/mo. The OSS runner is and always will be Apache 2.0 and free.</li>
     </ul>
   </div>
