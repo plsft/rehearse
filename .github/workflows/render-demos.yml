@@ -24,26 +24,16 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Install ffmpeg + ttyd
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq ffmpeg
-          curl -fsSL -o /tmp/ttyd https://github.com/tsl0922/ttyd/releases/latest/download/ttyd.x86_64
-          sudo install -m 0755 /tmp/ttyd /usr/local/bin/ttyd
-
       - uses: charmbracelet/vhs-action@v2
-        # Sets up VHS using the official action; works around the
-        # downstream tarball naming changes in newer releases.
+        # The action installs vhs + ttyd + ffmpeg + JetBrains Mono on
+        # its own. Pre-installing any of them races with the action's
+        # installer, which is why earlier attempts failed at "Failed to
+        # install ffmpeg".
+        with:
+          install-fonts: true
 
       - name: Install rehearse runner
         run: npm install -g @rehearse/runner@latest
-
-      - name: Install JetBrains Mono font
-        run: |
-          mkdir -p ~/.fonts
-          curl -fsSL -o /tmp/jbmono.zip https://download.jetbrains.com/fonts/JetBrainsMono-2.304.zip
-          unzip -j -o /tmp/jbmono.zip 'fonts/ttf/*.ttf' -d ~/.fonts/
-          fc-cache -f
 
       - name: Render tape
         env:
