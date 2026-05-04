@@ -33,7 +33,7 @@ program
 
 program
   .command('run <workflow>', { isDefault: true })
-  .description('Run a GitHub Actions workflow on this machine')
+  .description('Run a GitHub Actions workflow on this machine, or remotely with --remote')
   .option('-j, --job <name>', 'restrict to a single job (matrix variants of that job all run)')
   .option('-b, --backend <type>', 'host | container | auto', 'auto')
   .option('-p, --max-parallel <n>', 'max concurrent jobs', (v) => Number(v))
@@ -42,8 +42,20 @@ program
   .option('--quiet', 'minimal output (machine-readable result only)')
   .option('--bench', 'output a single JSON line for benchmarking')
   .option('--env-file <file>', 'load env vars from file (KEY=VALUE per line)')
+  .option('--remote', 'execute on a Rehearse Pro hosted sprite (requires REHEARSE_TOKEN)')
+  .option('--api-url <url>', 'override Pro API URL', 'https://api.rehearse.sh')
   .action(async (workflow, opts) => {
     const env = opts.envFile ? loadEnvFile(opts.envFile) : {};
+
+    if (opts.remote) {
+      const code = await runRemote({
+        workflowPath: workflow,
+        apiUrl: opts.apiUrl,
+        token: process.env.REHEARSE_TOKEN ?? '',
+      });
+      process.exit(code);
+    }
+
     const result = await run({
       workflowPath: workflow,
       cwd: opts.cwd,
@@ -64,6 +76,63 @@ program
     }
     process.exit(result.status === 'failure' ? 1 : 0);
   });
+
+/**
+ * --remote: ship the workflow YAML to api.rehearse.sh/v1/runs and stream the
+ * result back. The Pro API forwards the workflow to the team's dedicated
+ * Sprite microVM, executes it there with caches preserved between runs, and
+ * returns the same kind of output you'd get locally.
+ */
+async function runRemote(args: {
+  workflowPath: string;
+  apiUrl: string;
+  token: string;
+}): Promise<number> {
+  if (!args.token) {
+    process.stderr.write(pc.red('REHEARSE_TOKEN env var is required for --remote\n'));
+    process.stderr.write('Get one at https://pro.rehearse.sh/dashboard/keys\n');
+    return 2;
+  }
+  let workflow: string;
+  try {
+    workflow = readFileSync(resolve(args.workflowPath), 'utf-8');
+  } catch (err) {
+    process.stderr.write(pc.red(`could not read workflow: ${(err as Error).message}\n`));
+    return 2;
+  }
+
+  process.stderr.write(pc.dim(`[remote] POST ${args.apiUrl}/v1/runs\n`));
+  const start = Date.now();
+  const res = await fetch(`${args.apiUrl}/v1/runs`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${args.token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ workflow, workflow_path: args.workflowPath }),
+  });
+  const text = await res.text();
+  if (!res.ok) {
+    process.stderr.write(pc.red(`remote API ${res.status}: ${text}\n`));
+    return 2;
+  }
+  const body = JSON.parse(text) as {
+    run_id: string;
+    status: 'success' | 'failure';
+    exit_code: number;
+    duration_ms: number;
+    log: string;
+  };
+  process.stdout.write(body.log);
+  if (!body.log.endsWith('\n')) process.stdout.write('\n');
+  const wallSeconds = ((Date.now() - start) / 1000).toFixed(1);
+  const color = body.status === 'success' ? pc.green : pc.red;
+  process.stderr.write(
+    color(`[remote] ${body.status} · exit=${body.exit_code} · sprite=${body.duration_ms}ms · wall=${wallSeconds}s\n`),
+  );
+  process.stderr.write(pc.dim(`[remote] run id: ${body.run_id}\n`));
+  return body.status === 'success' ? 0 : 1;
+}
 
 program
   .command('watch <workflow>')
