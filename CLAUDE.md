@@ -15,7 +15,7 @@ local reusable workflows. Free, Apache 2.0, source on
 | `runner/` | `@rehearse/runner` — the CLI and the runner core | npm, Apache 2.0 |
 | `cli/` | `@rehearse/cli` — companion CLI (`rh`) for TS-pipeline workflows | npm, Apache 2.0 |
 | `ts-ci/` | `@rehearse/ci` — TypeScript SDK that compiles to GitHub Actions YAML | npm, Apache 2.0 |
-| `git-engine/` | `@rehearse/git-core` — pure-TypeScript git engine (powers `actions/checkout` in the runner) | npm, Apache 2.0 |
+| `git-engine/` | `@rehearse/git-core` — pure-TypeScript git engine, ships standalone for sandboxed-JS use cases (Workers/browser). Runner currently uses native `git` for clones; git-core is the foundation for future in-process checkout. | npm, Apache 2.0 |
 | `site/` | Marketing site at [rehearse.sh](https://rehearse.sh) (deploys as `rehearse-web` Workers Static Assets) | private |
 | `bench/` | Cross-OS benchmark harness (runner vs `act` vs GitHub-hosted) | private |
 | `poc/` | Test fixtures (`poc/fixtures/*.yml`) and a hono clone (`poc/playground/hono`) used by the bench | private |
@@ -26,7 +26,7 @@ local reusable workflows. Free, Apache 2.0, source on
 ## Current state (as of v0.3.6)
 
 - 4 packages on npm at `0.3.6`, all Apache 2.0
-- Runner: 105 tests across 11 suites, all green
+- Runner: 121 tests across 13 suites, all green
 - Git engine: 162 tests across 8 suites, all green
 - Compat: 100% on our own CI, 96.15% on `vitejs/vite` ci.yml, 97.18% on `honojs/hono` ci.yml
 - Bench (Linux GH-hosted, warm): 4.78× faster than `act` on `our-ci`,

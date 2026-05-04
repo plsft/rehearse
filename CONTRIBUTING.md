@@ -62,9 +62,9 @@ scripts/       release tooling (release.mjs)
 ## What we look for in a PR
 
 1. **Tests.** Every public-API change has a matching test.
-   - `@rehearse/runner` has 96 tests across 10 suites (matrix, expression,
+   - `@rehearse/runner` has 121 tests across 13 suites (matrix, expression,
      scheduler, cache, composite, artifacts, compat, js-action, reusable,
-     setup-node).
+     setup-node, setup-dotnet, image-resolver, git-context).
    - `@rehearse/ci` has compiler snapshot tests under
      `ts-ci/test/compiler/snapshots/`. If your change updates YAML output,
      delete the affected snapshot and re-run `pnpm --filter @rehearse/ci

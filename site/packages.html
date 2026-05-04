@@ -71,7 +71,7 @@
             <td class="py-3 px-5"><a href="#runner" class="link">@rehearse/runner</a></td>
             <td class="py-3 px-5"><code class="font-mono">runner</code></td>
             <td class="py-3 px-5 text-[var(--rh-muted)]">Local-first GitHub Actions runner</td>
-            <td class="py-3 px-5 text-right ok font-bold">117</td>
+            <td class="py-3 px-5 text-right ok font-bold">121</td>
           </tr>
           <tr>
             <td class="py-3 px-5"><a href="#ci" class="link">@rehearse/ci</a></td>
@@ -160,7 +160,7 @@
 
     <h3 class="mt-8 text-lg font-semibold text-white">Numbers</h3>
     <ul class="mt-3 space-y-1 text-sm text-[var(--rh-muted)]">
-      <li><strong class="text-white">117 tests</strong> across 12 suites, all green</li>
+      <li><strong class="text-white">121 tests</strong> across 13 suites, all green</li>
       <li>Compat: <strong class="text-white">100%</strong> on our own CI · <strong class="text-white">96.15%</strong> on <code class="font-mono">vitejs/vite</code> · <strong class="text-white">97.18%</strong> on <code class="font-mono">honojs/hono</code></li>
       <li>vs <code class="font-mono">act</code> (Linux GH-runner v0.3.2 warm — see <a href="https://github.com/plsft/rehearse/blob/main/bench/RESULTS.md" class="link">bench/RESULTS.md</a>): <strong class="text-white">4.78×</strong> on our-ci, <strong class="text-white">9.09×</strong> on node-matrix, <strong class="text-white">30.50×</strong> on service-postgres
       </li>
@@ -204,8 +204,8 @@
       <li><span class="ok">✓</span> Context helpers: <code class="font-mono">secrets()</code>, <code class="font-mono">vars()</code>, <code class="font-mono">github()</code>, <code class="font-mono">env()</code>, <code class="font-mono">needs()</code>, <code class="font-mono">steps()</code>, <code class="font-mono">expr()</code>, <code class="font-mono">hashFiles()</code> — all validated, throw on empty/whitespace</li>
       <li><span class="ok">✓</span> Language presets: <code class="font-mono">node</code>, <code class="font-mono">bun</code>, <code class="font-mono">python</code>, <code class="font-mono">rust</code>, <code class="font-mono">go</code>, <code class="font-mono">docker</code> — each exporting <code class="font-mono">setup() / install() / test() / build() / lint()</code> with correct action references</li>
       <li><span class="ok">✓</span> Hand-rolled YAML serializer — no external YAML library at runtime</li>
-      <li><span class="ok">✓</span> YAML → TypeScript converter (<code class="font-mono">convert()</code>) for migrating existing workflows</li>
-      <li><span class="ok">✓</span> Cost estimator (<code class="font-mono">estimate()</code>) — Ubicloud vs GitHub-hosted price per run</li>
+      <li><span class="ok">✓</span> YAML → TypeScript <span class="text-white">migration starter</span> (<code class="font-mono">convert()</code>) — handles common shapes (push/pr/dispatch/schedule, run/uses/with/env/if). Drops <code class="font-mono">matrix</code> / <code class="font-mono">services</code> / <code class="font-mono">concurrency</code> / job-level <code class="font-mono">permissions</code>; emits warnings. Use it to bootstrap, then hand-port the advanced bits.</li>
+      <li><span class="ok">✓</span> Cost estimator (<code class="font-mono">estimate()</code>) — Ubicloud vs GitHub-hosted comparison from a <span class="text-white">list-price snapshot</span> baked into the package. Math is real (per-job × per-min × runs/month with tier mapping); price tables refresh per release.</li>
     </ul>
 
     <h3 class="mt-8 text-lg font-semibold text-white">How it's used</h3>
@@ -246,8 +246,8 @@
     <p class="mt-5 text-[var(--rh-muted)] leading-relaxed">
       Full git protocol implementation in TypeScript with <span class="text-white">zero
       native dependencies</span>. Runs on Cloudflare Workers, Node, Bun, and the
-      browser. Powers <code class="font-mono">actions/checkout</code> in the
-      runner.
+      browser. Ships as a standalone library — install it directly when you
+      need git inside a sandboxed JS runtime.
     </p>
 
     <h3 class="mt-10 text-lg font-semibold text-white">Why it exists</h3>
@@ -258,6 +258,18 @@
       inflexible (you get whatever the user's git version supports).
       <code class="font-mono">@rehearse/git-core</code> is a complete from-scratch
       reimplementation in TypeScript.
+    </p>
+
+    <h3 class="mt-8 text-lg font-semibold text-white">Relationship to the runner</h3>
+    <p class="mt-2 text-[var(--rh-muted)] leading-relaxed">
+      The runner's <code class="font-mono">actions/checkout</code> shim is a
+      no-op for local execution because your repo is already in <code class="font-mono">cwd</code> —
+      cloning it again would be wasted I/O. The Pro VM clones via the standard
+      <code class="font-mono">git</code> binary on the VM today. We ship
+      <code class="font-mono">git-core</code> as the foundation it'll use when
+      a real in-process clone is needed (e.g., remote checkout from a Worker,
+      or <code class="font-mono">with: repository:</code> pointing at a
+      different repo than <code class="font-mono">cwd</code>).
     </p>
 
     <h3 class="mt-8 text-lg font-semibold text-white">What it does</h3>
@@ -293,8 +305,8 @@
 
     <h3 class="mt-8 text-lg font-semibold text-white">Where it's used</h3>
     <ul class="mt-3 space-y-1 text-sm text-[var(--rh-muted)]">
-      <li><a href="#runner" class="link">@rehearse/runner</a> — the <code class="font-mono">actions/checkout</code> shim, no <code class="font-mono">git clone</code> subprocess</li>
       <li>Anywhere you need git inside a JS-only sandbox: edge workers, browser-based code editors, embedded VCS UIs</li>
+      <li>Future runner work: in-process checkout for remote refs, Worker-based runners</li>
     </ul>
   </div>
 </section>
@@ -361,11 +373,11 @@
     <div class="eyebrow">// How they fit together</div>
     <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">Two pipelines, one engine.</h2>
     <p class="mt-5 text-[var(--rh-muted)] leading-relaxed">
-      The runner reads YAML and executes it. It uses git-core internally for
-      <code class="font-mono">checkout</code> without shelling out. Separately,
-      the <code class="font-mono">rh</code> CLI compiles TypeScript pipelines
-      down to YAML — and that YAML feeds back to the runner, or to GitHub
-      directly, or both.
+      The runner reads YAML and executes it. The
+      <code class="font-mono">rh</code> CLI compiles TypeScript pipelines down
+      to YAML — and that YAML feeds back to the runner, or to GitHub directly,
+      or both. <code class="font-mono">git-core</code> ships separately as a
+      standalone pure-TS git library for sandboxed runtimes.
     </p>
     <pre class="mt-8 font-mono text-[11.5px] text-white/85 whitespace-pre overflow-x-auto leading-relaxed">┌──────────────────────────────────────────────────────────┐
 │              .github/workflows/*.yml                     │
@@ -379,14 +391,16 @@
 │  • plans jobs + matrix cells                             │
 │  • picks backend per job (host vs container)             │
 │  • executes via the planner + scheduler                  │
-│  • uses @rehearse/git-core for actions/checkout           │
-└────────────────┬─────────────────────────────────────────┘
-                 │
-                 ▼  delegates
-                 ┌────────────────────────────────────────┐
-                 │  @rehearse/git-core  (zero native deps) │
-                 │  • clone, parse objects, diff, merge   │
-                 └────────────────────────────────────────┘
+│  • actions/checkout: no-op locally (cwd is the repo);    │
+│    standard git on the Pro VM                            │
+└──────────────────────────────────────────────────────────┘
+
+
+┌──────────────────────────────────────────────────────────┐
+│  @rehearse/git-core  (standalone library, zero native deps)│
+│  • clone, parse objects, diff, merge                     │
+│  • for use in Workers / browser / Bun / Node             │
+└──────────────────────────────────────────────────────────┘
 
 
 ┌──────────────────────────────────────────────────────────┐

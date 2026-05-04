@@ -13,10 +13,11 @@ passing**.
 [![License](https://img.shields.io/npm/l/@rehearse/git-core)](./LICENSE)
 [![Source](https://img.shields.io/badge/source-plsft%2Frehearse-22c55e)](https://github.com/plsft/rehearse)
 
-Used internally by [`@rehearse/runner`](https://www.npmjs.com/package/@rehearse/runner)
-to run `actions/checkout` and read repo state without shelling out to
-system git. Standalone-useful for any tool that needs to manipulate
-git objects in-process.
+Standalone library — install it directly when you need git inside a
+sandboxed JS runtime. Ships alongside [`@rehearse/runner`](https://www.npmjs.com/package/@rehearse/runner)
+as the foundation for future in-process checkout (the runner currently
+no-ops `actions/checkout` for local execution since `cwd` is already
+the repo, and uses native `git` on the Pro VM).
 
 ## Install
 
