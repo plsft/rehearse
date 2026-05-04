@@ -46,7 +46,7 @@
       <ul class="space-y-2 text-sm">
         <li>— <span class="text-white">Inside your sprite.</span> Each team gets a dedicated Firecracker microVM (Linux microVM-on-KVM, the same primitive AWS Lambda runs on). 4 vCPU / 8 GB RAM / 100 GB persistent storage.</li>
         <li>— <span class="text-white">No cross-tenant access.</span> Sprites have no shared kernel, no shared filesystem, no shared network namespace with other customers' sprites.</li>
-        <li>— <span class="text-white">Code transfers at run time.</span> When you run <code class="font-mono">rehearse run --remote</code>, your workflow YAML is shipped to your sprite over HTTPS. It executes there. Logs come back over HTTPS. Persistent files (your caches) stay on the sprite.</li>
+        <li>— <span class="text-white">Code transfers at run time.</span> When you run <code class="font-mono">runner run --remote</code>, your workflow YAML is shipped to your sprite over HTTPS. It executes there. Logs come back over HTTPS as they happen. Persistent files (your caches, repo clone) stay on the sprite.</li>
         <li>— <span class="text-white">Cancel = wiped.</span> Cancel your subscription and we destroy your sprite. The 100 GB volume is reclaimed.</li>
       </ul>
     </div>

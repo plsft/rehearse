@@ -50,7 +50,7 @@
       </h1>
       <p class="mt-6 text-lg text-[var(--rh-muted)] max-w-2xl mx-auto">
         GitHub Actions throws away your runner after every job. So you re-download Node, re-install dependencies, re-build the same artifacts on every push.
-        Rehearse Pro gives you <span class="text-white">a dedicated, hardware-isolated microVM that keeps your caches between runs</span>. <code class="font-mono text-white/90">npm ci</code>, <code class="font-mono text-white/90">pip install</code>, <code class="font-mono text-white/90">cargo build</code> — your second run skips the network. Same workflow YAML. Run it from <code class="font-mono">rehearse run --remote</code>.
+        Rehearse Pro gives you <span class="text-white">a dedicated, hardware-isolated microVM that keeps your caches between runs</span>. <code class="font-mono text-white/90">npm</code>, <code class="font-mono text-white/90">pip</code>, <code class="font-mono text-white/90">cargo</code> caches survive. Same workflow YAML you already have. Opt in with one flag: <code class="font-mono text-white/90">runner run --remote</code>.
       </p>
       <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
         <a href="/pricing" class="btn btn-primary">Start Pro — $49/mo</a>
@@ -58,8 +58,8 @@
       </div>
       <div class="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2 text-[12.5px] font-mono text-[var(--rh-muted)]">
         <span><span class="ok">●</span> Firecracker microVM, 4 vCPU / 8 GB</span>
-        <span><span class="ok">●</span> Caches survive between runs</span>
-        <span><span class="ok">●</span> Same workflow YAML</span>
+        <span><span class="ok">●</span> ~2× faster npm install (measured)</span>
+        <span><span class="ok">●</span> Same workflow YAML, opt-in flag</span>
       </div>
     </div>
   </div>
@@ -73,24 +73,76 @@
       <div class="card p-7">
         <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// persistent caches</div>
         <h3 class="font-semibold text-lg mb-2">Your <code class="font-mono">~/.npm</code> survives.</h3>
-        <p class="text-[var(--rh-muted)] text-sm">Every CI run lands on the same private microVM with your caches intact: <code class="font-mono">~/.npm</code>, <code class="font-mono">~/.cache/pip</code>, <code class="font-mono">~/.cargo</code>, <code class="font-mono">~/.gradle</code>, <code class="font-mono">node_modules</code>. Second-run installs are 5-10× faster. No config — caches just accumulate.</p>
+        <p class="text-[var(--rh-muted)] text-sm">Every CI run lands on the same private microVM with your caches intact: <code class="font-mono">~/.npm</code>, <code class="font-mono">~/.cache/pip</code>, <code class="font-mono">~/.cargo</code>, <code class="font-mono">~/.gradle</code>, <code class="font-mono">node_modules</code>. We measured a typical npm install dropping from 10.5s cold to 5.1s warm — ~2× on the install step.</p>
       </div>
       <div class="card p-7">
         <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// isolated</div>
         <h3 class="font-semibold text-lg mb-2">Hardware-isolated microVM.</h3>
-        <p class="text-[var(--rh-muted)] text-sm">One Firecracker microVM per team — not a shared host, not a container on someone else's kernel. 4 vCPU and 8 GB RAM by default. 100 GB persistent storage for your caches and artifacts.</p>
+        <p class="text-[var(--rh-muted)] text-sm">One Firecracker microVM per team — not a shared host, not a container on someone else's kernel. 4 vCPU and 8 GB RAM by default. 100 GB persistent storage. The same primitive AWS Lambda runs on, dedicated to you.</p>
       </div>
       <div class="card p-7">
-        <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// same yaml</div>
-        <h3 class="font-semibold text-lg mb-2">Your existing workflow.</h3>
-        <p class="text-[var(--rh-muted)] text-sm">No new format. <code class="font-mono">rehearse run --remote .github/workflows/ci.yml</code> ships the workflow to your private runner, executes it, streams logs back. Drop the flag and you're back to local execution with no other changes.</p>
+        <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// same cli, local + cloud</div>
+        <h3 class="font-semibold text-lg mb-2">One binary, two backends.</h3>
+        <p class="text-[var(--rh-muted)] text-sm"><code class="font-mono">runner run</code> executes locally; <code class="font-mono">runner run --remote</code> ships the same workflow to your sprite. Same YAML, same output format, same command. Switch with one flag — no config files, no second tool to learn.</p>
       </div>
       <div class="card p-7">
-        <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// fast wake</div>
-        <h3 class="font-semibold text-lg mb-2">Sub-500ms warm-up.</h3>
-        <p class="text-[var(--rh-muted)] text-sm">Idle sprite hibernates between runs. Wake from warm: 100-500ms. From cold: 1-2s. So the first byte of your CI starts faster than GitHub Actions hosted runners can even allocate a job.</p>
+        <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// streaming logs</div>
+        <h3 class="font-semibold text-lg mb-2">Live output.</h3>
+        <p class="text-[var(--rh-muted)] text-sm">Daemon streams stdout and stderr line-by-line over a long-lived HTTP connection. Your terminal updates as the workflow runs, not at the end. Closes when the run finishes with the real exit code.</p>
       </div>
     </div>
+  </div>
+</section>
+
+<section class="py-24 hairline">
+  <div class="max-w-6xl mx-auto px-5">
+    <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-2">// measured · not marketing</div>
+    <h2 class="text-3xl font-semibold tracking-tight mb-3">Real numbers on the same workload.</h2>
+    <p class="text-[var(--rh-muted)] mb-8 max-w-2xl">A workflow that runs <code class="font-mono">npm install typescript vite vitest react react-dom express axios zod hono</code> — eight popular packages, no project deps. Three scenarios, all measured this morning.</p>
+    <div class="card p-0 overflow-x-auto">
+      <table class="w-full text-sm font-mono">
+        <thead>
+          <tr class="border-b border-white/10 text-[var(--rh-muted)]">
+            <th class="text-left py-3 px-5 font-normal">scenario</th>
+            <th class="text-right py-3 px-5 font-normal">install</th>
+            <th class="text-right py-3 px-5 font-normal">wall</th>
+            <th class="text-left py-3 px-5 font-normal">notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-b border-white/5">
+            <td class="py-3 px-5">Local Docker, cold pull + install</td>
+            <td class="text-right py-3 px-5">—</td>
+            <td class="text-right py-3 px-5 text-[var(--rh-muted)]">22.0s</td>
+            <td class="py-3 px-5 text-[var(--rh-muted)]">first <code class="font-mono">docker run</code> on a clean machine</td>
+          </tr>
+          <tr class="border-b border-white/5">
+            <td class="py-3 px-5">Local Docker, image cached</td>
+            <td class="text-right py-3 px-5 text-[var(--rh-muted)]">17.1s</td>
+            <td class="text-right py-3 px-5 text-[var(--rh-muted)]">17.1s</td>
+            <td class="py-3 px-5 text-[var(--rh-muted)]">image cached, no npm cache</td>
+          </tr>
+          <tr class="border-b border-white/5">
+            <td class="py-3 px-5">Pro <span class="text-[var(--rh-amber)]">cold cache</span></td>
+            <td class="text-right py-3 px-5 text-white">10.5s</td>
+            <td class="text-right py-3 px-5 text-white">12.5s</td>
+            <td class="py-3 px-5 text-[var(--rh-muted)]">first run on a fresh sprite</td>
+          </tr>
+          <tr class="border-b border-white/5">
+            <td class="py-3 px-5">Pro <span class="accent-text">warm cache</span></td>
+            <td class="text-right py-3 px-5 accent-text">5.1s</td>
+            <td class="text-right py-3 px-5 accent-text">6.7s</td>
+            <td class="py-3 px-5 text-[var(--rh-muted)]">second + subsequent runs</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="text-[12px] font-mono text-[var(--rh-muted)] mt-6 max-w-2xl">
+      <span class="text-white">Pro warm vs local Docker cached: 2.55× faster.</span> Cold-to-warm Pro speedup: 2.07× on install, 1.86× on wall. The <em>real</em> savings show up when you run CI dozens of times a day, which is the whole point of CI.
+    </p>
+    <p class="text-[12px] font-mono text-[var(--rh-muted)] mt-3 max-w-2xl">
+      Reproduce: <code class="font-mono text-white/80">runner run --remote bench.yml</code> against any account.
+    </p>
   </div>
 </section>
 
@@ -100,6 +152,22 @@
     <p class="text-2xl leading-snug text-white max-w-3xl">
       GitHub Actions runs on a fresh container every time, so your install step pays full freight on every push. <span class="accent-text">Rehearse Pro keeps your caches between runs</span> on a private microVM you don't share with anyone. $49 a month, your existing workflow YAML, opt-in via one flag. <a href="/pricing" class="underline decoration-[var(--rh-accent)]">Start Pro →</a>
     </p>
+  </div>
+</section>
+
+<section class="py-24 hairline">
+  <div class="max-w-3xl mx-auto px-5">
+    <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-2">// quickstart</div>
+    <h2 class="text-2xl font-semibold mb-6">Three commands.</h2>
+    <pre class="terminal" data-label="~/your-repo"><code><span class="comment"># 1. install the OSS runner</span>
+npm install -g @rehearse/runner@latest
+
+<span class="comment"># 2. set your token (after Stripe checkout)</span>
+export REHEARSE_TOKEN=rh_pro_live_…
+
+<span class="comment"># 3. run any workflow you already have</span>
+runner run --remote .github/workflows/ci.yml</code></pre>
+    <p class="text-[12px] font-mono text-[var(--rh-muted)] mt-3">Same command without <code class="font-mono">--remote</code> runs locally. Drop the flag any time — there's no lock-in.</p>
   </div>
 </section>
 

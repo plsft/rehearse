@@ -45,23 +45,23 @@
     <pre class="terminal">export REHEARSE_TOKEN=rh_pro_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</pre>
 
     <h2 class="text-xl font-semibold mt-10 mb-3">03 — run remote</h2>
-    <pre class="terminal">rehearse run --remote .github/workflows/ci.yml</pre>
-    <p class="text-[var(--rh-muted)] mt-3 text-sm">Runner POSTs your workflow YAML to <code class="font-mono">api.rehearse.sh/v1/runs</code>, which forwards it to your sprite. Sprite executes the same YAML you'd run locally, returns logs.</p>
-    <p class="text-[var(--rh-muted)] mt-3 text-sm">Drop the <code class="font-mono">--remote</code> flag and you're back to local execution. No other code changes.</p>
+    <pre class="terminal">runner run --remote .github/workflows/ci.yml</pre>
+    <p class="text-[var(--rh-muted)] mt-3 text-sm">The runner POSTs your workflow YAML to <code class="font-mono">api.rehearse.sh/v1/runs/stream</code>, which forwards to your sprite. The sprite executes the same YAML you'd run locally and streams logs back line-by-line as the run progresses.</p>
+    <p class="text-[var(--rh-muted)] mt-3 text-sm">Drop the <code class="font-mono">--remote</code> flag and you're back to local execution. Same workflow file, same output format. No lock-in.</p>
 
-    <h2 class="text-xl font-semibold mt-10 mb-3">04 — see your cache fill up</h2>
-    <p class="text-[var(--rh-muted)] mb-3 text-sm">After the first run, your sprite has the project's <code class="font-mono">~/.npm</code> populated. Run 2 hits cache; <code class="font-mono">npm ci</code> typically goes from 30-90s to 3-10s.</p>
-    <p class="text-[var(--rh-muted)] mb-3 text-sm">The dashboard at <a class="underline" href="https://pro.rehearse.sh/dashboard/usage">pro.rehearse.sh/dashboard/usage</a> shows cache size, run history, and bandwidth.</p>
+    <h2 class="text-xl font-semibold mt-10 mb-3">04 — caches accumulate</h2>
+    <p class="text-[var(--rh-muted)] mb-3 text-sm">Your sprite's <code class="font-mono">/home/sprite/.npm</code> persists across runs. After the first run, subsequent runs that touch the same packages skip the network. We measured a typical install dropping <span class="text-white">10.5s → 5.1s</span> (~2×).</p>
+    <p class="text-[var(--rh-muted)] mb-3 text-sm">Other caches that persist for free: <code class="font-mono">~/.cache/pip</code>, <code class="font-mono">~/.cargo/registry</code>, <code class="font-mono">~/.gradle</code>, <code class="font-mono">~/.bun/install/cache</code>, your <code class="font-mono">node_modules</code>, the cloned repo. Anything you write to disk under <code class="font-mono">/home/sprite/</code> survives.</p>
 
-    <h2 class="text-xl font-semibold mt-10 mb-3">05 — rotate keys</h2>
-    <p class="text-[var(--rh-muted)] mb-3 text-sm">In <a class="underline" href="https://pro.rehearse.sh/dashboard/keys">Dashboard → API keys</a>: create a new key, swap your env-var, revoke the old one. Revocation is immediate; cached tokens expire within 5 minutes.</p>
+    <h2 class="text-xl font-semibold mt-10 mb-3">05 — manage from the dashboard</h2>
+    <p class="text-[var(--rh-muted)] mb-3 text-sm">At <a class="underline" href="https://pro.rehearse.sh/dashboard">pro.rehearse.sh/dashboard</a>: rotate API keys, see recent runs, hit Stripe Customer Portal to manage billing.</p>
 
     <h2 class="text-xl font-semibold mt-10 mb-3">troubleshooting</h2>
     <ul class="space-y-3 text-[var(--rh-muted)] text-sm">
-      <li>— <span class="text-white">"runner not provisioned":</span> sprite is still spinning up after signup, or onboarding paused. Wait 60s and retry; if it persists email <a class="underline" href="mailto:pro@rehearse.sh">pro@rehearse.sh</a>.</li>
-      <li>— <span class="text-white">"401 Unauthorized":</span> token revoked or wrong. <code class="font-mono">echo $REHEARSE_TOKEN</code>; create a new key in the dashboard.</li>
-      <li>— <span class="text-white">slow first run:</span> expected — your sprite has no cache yet. Run 2 onward should be ~5-10× faster on the install step.</li>
-      <li>— <span class="text-white">need to clear cache:</span> from the dashboard, "Reset cache" wipes <code class="font-mono">~/.npm</code> etc. Sometimes useful when you've changed lockfile structure.</li>
+      <li>— <span class="text-white">"runner not provisioned":</span> your sprite is still spinning up after signup. Provisioning takes 60–120s after Stripe checkout. Wait, then retry. If it persists, email <a class="underline" href="mailto:pro@rehearse.sh">pro@rehearse.sh</a>.</li>
+      <li>— <span class="text-white">"401 Unauthorized":</span> token revoked or wrong. Check <code class="font-mono">echo $REHEARSE_TOKEN</code>; create a new key in the dashboard.</li>
+      <li>— <span class="text-white">slow first run:</span> expected — your sprite has no cache yet. Run 2 onward is ~2× faster on install steps.</li>
+      <li>— <span class="text-white">need to clear cache:</span> currently a manual ask — email <a class="underline" href="mailto:pro@rehearse.sh">pro@rehearse.sh</a> and we'll wipe and re-provision. Self-serve reset lands in v1.</li>
     </ul>
   </div>
 </section>

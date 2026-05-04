@@ -22,8 +22,8 @@
 <a href="/pro" class="block bg-[var(--rh-accent-glow)] border-b border-[var(--rh-accent)]/30 hover:bg-[var(--rh-accent-dim)]/20 transition-colors fixed inset-x-0 top-0 z-[60]">
   <div class="max-w-6xl mx-auto px-5 h-7 flex items-center justify-center gap-2 text-[12px] font-mono">
     <span class="text-[var(--rh-accent)]">// new</span>
-    <span class="text-white">Rehearse Pro — signed, scanned, curated CI base images.</span>
-    <span class="text-[var(--rh-muted)]">$99/mo →</span>
+    <span class="text-white">Rehearse Pro — same CLI, hosted runner, caches between runs.</span>
+    <span class="text-[var(--rh-muted)]">$49/mo →</span>
   </div>
 </a>
 
@@ -34,7 +34,7 @@
     <a href="/" class="flex items-center gap-2.5 font-mono group" aria-label="Rehearse home">
       <span class="logo-mark logo-mark-md text-[var(--rh-accent)] transition-transform group-hover:scale-110"></span>
       <span class="font-semibold tracking-tight text-white">rehearse</span>
-      <span class="hidden sm:inline text-[11px] text-[var(--rh-muted)] border border-white/10 rounded px-1.5 py-0.5">v0.3.3 · alpha</span>
+      <span class="hidden sm:inline text-[11px] text-[var(--rh-muted)] border border-white/10 rounded px-1.5 py-0.5">v0.3.6 · alpha</span>
     </a>
     <nav class="hidden md:flex items-center gap-7">
       <a href="#bench" class="nav-link">Bench</a>
@@ -122,7 +122,7 @@
       </div>
     </div>
     <div class="mt-3 text-[12px] font-mono text-[var(--rh-muted)] text-right">
-      simulated output · real run on a Windows 11 laptop takes ~13s warm (v0.3.3) · GitHub-hosted ~50–110s
+      simulated output · real run on a Windows 11 laptop takes ~13s warm (v0.3.6) · GitHub-hosted ~50–110s
     </div>
   </div>
 </section>
@@ -214,7 +214,7 @@
     <p class="mt-6 text-sm text-[var(--rh-muted)] max-w-3xl">
       <span class="text-white">Honest caveats:</span> warm-cache numbers from
       a fresh GitHub-hosted <code class="font-mono">ubuntu-latest</code> runner
-      at <code class="font-mono">v0.3.3</code> — the second run, with deps already
+      at <code class="font-mono">v0.3.6</code> — the second run, with deps already
       on disk. Cold-vs-cold is narrower — a fresh <code class="font-mono">pnpm install</code>
       dominates everything. We run the same bench on macOS and Windows
       runners (host-backend targets only — no Docker on those GH runners) and
@@ -223,6 +223,31 @@
       per-OS numbers, and the regression writeup in
       <a href="https://github.com/plsft/rehearse/blob/main/bench/RESULTS.md" class="link">bench/RESULTS.md</a>.
     </p>
+  </div>
+</section>
+
+<!-- ============== LOCAL + CLOUD ============== -->
+<section class="py-24 hairline bg-track">
+  <div class="max-w-6xl mx-auto px-5">
+    <div class="max-w-3xl">
+      <div class="eyebrow">// Local + cloud, same binary</div>
+      <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">One CLI. Two backends. Switch with a flag.</h2>
+      <p class="mt-4 text-lg text-[var(--rh-muted)]">
+        Run on your laptop for free. When you want a hosted runner with caches that persist between runs, add <code class="font-mono text-white">--remote</code>. Same workflow YAML, same output format, same exit codes. No second tool to learn, no lock-in.
+      </p>
+    </div>
+    <div class="grid md:grid-cols-2 gap-6 mt-10">
+      <div class="card p-6">
+        <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// local</div>
+        <pre class="font-mono text-[13px] text-white/90"><span class="prompt"></span>runner run .github/workflows/ci.yml</pre>
+        <p class="mt-4 text-sm text-[var(--rh-muted)]">Free. Apache 2.0. Host or container backend, your choice. 5–30× faster than <code class="font-mono">act</code> on the bench above.</p>
+      </div>
+      <div class="card p-6 border-[var(--rh-accent)]/40">
+        <div class="text-[12px] font-mono text-[var(--rh-accent)] mb-2">// cloud</div>
+        <pre class="font-mono text-[13px] text-white/90"><span class="prompt"></span>runner run --remote .github/workflows/ci.yml</pre>
+        <p class="mt-4 text-sm text-[var(--rh-muted)]">$49/mo. Dedicated Firecracker microVM with persistent caches. Live-streaming logs. ~2× faster <code class="font-mono">npm install</code> on warm runs (measured). <a href="/pro" class="link">Read more →</a></p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -466,10 +491,9 @@
   <div class="max-w-6xl mx-auto px-5">
     <div class="max-w-3xl">
       <div class="eyebrow">// Open source</div>
-      <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">All Apache 2.0. No hosted product.</h2>
+      <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">All Apache 2.0. Use locally for free.</h2>
       <p class="mt-4 text-lg text-[var(--rh-muted)]">
-        Four packages on npm. One source repo on GitHub. Free forever.
-        Nothing in this stack ties you to a service we run.
+        Four packages on npm. One source repo on GitHub. The OSS runner is free forever — drop the <code class="font-mono">--remote</code> flag and it executes on your laptop with no service tie-in. <a href="/pro" class="link">Pro</a> adds a hosted execution target with persistent caches, but it's strictly additive: same binary, same YAML, same exit codes.
       </p>
     </div>
     <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-5 mt-12">
@@ -532,7 +556,7 @@
     </div>
   </div>
   <div class="max-w-6xl mx-auto px-5 mt-6 font-mono text-[11px] text-[var(--rh-muted)]">
-    <span class="ok">●</span> v0.3.3 · public alpha · Apache 2.0
+    <span class="ok">●</span> v0.3.6 · public alpha · Apache 2.0
   </div>
 </footer>
 
