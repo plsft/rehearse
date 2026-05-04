@@ -49,17 +49,18 @@
       <div class="card p-8">
         <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// pro</div>
         <h2 class="text-2xl font-semibold mb-1">Pro</h2>
-        <p class="text-[var(--rh-muted)] text-sm mb-6">For teams using Rehearse OSS who want signed, scanned, current CI base images.</p>
+        <p class="text-[var(--rh-muted)] text-sm mb-6">A dedicated microVM that keeps your CI caches between runs. Same workflow YAML.</p>
         <div class="text-4xl font-semibold mb-1">
-          <span x-show="billing==='monthly'">$99<span class="text-[var(--rh-muted)] text-base font-normal"> / month</span></span>
-          <span x-show="billing==='yearly'" x-cloak>$999<span class="text-[var(--rh-muted)] text-base font-normal"> / year</span></span>
+          <span x-show="billing==='monthly'">$49<span class="text-[var(--rh-muted)] text-base font-normal"> / month</span></span>
+          <span x-show="billing==='yearly'" x-cloak>$490<span class="text-[var(--rh-muted)] text-base font-normal"> / year</span></span>
         </div>
         <p class="text-[12px] font-mono text-[var(--rh-muted)] mb-6">Cancel anytime · 14-day refund · no proration tricks</p>
         <ul class="space-y-2 text-sm mb-8">
-          <li><span class="ok">●</span> All catalog images</li>
-          <li><span class="ok">●</span> Multi-arch (amd64 + arm64)</li>
-          <li><span class="ok">●</span> Cosign-signed, Trivy-scanned weekly</li>
-          <li><span class="ok">●</span> 100 GB bandwidth / month</li>
+          <li><span class="ok">●</span> Dedicated 4 vCPU / 8 GB sprite</li>
+          <li><span class="ok">●</span> 100 GB persistent cache</li>
+          <li><span class="ok">●</span> Caches survive between runs</li>
+          <li><span class="ok">●</span> Up to 1000 CI runs / month included</li>
+          <li><span class="ok">●</span> Sub-500ms warm-up</li>
           <li><span class="ok">●</span> Email support</li>
         </ul>
         <a href="/checkout" class="btn btn-primary w-full justify-center">Start Pro</a>
@@ -68,17 +69,17 @@
       <div class="card p-8 border-[var(--rh-accent)]/40">
         <div class="text-[12px] font-mono text-[var(--rh-accent)] mb-2">// enterprise</div>
         <h2 class="text-2xl font-semibold mb-1">Enterprise</h2>
-        <p class="text-[var(--rh-muted)] text-sm mb-6">Self-hosted Pro on your infrastructure. Custom images. SLA. Slack Connect.</p>
+        <p class="text-[var(--rh-muted)] text-sm mb-6">Multiple sprites for parallel matrix jobs, larger machines, dedicated support.</p>
         <div class="text-4xl font-semibold mb-1">
-          From $12,000<span class="text-[var(--rh-muted)] text-base font-normal"> / year</span>
+          From $499<span class="text-[var(--rh-muted)] text-base font-normal"> / month</span>
         </div>
-        <p class="text-[12px] font-mono text-[var(--rh-muted)] mb-6">Annual contract · invoice billing · ACH or wire</p>
+        <p class="text-[12px] font-mono text-[var(--rh-muted)] mb-6">Annual contract available · invoice billing</p>
         <ul class="space-y-2 text-sm mb-8">
-          <li><span class="ok">●</span> Self-hosted, your infrastructure</li>
-          <li><span class="ok">●</span> Custom images on request</li>
+          <li><span class="ok">●</span> Up to 10 parallel sprites for matrix jobs</li>
+          <li><span class="ok">●</span> 8 vCPU / 16 GB per sprite</li>
+          <li><span class="ok">●</span> Unlimited CI runs</li>
           <li><span class="ok">●</span> Dedicated Slack Connect channel</li>
           <li><span class="ok">●</span> 4-hour response SLA, business hours</li>
-          <li><span class="ok">●</span> Negotiated bandwidth + image count</li>
         </ul>
         <a href="mailto:pro@rehearse.sh?subject=Enterprise%20interest" class="btn btn-ghost w-full justify-center">Talk to George</a>
       </div>
@@ -97,19 +98,19 @@
     <div class="space-y-6 text-sm">
       <div>
         <p class="font-semibold mb-1">What about my source code and secrets?</p>
-        <p class="text-[var(--rh-muted)]">They never touch our infrastructure. Pro serves image bytes — that's the entire surface.</p>
+        <p class="text-[var(--rh-muted)]">Your code is shipped to the sprite at run time and lives in your dedicated 100 GB persistent volume. Each customer gets a hardware-isolated Firecracker microVM — no shared kernel, no cross-tenant access. Secrets are passed in via env at run time and aren't logged.</p>
       </div>
       <div>
         <p class="font-semibold mb-1">Can I cancel anytime?</p>
         <p class="text-[var(--rh-muted)]">Yes. Stripe Customer Portal handles cancellation, refund (14-day window), card update, plan switch. We never gate it.</p>
       </div>
       <div>
-        <p class="font-semibold mb-1">What happens if I exceed 100 GB bandwidth?</p>
-        <p class="text-[var(--rh-muted)]">Soft cap. We email you at 80% / 100% / 150%. We rate-limit pulls at 200% to keep the bill sane. CI never fails because of billing.</p>
+        <p class="font-semibold mb-1">What happens if I exceed 1000 runs?</p>
+        <p class="text-[var(--rh-muted)]">Soft cap. We email at 80% / 100%. Overage is $0.05/run. Cancel or upgrade from the dashboard. CI never fails because of billing.</p>
       </div>
       <div>
         <p class="font-semibold mb-1">Will the OSS runner ever be paywalled?</p>
-        <p class="text-[var(--rh-muted)]">No. Apache 2.0, free, supported. Pro is strictly additive — set <code class="font-mono">REHEARSE_TOKEN</code> and it works; don't, and the runner pulls from public Docker Hub like before.</p>
+        <p class="text-[var(--rh-muted)]">No. Apache 2.0, free, supported. Pro is strictly additive — pass <code class="font-mono">--remote</code> with <code class="font-mono">REHEARSE_TOKEN</code> set and the runner ships your workflow to your sprite; drop the flag and you're back to running locally.</p>
       </div>
       <div>
         <p class="font-semibold mb-1">Do you have a free trial?</p>

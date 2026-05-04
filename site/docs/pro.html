@@ -35,41 +35,33 @@
   <div class="max-w-3xl mx-auto px-5">
     <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-2">// docs / pro</div>
     <h1 class="text-3xl font-semibold mb-3">Pro quickstart.</h1>
-    <p class="text-[var(--rh-muted)] mb-12 max-w-2xl">Set the token, the OSS runner does the rest. No new commands.</p>
+    <p class="text-[var(--rh-muted)] mb-12 max-w-2xl">Pass <code class="font-mono">--remote</code> to the OSS runner with your Pro token set. Workflow ships to your dedicated sprite; cache survives between runs.</p>
 
     <h2 class="text-xl font-semibold mb-3">01 — sign up</h2>
     <p class="text-[var(--rh-muted)] mb-3 text-sm">Buy Pro at <a class="underline" href="/pricing">/pricing</a>. Stripe sends you a receipt; we send you the API key (shown once on the success page and in the welcome email). Save it somewhere safe.</p>
+    <p class="text-[var(--rh-muted)] mb-3 text-sm">Right after checkout we provision your dedicated microVM. Takes 30-60 seconds. The welcome email goes out only when your sprite is up and ready to accept runs.</p>
 
     <h2 class="text-xl font-semibold mt-10 mb-3">02 — set the token</h2>
-    <p class="text-[var(--rh-muted)] mb-3 text-sm">Either via env-var or a config file. Both work; env-var wins if both are present.</p>
     <pre class="terminal">export REHEARSE_TOKEN=rh_pro_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</pre>
-    <p class="text-[var(--rh-muted)] mt-3 mb-3 text-sm">Or in <code class="font-mono">rehearse.config.mjs</code>:</p>
-    <pre class="terminal">export default {
-  images: {
-    source: 'rehearse-pro',
-    apiKey: process.env.REHEARSE_TOKEN,
-    fallback: 'public',
-  },
-};</pre>
 
-    <h2 class="text-xl font-semibold mt-10 mb-3">03 — run as before</h2>
-    <pre class="terminal">rehearse run .github/workflows/ci.yml</pre>
-    <p class="text-[var(--rh-muted)] mt-3 text-sm">The runner pulls warmed images automatically when your workflow uses Node, Python, Go, etc. If anything goes wrong (token invalid, image not in catalog, registry unreachable) the runner falls back to public Docker Hub silently — your CI never fails because of Pro.</p>
+    <h2 class="text-xl font-semibold mt-10 mb-3">03 — run remote</h2>
+    <pre class="terminal">rehearse run --remote .github/workflows/ci.yml</pre>
+    <p class="text-[var(--rh-muted)] mt-3 text-sm">Runner POSTs your workflow YAML to <code class="font-mono">api.rehearse.sh/v1/runs</code>, which forwards it to your sprite. Sprite executes the same YAML you'd run locally, returns logs.</p>
+    <p class="text-[var(--rh-muted)] mt-3 text-sm">Drop the <code class="font-mono">--remote</code> flag and you're back to local execution. No other code changes.</p>
 
-    <h2 class="text-xl font-semibold mt-10 mb-3">04 — verify a Pro image (optional)</h2>
-    <p class="text-[var(--rh-muted)] mb-3 text-sm">Every image is cosign-signed via Sigstore. To verify before pulling:</p>
-    <pre class="terminal">cosign verify registry.rehearse.sh/node:20-warm \
-  --certificate-identity-regexp 'https://github.com/plsft/rehearse-images/' \
-  --certificate-oidc-issuer 'https://token.actions.githubusercontent.com'</pre>
+    <h2 class="text-xl font-semibold mt-10 mb-3">04 — see your cache fill up</h2>
+    <p class="text-[var(--rh-muted)] mb-3 text-sm">After the first run, your sprite has the project's <code class="font-mono">~/.npm</code> populated. Run 2 hits cache; <code class="font-mono">npm ci</code> typically goes from 30-90s to 3-10s.</p>
+    <p class="text-[var(--rh-muted)] mb-3 text-sm">The dashboard at <a class="underline" href="https://pro.rehearse.sh/dashboard/usage">pro.rehearse.sh/dashboard/usage</a> shows cache size, run history, and bandwidth.</p>
 
     <h2 class="text-xl font-semibold mt-10 mb-3">05 — rotate keys</h2>
     <p class="text-[var(--rh-muted)] mb-3 text-sm">In <a class="underline" href="https://pro.rehearse.sh/dashboard/keys">Dashboard → API keys</a>: create a new key, swap your env-var, revoke the old one. Revocation is immediate; cached tokens expire within 5 minutes.</p>
 
     <h2 class="text-xl font-semibold mt-10 mb-3">troubleshooting</h2>
     <ul class="space-y-3 text-[var(--rh-muted)] text-sm">
-      <li>— <span class="text-white">"401 Unauthorized" on pull:</span> token revoked or wrong. Run <code class="font-mono">echo $REHEARSE_TOKEN</code>; create a new key in the dashboard.</li>
-      <li>— <span class="text-white">"image not in catalog":</span> the requested <code class="font-mono">name:tag</code> isn't a Pro image. Check <a class="underline" href="/catalog">/catalog</a>; the runner falls back to public Docker Hub silently.</li>
-      <li>— <span class="text-white">slow pulls:</span> first pull is uncached at the edge — subsequent pulls hit the Worker's cache. If you're seeing &gt;5s on small manifests after the first request, email us.</li>
+      <li>— <span class="text-white">"runner not provisioned":</span> sprite is still spinning up after signup, or onboarding paused. Wait 60s and retry; if it persists email <a class="underline" href="mailto:pro@rehearse.sh">pro@rehearse.sh</a>.</li>
+      <li>— <span class="text-white">"401 Unauthorized":</span> token revoked or wrong. <code class="font-mono">echo $REHEARSE_TOKEN</code>; create a new key in the dashboard.</li>
+      <li>— <span class="text-white">slow first run:</span> expected — your sprite has no cache yet. Run 2 onward should be ~5-10× faster on the install step.</li>
+      <li>— <span class="text-white">need to clear cache:</span> from the dashboard, "Reset cache" wipes <code class="font-mono">~/.npm</code> etc. Sometimes useful when you've changed lockfile structure.</li>
     </ul>
   </div>
 </section>

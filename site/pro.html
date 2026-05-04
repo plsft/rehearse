@@ -44,22 +44,22 @@
 <section class="bg-grid pt-36 pb-20 relative">
   <div class="max-w-6xl mx-auto px-5">
     <div class="max-w-3xl mx-auto text-center">
-      <div class="tag mb-5"><span class="w-1.5 h-1.5 rounded-full bg-[var(--rh-accent)] inline-block"></span> rehearse pro · $99 / month</div>
+      <div class="tag mb-5"><span class="w-1.5 h-1.5 rounded-full bg-[var(--rh-accent)] inline-block"></span> rehearse pro · hosted runner · $49 / month</div>
       <h1 class="text-4xl sm:text-5xl lg:text-[3.7rem] leading-[1.04] font-semibold tracking-tight gradient-text">
-        Trusted CI base images.<br/>Without the maintenance tax.
+        Your CI on a private microVM.<br/>Caches that actually persist.
       </h1>
       <p class="mt-6 text-lg text-[var(--rh-muted)] max-w-2xl mx-auto">
-        Public Docker Hub images are unsigned, scanned by no one, and patched whenever the maintainer has time. Pro images are
-        <span class="text-white">cosign-signed, Trivy-scanned weekly, multi-arch, and rebuilt every Monday</span>. Use them with the OSS Rehearse runner — or any Docker client.
+        GitHub Actions throws away your runner after every job. So you re-download Node, re-install dependencies, re-build the same artifacts on every push.
+        Rehearse Pro gives you <span class="text-white">a dedicated, hardware-isolated microVM that keeps your caches between runs</span>. <code class="font-mono text-white/90">npm ci</code>, <code class="font-mono text-white/90">pip install</code>, <code class="font-mono text-white/90">cargo build</code> — your second run skips the network. Same workflow YAML. Run it from <code class="font-mono">rehearse run --remote</code>.
       </p>
       <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
-        <a href="/pricing" class="btn btn-primary">Start Pro — $99/mo</a>
-        <a href="/catalog" class="btn btn-ghost">Browse the catalog →</a>
+        <a href="/pricing" class="btn btn-primary">Start Pro — $49/mo</a>
+        <a href="/docs/pro" class="btn btn-ghost">How it works →</a>
       </div>
       <div class="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2 text-[12.5px] font-mono text-[var(--rh-muted)]">
-        <span><span class="ok">●</span> 10 images at launch · 8 languages</span>
-        <span><span class="ok">●</span> Multi-arch (amd64 + arm64)</span>
-        <span><span class="ok">●</span> Speed is the side effect</span>
+        <span><span class="ok">●</span> Firecracker microVM, 4 vCPU / 8 GB</span>
+        <span><span class="ok">●</span> Caches survive between runs</span>
+        <span><span class="ok">●</span> Same workflow YAML</span>
       </div>
     </div>
   </div>
@@ -68,27 +68,27 @@
 <section class="py-24 hairline">
   <div class="max-w-6xl mx-auto px-5">
     <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-2">// what you get</div>
-    <h2 class="text-3xl font-semibold tracking-tight mb-12">Image hygiene, productized.</h2>
+    <h2 class="text-3xl font-semibold tracking-tight mb-12">CI that remembers.</h2>
     <div class="grid md:grid-cols-2 gap-6">
       <div class="card p-7">
-        <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// signed</div>
-        <h3 class="font-semibold text-lg mb-2">Cosign signatures, OIDC-issued.</h3>
-        <p class="text-[var(--rh-muted)] text-sm">Every image is signed in CI via Sigstore's keyless flow. You can verify provenance with <code class="font-mono">cosign verify</code>. Public Docker Hub images are unsigned by default.</p>
+        <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// persistent caches</div>
+        <h3 class="font-semibold text-lg mb-2">Your <code class="font-mono">~/.npm</code> survives.</h3>
+        <p class="text-[var(--rh-muted)] text-sm">Every CI run lands on the same private microVM with your caches intact: <code class="font-mono">~/.npm</code>, <code class="font-mono">~/.cache/pip</code>, <code class="font-mono">~/.cargo</code>, <code class="font-mono">~/.gradle</code>, <code class="font-mono">node_modules</code>. Second-run installs are 5-10× faster. No config — caches just accumulate.</p>
       </div>
       <div class="card p-7">
-        <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// scanned</div>
-        <h3 class="font-semibold text-lg mb-2">Trivy gate, every build.</h3>
-        <p class="text-[var(--rh-muted)] text-sm">No image ships with a fixed-and-published HIGH or CRITICAL CVE. The build pipeline fails before the catalog row updates. We document our threshold publicly.</p>
+        <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// isolated</div>
+        <h3 class="font-semibold text-lg mb-2">Hardware-isolated microVM.</h3>
+        <p class="text-[var(--rh-muted)] text-sm">One Firecracker microVM per team — not a shared host, not a container on someone else's kernel. 4 vCPU and 8 GB RAM by default. 100 GB persistent storage for your caches and artifacts.</p>
       </div>
       <div class="card p-7">
-        <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// curated</div>
-        <h3 class="font-semibold text-lg mb-2">10 images, none of the sprawl.</h3>
-        <p class="text-[var(--rh-muted)] text-sm">Node, Python, Go, Rust, Java, .NET, Bun, Ruby, PHP — plus Postgres combos. We don't ship 300 images. We ship the ones our customers' CI actually uses, and we keep them current.</p>
+        <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// same yaml</div>
+        <h3 class="font-semibold text-lg mb-2">Your existing workflow.</h3>
+        <p class="text-[var(--rh-muted)] text-sm">No new format. <code class="font-mono">rehearse run --remote .github/workflows/ci.yml</code> ships the workflow to your private runner, executes it, streams logs back. Drop the flag and you're back to local execution with no other changes.</p>
       </div>
       <div class="card p-7">
-        <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// fast (side effect)</div>
-        <h3 class="font-semibold text-lg mb-2">Pre-warmed, multi-arch.</h3>
-        <p class="text-[var(--rh-muted)] text-sm">Toolchain installed, package-manager content cache populated, system deps pre-baked. Cold-start CI runs faster — but that's not why you're buying. The trust is.</p>
+        <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// fast wake</div>
+        <h3 class="font-semibold text-lg mb-2">Sub-500ms warm-up.</h3>
+        <p class="text-[var(--rh-muted)] text-sm">Idle sprite hibernates between runs. Wake from warm: 100-500ms. From cold: 1-2s. So the first byte of your CI starts faster than GitHub Actions hosted runners can even allocate a job.</p>
       </div>
     </div>
   </div>
@@ -98,7 +98,7 @@
   <div class="max-w-6xl mx-auto px-5">
     <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-2">// the pitch in one paragraph</div>
     <p class="text-2xl leading-snug text-white max-w-3xl">
-      Most CI base images on Docker Hub are unsigned, scanned by no one, and patched whenever the maintainer has time. <span class="accent-text">Pro is the trusted Docker Hub for CI.</span> $99 a month, no source code on our infrastructure, replaceable in your config in one line. <a href="/pricing" class="underline decoration-[var(--rh-accent)]">Start Pro →</a>
+      GitHub Actions runs on a fresh container every time, so your install step pays full freight on every push. <span class="accent-text">Rehearse Pro keeps your caches between runs</span> on a private microVM you don't share with anyone. $49 a month, your existing workflow YAML, opt-in via one flag. <a href="/pricing" class="underline decoration-[var(--rh-accent)]">Start Pro →</a>
     </p>
   </div>
 </section>
@@ -108,10 +108,10 @@
     <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-2">// honest caveats</div>
     <h2 class="text-2xl font-semibold mb-8">What Pro is not.</h2>
     <ul class="space-y-3 text-[var(--rh-muted)] max-w-3xl">
-      <li>— <span class="text-white">Not a hosted CI service.</span> Pro is image distribution. Your code, secrets, and run logs never touch our infrastructure.</li>
-      <li>— <span class="text-white">Not magic.</span> A pre-warmed npm cache helps the toolchain step. Your project's own dependencies still install on first run; you may not feel a 3× speed-up unless you cold-pull often.</li>
-      <li>— <span class="text-white">Not a license to skip your own security review.</span> We sign and scan; you should still pin digests, audit your composition, and treat any base image with appropriate paranoia.</li>
-      <li>— <span class="text-white">Not free.</span> $99/mo. The OSS runner is and always will be Apache 2.0 and free.</li>
+      <li>— <span class="text-white">First run isn't faster.</span> The cache populates on run 1; runs 2-N benefit. If your project sees its first CI run on Pro and never again, you'll see no win.</li>
+      <li>— <span class="text-white">Not a parallel-matrix multiplier.</span> One sprite per team in v0. Matrix jobs run sequentially on your sprite. Team plans add parallelism in v1.</li>
+      <li>— <span class="text-white">Caches are private to your sprite.</span> No cross-team sharing — that's the security boundary. If you have 5 unrelated repos, all 5 share one cache, but no other customer touches yours.</li>
+      <li>— <span class="text-white">Not free.</span> $49/mo. The OSS runner is and always will be Apache 2.0 and free.</li>
     </ul>
   </div>
 </section>
