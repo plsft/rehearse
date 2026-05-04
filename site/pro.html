@@ -94,6 +94,28 @@
   </div>
 </section>
 
+<section class="py-20 hairline">
+  <div class="max-w-6xl mx-auto px-5">
+    <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-2">// supported languages</div>
+    <h2 class="text-3xl font-semibold tracking-tight mb-3">11 languages, verified end-to-end.</h2>
+    <p class="text-[var(--rh-muted)] mb-8 max-w-2xl">Every language listed below was bench-tested against a real Pro account. The toolchain is preinstalled on the sprite (or auto-installed and cached on first use, in the case of .NET). Same workflow YAML you'd run on GitHub-hosted runners.</p>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+      <div class="card p-4 text-sm"><span class="ok">✓</span> <span class="text-white font-mono">Node.js</span> <span class="text-[var(--rh-muted)] text-xs">setup-node</span></div>
+      <div class="card p-4 text-sm"><span class="ok">✓</span> <span class="text-white font-mono">Bun</span> <span class="text-[var(--rh-muted)] text-xs">oven-sh/setup-bun</span></div>
+      <div class="card p-4 text-sm"><span class="ok">✓</span> <span class="text-white font-mono">Deno</span> <span class="text-[var(--rh-muted)] text-xs">denoland/setup-deno</span></div>
+      <div class="card p-4 text-sm"><span class="ok">✓</span> <span class="text-white font-mono">Python</span> <span class="text-[var(--rh-muted)] text-xs">setup-python</span></div>
+      <div class="card p-4 text-sm"><span class="ok">✓</span> <span class="text-white font-mono">Go</span> <span class="text-[var(--rh-muted)] text-xs">setup-go</span></div>
+      <div class="card p-4 text-sm"><span class="ok">✓</span> <span class="text-white font-mono">Java</span> <span class="text-[var(--rh-muted)] text-xs">setup-java</span></div>
+      <div class="card p-4 text-sm"><span class="ok">✓</span> <span class="text-white font-mono">Ruby</span> <span class="text-[var(--rh-muted)] text-xs">ruby/setup-ruby</span></div>
+      <div class="card p-4 text-sm"><span class="ok">✓</span> <span class="text-white font-mono">Rust</span> <span class="text-[var(--rh-muted)] text-xs">dtolnay/rust-toolchain</span></div>
+      <div class="card p-4 text-sm"><span class="ok">✓</span> <span class="text-white font-mono">Elixir</span> <span class="text-[var(--rh-muted)] text-xs">erlef/setup-beam</span></div>
+      <div class="card p-4 text-sm"><span class="ok">✓</span> <span class="text-white font-mono">Erlang</span> <span class="text-[var(--rh-muted)] text-xs">erlef/setup-beam</span></div>
+      <div class="card p-4 text-sm"><span class="ok">✓</span> <span class="text-white font-mono">.NET</span> <span class="text-[var(--rh-muted)] text-xs">setup-dotnet (auto-install)</span></div>
+      <div class="card p-4 text-sm border-[var(--rh-amber)]/40"><span class="warn">○</span> <span class="text-white font-mono">PHP</span> <span class="text-[var(--rh-muted)] text-xs">not yet</span></div>
+    </div>
+  </div>
+</section>
+
 <section class="py-24 hairline">
   <div class="max-w-6xl mx-auto px-5">
     <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-2">// measured · not marketing</div>
@@ -176,7 +198,7 @@ runner run --remote .github/workflows/ci.yml</code></pre>
     <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-2">// honest caveats</div>
     <h2 class="text-2xl font-semibold mb-8">What Pro is not.</h2>
     <ul class="space-y-3 text-[var(--rh-muted)] max-w-3xl">
-      <li>— <span class="text-white">Not every language yet.</span> Pro v0 supports workflows in <span class="text-white">Node, Bun, Deno, Python, Go, Java, Ruby, Rust, Elixir, Erlang</span> (Sprites.dev's native languages) plus <span class="text-white">.NET</span> (auto-installed via Microsoft's <code class="font-mono">dotnet-install.sh</code> on first <code class="font-mono">actions/setup-dotnet</code>; cached on the sprite for subsequent runs). PHP isn't supported yet — those workflows still run great on the OSS runner locally.</li>
+      <li>— <span class="text-white">11 languages today, PHP not yet.</span> Pro v0 verified end-to-end against your Pro account on <span class="text-white">Node, Bun, Deno, Python, Go, Java, Ruby, Rust, Elixir, Erlang, and .NET</span>. PHP is the only language not yet supported (Sprites.dev doesn't ship PHP and there's no clean install path); those workflows still run great on the OSS runner locally.</li>
       <li>— <span class="text-white">No service containers (yet).</span> Workflows that declare <code class="font-mono">services:</code> (Postgres, Redis, etc.) need Docker on the sprite, which isn't available on the default tier. Use the OSS runner with the container backend locally for those.</li>
       <li>— <span class="text-white">First run isn't faster.</span> The cache populates on run 1; runs 2-N benefit. If your project sees its first CI run on Pro and never again, you'll see no win.</li>
       <li>— <span class="text-white">Not a parallel-matrix multiplier.</span> One sprite per team in v0. Matrix jobs run sequentially on your sprite. Team plans add parallelism in v1.</li>
