@@ -12,8 +12,12 @@ import { resolve } from 'node:path';
 import { performance } from 'node:perf_hooks';
 import type { Backend, JobSession, PrepareArgs, PlannedStep, StepResult } from '../types.js';
 import { runShim, hasShim } from '../shims/index.js';
+import { createImageResolver, dockerLogin } from './image-resolver.js';
 
 const DEFAULT_RUNNER_IMAGE = 'node:22-bookworm-slim';
+// With Pro token, default to a base that maps to a warmed variant in the
+// Pro catalog. The resolver rewrites `node:20` → `registry.rehearse.sh/node:20-warm`.
+const PRO_DEFAULT_RUNNER_IMAGE = 'node:20';
 
 export interface ContainerBackendOptions {
   /** Image used as the job container. Defaults to node:22-bookworm-slim. */
@@ -31,8 +35,8 @@ export class ContainerBackend implements Backend {
     const services = parseServices(args.job.raw);
     const allContainers: string[] = [];
 
-    const runnerImage = pickRunnerImage(args.job.runsOn, this.opts.runnerImage);
-    await pullIfMissing(runnerImage);
+    const askedFor = pickRunnerImage(args.job.runsOn, this.opts.runnerImage);
+    const runnerImage = await pullViaResolver(askedFor);
     for (const svc of services) await pullIfMissing(svc.image);
 
     runDocker(['network', 'create', network], { throwOnError: true });
@@ -186,6 +190,41 @@ async function pullIfMissing(image: string): Promise<void> {
   if (code !== 0) throw new Error(`docker pull failed for ${image}`);
 }
 
+/**
+ * Pull through the Pro image resolver. With REHEARSE_TOKEN set and a known
+ * mapping, pulls from registry.rehearse.sh. Falls back to the original public
+ * image on any failure (auth, network, missing) — Pro must never break CI.
+ */
+async function pullViaResolver(askedFor: string): Promise<string> {
+  const resolver = createImageResolver();
+  const resolved = resolver.resolve(askedFor);
+  if (resolved.source === 'public') {
+    await pullIfMissing(askedFor);
+    return askedFor;
+  }
+  try {
+    if (resolved.auth && !dockerLogin(resolved.auth)) {
+      console.warn(
+        `[rehearse-pro] docker login failed for ${resolved.auth.registry}; using ${askedFor}`,
+      );
+      await pullIfMissing(askedFor);
+      return askedFor;
+    }
+    await pullIfMissing(resolved.image);
+    console.log(
+      `[rehearse-pro] using warmed image ${resolved.image} (asked for ${askedFor})`,
+    );
+    return resolved.image;
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(
+      `[rehearse-pro] ${resolved.image} pull failed (${msg}); using ${askedFor}`,
+    );
+    await pullIfMissing(askedFor);
+    return askedFor;
+  }
+}
+
 async function waitHealthy(name: string, timeoutMs = 60_000): Promise<void> {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
@@ -203,9 +242,9 @@ async function waitHealthy(name: string, timeoutMs = 60_000): Promise<void> {
 
 function pickRunnerImage(runsOn: string, override?: string): string {
   if (override) return override;
-  // For now everything maps to a node-friendly Debian image. We can add
-  // more granular mappings (windows-latest → mcr.microsoft.com/.../servercore)
-  // later, but on a Linux/macOS Docker host that's not where the value is.
   void runsOn;
+  // With a Pro token, default to a base that has a warmed variant in the
+  // catalog so customers feel the speedup without configuring anything.
+  if (process.env.REHEARSE_TOKEN) return PRO_DEFAULT_RUNNER_IMAGE;
   return DEFAULT_RUNNER_IMAGE;
 }
