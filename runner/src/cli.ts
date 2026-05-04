@@ -60,6 +60,7 @@ program
         repoUrlOverride: opts.repoUrl,
         repoRefOverride: opts.repoRef,
         repoSubdirOverride: opts.repoSubdir,
+        env,
       });
       process.exit(code);
     }
@@ -104,6 +105,13 @@ async function runRemote(args: {
   repoUrlOverride?: string;
   repoRefOverride?: string;
   repoSubdirOverride?: string;
+  /**
+   * Env vars (typically loaded from --env-file). Shipped to the sprite where
+   * they become BOTH process env AND `${{ secrets.* }}` for workflow
+   * expansion. This is what makes `runner run --remote` usable for deploys
+   * (AWS_ACCESS_KEY_ID, AZURE_CREDENTIALS, GH_TOKEN, etc.).
+   */
+  env?: Record<string, string>;
 }): Promise<number> {
   if (!args.token) {
     process.stderr.write(pc.red('REHEARSE_TOKEN env var is required for --remote\n'));
@@ -153,6 +161,7 @@ async function runRemote(args: {
       repo_url: repoUrl ?? undefined,
       repo_ref: repoRef ?? undefined,
       repo_subdir: repoSubdir ?? undefined,
+      env: args.env && Object.keys(args.env).length > 0 ? args.env : undefined,
     }),
   });
   if (!res.ok || !res.body) {
