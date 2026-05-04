@@ -116,6 +116,28 @@
   </div>
 </section>
 
+<section class="py-20 hairline">
+  <div class="max-w-3xl mx-auto px-5">
+    <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-2">// deploy anywhere</div>
+    <h2 class="text-3xl font-semibold tracking-tight mb-3">Deploy from your CI, not just build.</h2>
+    <p class="text-[var(--rh-muted)] mb-5">Pass long-lived credentials with <code class="font-mono">--env-file</code>; they ship to your sprite and become <code class="font-mono">${{ secrets.* }}</code> for workflow expansion. Install whatever cloud CLI you need on-demand inside the workflow (pip wheel, npm install). Verified end-to-end against AWS STS today.</p>
+    <pre class="font-mono text-[12.5px] text-white/85 bg-black/40 p-4 rounded border border-white/10 overflow-x-auto"><span class="text-[var(--rh-muted)]"># 1. Put your cloud creds in a local .env (NEVER commit it)</span>
+$ cat .env
+AWS_ACCESS_KEY_ID=AKIA...
+AWS_SECRET_ACCESS_KEY=...
+AWS_DEFAULT_REGION=us-east-1
+
+<span class="text-[var(--rh-muted)]"># 2. Same workflow you'd run on GitHub-hosted</span>
+$ runner run --remote --env-file .env .github/workflows/deploy.yml</pre>
+    <p class="text-[var(--rh-muted)] text-sm mt-5">
+      <span class="text-white">Cloud CLIs:</span> sprite ships <code class="font-mono">curl</code>, <code class="font-mono">wget</code>, <code class="font-mono">rsync</code>, <code class="font-mono">ssh</code>. Install <code class="font-mono">aws</code>/<code class="font-mono">az</code>/<code class="font-mono">gcloud</code>/<code class="font-mono">kubectl</code>/<code class="font-mono">terraform</code> in the workflow itself — pip-wheel installs (~5s) cache to your persistent rootfs after the first run.
+    </p>
+    <p class="text-[var(--rh-muted)] text-sm mt-3">
+      <span class="text-white">Honest gap:</span> OIDC-based auth (<code class="font-mono">permissions: id-token: write</code> + <code class="font-mono">aws-actions/configure-aws-credentials</code> with <code class="font-mono">role-to-assume</code>) doesn't work — there's no GitHub OIDC issuer in front of your sprite. Use long-lived credentials for now. OIDC bridge is a v1 candidate.
+    </p>
+  </div>
+</section>
+
 <section class="py-24 hairline">
   <div class="max-w-6xl mx-auto px-5">
     <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-2">// measured · not marketing</div>
