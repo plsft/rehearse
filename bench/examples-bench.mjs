@@ -42,11 +42,25 @@ if (!existsSync(runnerCli)) {
   process.exit(2);
 }
 
+// Apps we skip on Pro and document why. The `--only` override still runs
+// these so you can confirm the limitation hasn't changed.
+const PRO_UNSUPPORTED = {
+  'php-app': 'PHP runtime not on Sprites; composer not found; shivammathur/setup-php@v2 needs apt-get',
+  'python-api': 'declares `services: postgres` which needs Docker on the sprite (not available in Pro v0)',
+};
+
 const apps = readdirSync(examplesDir, { withFileTypes: true })
   .filter((d) => d.isDirectory() && !d.name.startsWith('.') && d.name !== 'node_modules')
   .map((d) => d.name)
   .filter((name) => existsSync(resolve(examplesDir, name, '.github', 'workflows', 'ci.yml')))
-  .filter((name) => (only ? name === only : true));
+  .filter((name) => (only ? name === only : true))
+  .filter((name) => only || !PRO_UNSUPPORTED[name]);
+
+if (!only) {
+  for (const [app, reason] of Object.entries(PRO_UNSUPPORTED)) {
+    console.error(`[skip] ${app}: ${reason}`);
+  }
+}
 
 if (apps.length === 0) {
   console.error('no apps with .github/workflows/ci.yml found');

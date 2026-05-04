@@ -33,7 +33,14 @@ import { performance } from 'node:perf_hooks';
 import { parse as parseYaml } from 'yaml';
 import type { JobSession, PlannedStep, StepResult } from './types.js';
 
-const SUPPORTED_RUNTIMES = new Set(['node12', 'node16', 'node18', 'node20', 'node22']);
+// We don't pin the action to a specific node binary — the host's node runs
+// the action's bundled JS. Any node version >=12 supported by upstream
+// actions/setup-* implementations is fine; we just need to not reject it
+// upfront. node24 was added because shivammathur/setup-php@v2 declares it,
+// node25 to keep up with upstream churn.
+const SUPPORTED_RUNTIMES = new Set([
+  'node12', 'node16', 'node18', 'node20', 'node22', 'node24', 'node25',
+]);
 
 interface ActionYaml {
   name?: string;
