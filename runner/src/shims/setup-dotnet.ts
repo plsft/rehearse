@@ -76,6 +76,13 @@ export async function setupDotnetShim(step: PlannedStep, session: JobSession): P
   session.env.DOTNET_CLI_TELEMETRY_OPTOUT = session.env.DOTNET_CLI_TELEMETRY_OPTOUT ?? '1';
   session.env.DOTNET_NOLOGO = session.env.DOTNET_NOLOGO ?? 'true';
   session.env.DOTNET_SKIP_FIRST_TIME_EXPERIENCE = session.env.DOTNET_SKIP_FIRST_TIME_EXPERIENCE ?? '1';
+  // Many minimal Linux base images (Sprites included) ship without libicu.
+  // .NET hard-requires ICU for globalization unless we set this flag, in
+  // which case `dotnet` runs in invariant culture mode — fine for >99% of
+  // CI builds (compile + test). Customer can override by setting the var
+  // explicitly in their workflow `env:` if they actually need globalization.
+  session.env.DOTNET_SYSTEM_GLOBALIZATION_INVARIANT =
+    session.env.DOTNET_SYSTEM_GLOBALIZATION_INVARIANT ?? '1';
 
   return {
     label: step.label,
