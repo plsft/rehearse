@@ -24,17 +24,16 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Install ttyd (VHS dependency)
+      - name: Install ffmpeg + ttyd
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
           curl -fsSL -o /tmp/ttyd https://github.com/tsl0922/ttyd/releases/latest/download/ttyd.x86_64
           sudo install -m 0755 /tmp/ttyd /usr/local/bin/ttyd
 
-      - name: Install VHS
-        run: |
-          curl -fsSL https://github.com/charmbracelet/vhs/releases/latest/download/vhs_Linux_x86_64.tar.gz | sudo tar -xz -C /usr/local/bin vhs
-          vhs --version
+      - uses: charmbracelet/vhs-action@v2
+        # Sets up VHS using the official action; works around the
+        # downstream tarball naming changes in newer releases.
 
       - name: Install rehearse runner
         run: npm install -g @rehearse/runner@latest
