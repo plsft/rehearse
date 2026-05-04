@@ -71,7 +71,7 @@
             <td class="py-3 px-5"><a href="#runner" class="link">@rehearse/runner</a></td>
             <td class="py-3 px-5"><code class="font-mono">runner</code></td>
             <td class="py-3 px-5 text-[var(--rh-muted)]">Local-first GitHub Actions runner</td>
-            <td class="py-3 px-5 text-right ok font-bold">96</td>
+            <td class="py-3 px-5 text-right ok font-bold">117</td>
           </tr>
           <tr>
             <td class="py-3 px-5"><a href="#ci" class="link">@rehearse/ci</a></td>
@@ -133,7 +133,7 @@
       <li><span class="ok">✓</span> <code class="font-mono">actions/upload-artifact</code> / <code class="font-mono">download-artifact</code> backed by <code class="font-mono">.runner/artifacts/</code></li>
       <li><span class="ok">✓</span> Composite actions — local <code class="font-mono">./.github/actions/*</code> and remote <code class="font-mono">org/repo[/sub]@ref</code>, auto-cloned</li>
       <li><span class="ok">✓</span> Local reusable workflows (<code class="font-mono">uses: ./.github/workflows/foo.yml</code> at job level) with <code class="font-mono">with:</code> + <code class="font-mono">secrets: inherit</code></li>
-      <li><span class="ok">✓</span> JS actions (<code class="font-mono">runs.using: node20|18|16</code>) — auto-cloned at the requested ref, full <code class="font-mono">INPUT_*</code> / <code class="font-mono">GITHUB_OUTPUT</code> contract</li>
+      <li><span class="ok">✓</span> JS actions (<code class="font-mono">runs.using: node20|18|16</code>) on the host backend — auto-cloned at the requested ref, full <code class="font-mono">INPUT_*</code> / <code class="font-mono">GITHUB_OUTPUT</code> contract. Container-backend execution of JS actions is on the roadmap.</li>
       <li><span class="ok">✓</span> 16 in-process shims: <code class="font-mono">checkout</code>, <code class="font-mono">setup-{node,python,go,java,dotnet,bun}</code>, <code class="font-mono">setup-pnpm</code>, <code class="font-mono">setup-deno</code>, <code class="font-mono">rust-toolchain</code>, <code class="font-mono">setup-ruby</code>, <code class="font-mono">cache</code>, <code class="font-mono">upload/download-artifact</code>, <code class="font-mono">codecov</code>, <code class="font-mono">github-script</code></li>
       <li><span class="ok">✓</span> <code class="font-mono">if:</code> on jobs and steps with <code class="font-mono">${{ matrix.* }}</code>, <code class="font-mono">env</code>, <code class="font-mono">secrets</code>, <code class="font-mono">needs</code>, <code class="font-mono">steps</code>, <code class="font-mono">runner</code>, <code class="font-mono">github</code>, <code class="font-mono">inputs</code></li>
       <li><span class="ok">✓</span> <code class="font-mono">needs:</code> with topological scheduling and bounded parallelism</li>
@@ -160,9 +160,10 @@
 
     <h3 class="mt-8 text-lg font-semibold text-white">Numbers</h3>
     <ul class="mt-3 space-y-1 text-sm text-[var(--rh-muted)]">
-      <li><strong class="text-white">96 tests</strong> across 10 suites, all green</li>
+      <li><strong class="text-white">117 tests</strong> across 12 suites, all green</li>
       <li>Compat: <strong class="text-white">100%</strong> on our own CI · <strong class="text-white">96.15%</strong> on <code class="font-mono">vitejs/vite</code> · <strong class="text-white">97.18%</strong> on <code class="font-mono">honojs/hono</code></li>
-      <li>vs <code class="font-mono">act</code> (Linux GH-runner v0.3.6 warm): <strong class="text-white">4.78×</strong> on our-ci, <strong class="text-white">9.09×</strong> on node-matrix, <strong class="text-white">30.50×</strong> on service-postgres</li>
+      <li>vs <code class="font-mono">act</code> (Linux GH-runner v0.3.2 warm — see <a href="https://github.com/plsft/rehearse/blob/main/bench/RESULTS.md" class="link">bench/RESULTS.md</a>): <strong class="text-white">4.78×</strong> on our-ci, <strong class="text-white">9.09×</strong> on node-matrix, <strong class="text-white">30.50×</strong> on service-postgres
+      </li>
       <li>Runtime deps: <code class="font-mono">commander</code>, <code class="font-mono">picocolors</code>, <code class="font-mono">yaml</code> (plus workspace siblings)</li>
     </ul>
 

@@ -56,7 +56,7 @@
         </div>
         <p class="text-[12px] font-mono text-[var(--rh-muted)] mb-6">Cancel anytime · 14-day refund · no proration tricks</p>
         <ul class="space-y-2 text-sm mb-8">
-          <li><span class="ok">●</span> Dedicated 4 vCPU / 8 GB Firecracker microVM</li>
+          <li><span class="ok">●</span> Dedicated microVM with hardware-level isolation</li>
           <li><span class="ok">●</span> 100 GB persistent storage</li>
           <li><span class="ok">●</span> Caches survive between runs (~2× faster <code class="font-mono">npm install</code>, measured)</li>
           <li><span class="ok">●</span> Live streaming logs</li>
@@ -98,7 +98,7 @@
     <div class="space-y-6 text-sm">
       <div>
         <p class="font-semibold mb-1">What about my source code and secrets?</p>
-        <p class="text-[var(--rh-muted)]">Your code is shipped to the sprite at run time and lives in your dedicated 100 GB persistent volume. Each customer gets a hardware-isolated Firecracker microVM — no shared kernel, no cross-tenant access. Secrets are passed in via env at run time and aren't logged.</p>
+        <p class="text-[var(--rh-muted)]">Your code is shipped to the sprite at run time and lives in your dedicated 100 GB persistent volume. Each customer gets a hardware-isolated microVM — no shared kernel, no cross-tenant access. Secrets are passed in via env at run time and aren't logged.</p>
       </div>
       <div>
         <p class="font-semibold mb-1">Can I cancel anytime?</p>
@@ -106,7 +106,7 @@
       </div>
       <div>
         <p class="font-semibold mb-1">Are there usage limits?</p>
-        <p class="text-[var(--rh-muted)]">Not at v0 launch. Your sprite is sized at 4 vCPU / 8 GB / 100 GB disk; that's the natural ceiling. If you're running CI heavily and need more, talk to me before I have to email you about it. We'll figure it out before adding any cap.</p>
+        <p class="text-[var(--rh-muted)]">Not at v0 launch. Your sprite is provisioned with 100 GB persistent storage at the Sprites.dev default compute tier; that's the natural ceiling. If you're running CI heavily and need more, talk to me before I have to email you about it. We'll figure it out before adding any cap.</p>
       </div>
       <div>
         <p class="font-semibold mb-1">How long does provisioning take?</p>

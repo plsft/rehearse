@@ -1,0 +1,40 @@
+# Rehearse Pro reproducer — measures the persistent-cache wedge.
+#
+# Same workflow runs cold (fresh sprite, no cache) → warm (deps already on
+# the sprite's persistent volume). The npm-install step is the dominant
+# cost; ~2x speedup on warm runs is the headline.
+#
+# Reproduce against your Pro account:
+#   1. npm install -g @rehearse/runner
+#   2. export REHEARSE_TOKEN=rh_pro_live_...
+#   3. runner run --remote bench/pro-bench.yml         # cold (run 1)
+#   4. runner run --remote bench/pro-bench.yml         # warm (run 2)
+#
+# Numbers from the most recent measurement (Pro page table at rehearse.sh/pro)
+# were cold install 10.5s / wall 12.5s, warm install 5.1s / wall 6.7s on a
+# default-tier Sprite. Exact numbers vary per region/upstream-registry latency
+# but the cold→warm ratio is the load-bearing claim.
+
+name: pro-bench-npm-install
+on: [push]
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - name: install 8 popular packages and time it
+        run: |
+          set -eo pipefail
+          mkdir -p /tmp/pro-bench && cd /tmp/pro-bench
+          # Force a fresh node_modules + lockfile each run so we measure the
+          # install-from-cache path. The npm cache itself (~/.npm, set via
+          # NPM_CONFIG_CACHE on the sprite) is what persists.
+          rm -rf node_modules package-lock.json
+          echo '{}' > package.json
+          start=$(date +%s%3N)
+          npm install --silent --no-audit --no-fund \
+            typescript vite vitest react react-dom express axios zod hono
+          end=$(date +%s%3N)
+          install_ms=$((end - start))
+          echo "::notice::npm install completed in ${install_ms}ms"
+          echo "install_ms=${install_ms}" >> "$GITHUB_OUTPUT"

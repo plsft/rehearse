@@ -5,6 +5,6 @@
   "description": "Rehearse example: .NET (C#) + xUnit, matrix across net8.0 and net9.0",
   "type": "module",
   "devDependencies": {
-    "@rehearse/ci": "^0.3.2"
+    "@rehearse/ci": "^0.3.6"
   }
 }

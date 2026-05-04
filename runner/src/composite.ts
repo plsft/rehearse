@@ -6,11 +6,11 @@
  * context, and rewrites the parent step into the composite's inner steps
  * (each with `${{ inputs.x }}` resolved).
  *
- * Out of scope (yet):
- *   - Remote composites (`org/repo/path@ref`) — needs git fetch
- *   - JavaScript actions (`runs.using: node20|node16`) — would need to load
- *     and execute the action's main.js via @actions/core polyfills
- *   - Docker actions (`runs.using: docker`) — feasible via container backend
+ * `uses: org/repo[/sub]@ref` for composite action.yml files is also handled
+ * here via `resolveRemote()` (auto-clone to `.runner/actions/<slug>/`).
+ * JavaScript actions (`runs.using: node*`) live in `js-action.ts`.
+ *
+ * Out of scope (still): Docker actions (`runs.using: docker`).
  */
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';

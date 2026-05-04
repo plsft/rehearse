@@ -7,6 +7,5 @@
 
 | ID | Time | T | Title | Read |
 |----|------|---|-------|------|
-| #25399 | 12:19 PM | 🔵 | Comprehensive marketing claims verification confirms 100% accuracy after remediation | ~549 |
-| #25388 | 12:08 PM | 🔵 | Package metadata verified against marketing claims | ~392 |
+| #25449 | 12:39 PM | 🔵 | Tauri dev build fails with updater plugin configuration deserialization error | ~353 |
 </claude-mem-context>

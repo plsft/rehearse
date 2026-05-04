@@ -43,7 +43,7 @@
       <a href="/docs" class="nav-link">Docs</a>
       <a href="/about" class="nav-link">About</a>
       <a href="/pro" class="nav-link text-white">Pro
-        <span class="ml-1 text-[10px] font-mono text-[var(--rh-accent)] border border-[var(--rh-accent)]/40 rounded px-1 py-0.5 align-middle">$99/mo</span>
+        <span class="ml-1 text-[10px] font-mono text-[var(--rh-accent)] border border-[var(--rh-accent)]/40 rounded px-1 py-0.5 align-middle">$49/mo</span>
       </a>
       <a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a>
     </nav>
@@ -122,7 +122,7 @@
       </div>
     </div>
     <div class="mt-3 text-[12px] font-mono text-[var(--rh-muted)] text-right">
-      simulated output · real run on a Windows 11 laptop takes ~13s warm (v0.3.6) · GitHub-hosted ~50–110s
+      simulated output · real run on a Windows 11 laptop takes ~13s warm (v0.3.2 bench) · GitHub-hosted ~50–110s
     </div>
   </div>
 </section>
@@ -134,10 +134,12 @@
       <div class="eyebrow">// The benchmark</div>
       <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">Real workflows. Real numbers.</h2>
       <p class="mt-4 text-lg text-[var(--rh-muted)]">
-        Five workflows on a fresh GitHub-hosted <code class="font-mono">ubuntu-latest</code>
+        Four workflows on a fresh GitHub-hosted <code class="font-mono">ubuntu-latest</code>
         runner, head-to-head against <a href="https://github.com/nektos/act" class="link">nektos/act</a>.
         Same YAML, same job, same runner image. Both tools timed warm.
         Reproducible via <code class="font-mono">gh workflow run bench.yml</code>.
+        (A fifth target, <code class="font-mono">hono-node-matrix</code>, is in
+        regression on GH-hosted runners — see caveats below.)
       </p>
     </div>
 
@@ -214,8 +216,10 @@
     <p class="mt-6 text-sm text-[var(--rh-muted)] max-w-3xl">
       <span class="text-white">Honest caveats:</span> warm-cache numbers from
       a fresh GitHub-hosted <code class="font-mono">ubuntu-latest</code> runner
-      at <code class="font-mono">v0.3.6</code> — the second run, with deps already
-      on disk. Cold-vs-cold is narrower — a fresh <code class="font-mono">pnpm install</code>
+      at <code class="font-mono">v0.3.2</code> (the last bench-recorded version
+      in <a href="https://github.com/plsft/rehearse/blob/main/bench/RESULTS.md" class="link">bench/RESULTS.md</a>;
+      runner is now at v0.3.6 with no perf regressions on host backend) — the
+      second run, with deps already on disk. Cold-vs-cold is narrower — a fresh <code class="font-mono">pnpm install</code>
       dominates everything. We run the same bench on macOS and Windows
       runners (host-backend targets only — no Docker on those GH runners) and
       <code class="font-mono">hono-node-matrix</code> currently regresses on
@@ -245,7 +249,7 @@
       <div class="card p-6 border-[var(--rh-accent)]/40">
         <div class="text-[12px] font-mono text-[var(--rh-accent)] mb-2">// cloud</div>
         <pre class="font-mono text-[13px] text-white/90"><span class="prompt"></span>runner run --remote .github/workflows/ci.yml</pre>
-        <p class="mt-4 text-sm text-[var(--rh-muted)]">$49/mo. Dedicated Firecracker microVM with persistent caches. Live-streaming logs. ~2× faster <code class="font-mono">npm install</code> on warm runs (measured). <a href="/pro" class="link">Read more →</a></p>
+        <p class="mt-4 text-sm text-[var(--rh-muted)]">$49/mo. Dedicated microVM with 100 GB persistent storage. Live-streaming logs. ~2× faster <code class="font-mono">npm install</code> on warm runs (measured). <a href="/pro" class="link">Read more →</a></p>
       </div>
     </div>
   </div>
@@ -259,7 +263,7 @@
       <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">A real runner. Not a demo.</h2>
       <p class="mt-4 text-lg text-[var(--rh-muted)]">
         Parallel jobs. Matrix. Services. Caching. Watch mode. Pre-push hook.
-        All wired in. 96 tests across 10 suites in the runner package alone.
+        All wired in. 117 tests across 12 suites in the runner package alone.
       </p>
     </div>
 
@@ -469,7 +473,7 @@
           <li><span class="ok">✓</span> <code class="font-mono">services:</code> with health checks</li>
           <li><span class="ok">✓</span> Local <strong>and</strong> remote composite actions (<code class="font-mono">./.github/actions/*</code> + <code class="font-mono">org/repo@ref</code>)</li>
           <li><span class="ok">✓</span> Local reusable workflows (<code class="font-mono">uses: ./.github/workflows/foo.yml</code> at job level)</li>
-          <li><span class="ok">✓</span> JavaScript actions (<code class="font-mono">runs.using: node20</code>) — auto-cloned at ref</li>
+          <li><span class="ok">✓</span> JavaScript actions (<code class="font-mono">runs.using: node20</code>) on host backend — auto-cloned at ref</li>
           <li><span class="ok">✓</span> <code class="font-mono">${{ matrix… }}</code>, <code class="font-mono">env</code>, <code class="font-mono">secrets</code>, <code class="font-mono">needs</code>, <code class="font-mono">steps</code>, <code class="font-mono">runner</code></li>
         </ul>
       </div>

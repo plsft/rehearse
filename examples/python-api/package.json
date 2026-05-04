@@ -5,6 +5,6 @@
   "description": "Rehearse example: FastAPI + pytest + Postgres service",
   "type": "module",
   "devDependencies": {
-    "@rehearse/ci": "^0.3.2"
+    "@rehearse/ci": "^0.3.6"
   }
 }

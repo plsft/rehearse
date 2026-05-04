@@ -5,12 +5,12 @@
  * `container:` block, runs-on label matches the host OS family or is generic.
  */
 import { spawn, spawnSync } from 'node:child_process';
-import { existsSync, mkdtempSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { relative, resolve } from 'node:path';
 import { performance } from 'node:perf_hooks';
 import type { Backend, JobSession, PrepareArgs, PlannedStep, StepResult } from '../types.js';
-import { isJsActionUses, runJsAction } from '../js-action.js';
+import { isJsActionUses, parseGithubOutput, runJsAction } from '../js-action.js';
 import { runShim, hasShim } from '../shims/index.js';
 import { createWorktree, isGitRepo } from '../worktree.js';
 
@@ -101,6 +101,22 @@ export class HostBackend implements Backend {
     }
 
     const shell = pickShell(step.shell);
+
+    // Per-step temp files for the GitHub Actions step-output protocol.
+    // Steps write to these via `echo "k=v" >> $GITHUB_OUTPUT` etc.; we
+    // parse them back after the step exits. Without this, any workflow
+    // that uses `outputs.xxx`, `id: foo` then `${{ steps.foo.outputs.bar }}`,
+    // or `echo ... >> $GITHUB_ENV` fails with "ambiguous redirect".
+    const stepDir = mkdtempSync(resolve(session.tempDir, 'step-'));
+    const outputFile = resolve(stepDir, 'output');
+    const envFile = resolve(stepDir, 'env');
+    const pathFile = resolve(stepDir, 'path');
+    const summaryFile = resolve(stepDir, 'summary');
+    writeFileSync(outputFile, '');
+    writeFileSync(envFile, '');
+    writeFileSync(pathFile, '');
+    writeFileSync(summaryFile, '');
+
     const env: NodeJS.ProcessEnv = {
       ...process.env,
       ...session.env,
@@ -108,6 +124,10 @@ export class HostBackend implements Backend {
       CI: 'true',
       GITHUB_ACTIONS: 'true',
       GITHUB_WORKSPACE: session.workdir,
+      GITHUB_OUTPUT: outputFile,
+      GITHUB_ENV: envFile,
+      GITHUB_PATH: pathFile,
+      GITHUB_STEP_SUMMARY: summaryFile,
       RUNNER_OS: process.platform === 'win32' ? 'Windows' : process.platform === 'darwin' ? 'macOS' : 'Linux',
       RUNNER_TEMP: session.tempDir,
     };
@@ -125,12 +145,24 @@ export class HostBackend implements Backend {
         });
       });
       proc.on('exit', (code) => {
+        // Surface step outputs and propagate env/PATH mutations so subsequent
+        // steps see them — same contract as the JS-action runtime.
+        const outputs = readFileSafe(outputFile) ? parseGithubOutput(readFileSafe(outputFile)) : {};
+        const envAdditions = readFileSafe(envFile) ? parseGithubOutput(readFileSafe(envFile)) : {};
+        for (const [k, v] of Object.entries(envAdditions)) session.env[k] = v;
+        const pathAdditions = readFileSafe(pathFile)
+          .split(/\r?\n/)
+          .filter(Boolean);
+        if (pathAdditions.length > 0) {
+          const sep = process.platform === 'win32' ? ';' : ':';
+          session.env.PATH = `${pathAdditions.join(sep)}${sep}${session.env.PATH ?? process.env.PATH ?? ''}`;
+        }
         done({
           label: step.label,
           status: code === 0 ? 'success' : 'failure',
           exitCode: code ?? -1,
           durationMs: performance.now() - t0,
-          outputs: {},
+          outputs,
         });
       });
     });
@@ -140,6 +172,11 @@ export class HostBackend implements Backend {
     // Leave tempDir for inspection on failure; OS cleans up tmp eventually.
     if (session.worktree) session.worktree.cleanup();
   }
+}
+
+/** readFileSync that returns '' if the file disappeared (rare cleanup races). */
+function readFileSafe(path: string): string {
+  try { return readFileSync(path, 'utf-8'); } catch { return ''; }
 }
 
 function pickShell(scriptShell: string | undefined): { cmd: string; args: (s: string) => string[] } {

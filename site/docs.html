@@ -159,7 +159,7 @@
         <div class="term-body">
 <pre class="whitespace-pre overflow-x-auto"><span class="kw">-j, --job &lt;name&gt;</span>          run only this job (matrix variants of it still all run)
 <span class="kw">-b, --backend &lt;type&gt;</span>      host | container | auto (default: auto)
-<span class="kw">-p, --max-parallel &lt;n&gt;</span>   max concurrent jobs (default: min(cpus, 4))
+<span class="kw">-p, --max-parallel &lt;n&gt;</span>   max concurrent jobs (omit to let the scheduler pick — typically min(cpus, 4))
 <span class="kw">-c, --cwd &lt;dir&gt;</span>          working directory (default: inferred from workflow path)
 <span class="kw">    --fail-fast</span>           cancel sibling jobs on first failure
 <span class="kw">    --quiet</span>               minimal output (machine-readable result only)

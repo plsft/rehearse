@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#08090c" />
 <title>Rehearse Pro — hosted CI runner with persistent caches</title>
-<meta name="description" content="Rehearse Pro: hosted CI runner on private Firecracker microVMs. Caches survive between runs. Same workflow YAML. $49/mo." />
+<meta name="description" content="Rehearse Pro: hosted CI runner on private microVMs. Caches survive between runs. Same workflow YAML. $49/mo." />
 <meta property="og:title" content="Rehearse Pro — hosted CI runner with persistent caches" />
-<meta property="og:description" content="Private Firecracker microVM. Caches survive between runs. Same workflow YAML. $49/mo." />
+<meta property="og:description" content="Private dedicated microVM. Caches survive between runs. Same workflow YAML. $49/mo." />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -57,7 +57,7 @@
         <a href="/docs/pro" class="btn btn-ghost">How it works →</a>
       </div>
       <div class="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2 text-[12.5px] font-mono text-[var(--rh-muted)]">
-        <span><span class="ok">●</span> Firecracker microVM, 4 vCPU / 8 GB</span>
+        <span><span class="ok">●</span> Dedicated microVM, 100 GB storage</span>
         <span><span class="ok">●</span> ~2× faster npm install (measured)</span>
         <span><span class="ok">●</span> Same workflow YAML, opt-in flag</span>
       </div>
@@ -78,7 +78,7 @@
       <div class="card p-7">
         <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// isolated</div>
         <h3 class="font-semibold text-lg mb-2">Hardware-isolated microVM.</h3>
-        <p class="text-[var(--rh-muted)] text-sm">One Firecracker microVM per team — not a shared host, not a container on someone else's kernel. 4 vCPU and 8 GB RAM by default. 100 GB persistent storage. The same primitive AWS Lambda runs on, dedicated to you.</p>
+        <p class="text-[var(--rh-muted)] text-sm">One dedicated microVM per team — not a shared host, not a container on someone else's kernel. Hardware-level isolation, persistent ext4 filesystem, 100 GB of storage. Compute provisioned at Sprites.dev's default tier.</p>
       </div>
       <div class="card p-7">
         <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// same cli, local + cloud</div>
@@ -141,7 +141,7 @@
       <span class="text-white">Pro warm vs local Docker cached: 2.55× faster.</span> Cold-to-warm Pro speedup: 2.07× on install, 1.86× on wall. The <em>real</em> savings show up when you run CI dozens of times a day, which is the whole point of CI.
     </p>
     <p class="text-[12px] font-mono text-[var(--rh-muted)] mt-3 max-w-2xl">
-      Reproduce: <code class="font-mono text-white/80">runner run --remote bench.yml</code> against any account.
+      Reproduce: <code class="font-mono text-white/80">runner run --remote <a href="https://github.com/plsft/rehearse/blob/main/bench/pro-bench.yml" class="link">bench/pro-bench.yml</a></code> against your Pro account, twice. The first run is cold; the second is warm. Exact ms vary by region and upstream-registry latency — the cold/warm ratio is what's load-bearing.
     </p>
   </div>
 </section>
