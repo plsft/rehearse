@@ -1,0 +1,71 @@
+name: render-demos
+# Renders VHS .tape files into .mp4 / .gif on a Linux runner and uploads the
+# results as artifacts. Run manually:
+#   gh workflow run render-demos.yml -f tape=demos/pro-elevator.tape
+#
+# Requires repo secret REHEARSE_TOKEN_DEMO (a real Pro API key) so the
+# `runner run --remote` lines actually hit a sprite.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tape:
+        description: 'Tape file to render (e.g. demos/pro-elevator.tape)'
+        required: true
+        default: 'demos/pro-elevator.tape'
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install ttyd (VHS dependency)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          curl -fsSL -o /tmp/ttyd https://github.com/tsl0922/ttyd/releases/latest/download/ttyd.x86_64
+          sudo install -m 0755 /tmp/ttyd /usr/local/bin/ttyd
+
+      - name: Install VHS
+        run: |
+          curl -fsSL https://github.com/charmbracelet/vhs/releases/latest/download/vhs_Linux_x86_64.tar.gz | sudo tar -xz -C /usr/local/bin vhs
+          vhs --version
+
+      - name: Install rehearse runner
+        run: npm install -g @rehearse/runner@latest
+
+      - name: Install JetBrains Mono font
+        run: |
+          mkdir -p ~/.fonts
+          curl -fsSL -o /tmp/jbmono.zip https://download.jetbrains.com/fonts/JetBrainsMono-2.304.zip
+          unzip -j -o /tmp/jbmono.zip 'fonts/ttf/*.ttf' -d ~/.fonts/
+          fc-cache -f
+
+      - name: Render tape
+        env:
+          REHEARSE_TOKEN_DEMO: ${{ secrets.REHEARSE_TOKEN_DEMO }}
+        run: |
+          if [ -z "${REHEARSE_TOKEN_DEMO}" ]; then
+            echo "::warning::REHEARSE_TOKEN_DEMO secret not set; --remote lines will fail"
+          fi
+          vhs "${{ inputs.tape }}"
+
+      - name: Upload mp4
+        uses: actions/upload-artifact@v5
+        with:
+          name: demo-mp4
+          path: demos/*.mp4
+          retention-days: 30
+
+      - name: Upload gif (if produced)
+        uses: actions/upload-artifact@v5
+        if: hashFiles('demos/*.gif') != ''
+        with:
+          name: demo-gif
+          path: demos/*.gif
+          retention-days: 30
