@@ -99,20 +99,157 @@
     <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-2">// supported languages</div>
     <h2 class="text-3xl font-semibold tracking-tight mb-3">11 languages, verified end-to-end.</h2>
     <p class="text-[var(--rh-muted)] mb-8 max-w-2xl">Every language listed below was bench-tested against a real Pro account. The toolchain is preinstalled on the sprite (or auto-installed and cached on first use, in the case of .NET). Same workflow YAML you'd run on GitHub-hosted runners.</p>
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-      <div class="card p-4 text-sm"><span class="ok">✓</span> <span class="text-white font-mono">Node.js</span> <span class="text-[var(--rh-muted)] text-xs">setup-node</span></div>
-      <div class="card p-4 text-sm"><span class="ok">✓</span> <span class="text-white font-mono">Bun</span> <span class="text-[var(--rh-muted)] text-xs">oven-sh/setup-bun</span></div>
-      <div class="card p-4 text-sm"><span class="ok">✓</span> <span class="text-white font-mono">Deno</span> <span class="text-[var(--rh-muted)] text-xs">denoland/setup-deno</span></div>
-      <div class="card p-4 text-sm"><span class="ok">✓</span> <span class="text-white font-mono">Python</span> <span class="text-[var(--rh-muted)] text-xs">setup-python</span></div>
-      <div class="card p-4 text-sm"><span class="ok">✓</span> <span class="text-white font-mono">Go</span> <span class="text-[var(--rh-muted)] text-xs">setup-go</span></div>
-      <div class="card p-4 text-sm"><span class="ok">✓</span> <span class="text-white font-mono">Java</span> <span class="text-[var(--rh-muted)] text-xs">setup-java</span></div>
-      <div class="card p-4 text-sm"><span class="ok">✓</span> <span class="text-white font-mono">Ruby</span> <span class="text-[var(--rh-muted)] text-xs">ruby/setup-ruby</span></div>
-      <div class="card p-4 text-sm"><span class="ok">✓</span> <span class="text-white font-mono">Rust</span> <span class="text-[var(--rh-muted)] text-xs">dtolnay/rust-toolchain</span></div>
-      <div class="card p-4 text-sm"><span class="ok">✓</span> <span class="text-white font-mono">Elixir</span> <span class="text-[var(--rh-muted)] text-xs">erlef/setup-beam</span></div>
-      <div class="card p-4 text-sm"><span class="ok">✓</span> <span class="text-white font-mono">Erlang</span> <span class="text-[var(--rh-muted)] text-xs">erlef/setup-beam</span></div>
-      <div class="card p-4 text-sm"><span class="ok">✓</span> <span class="text-white font-mono">.NET</span> <span class="text-[var(--rh-muted)] text-xs">setup-dotnet (auto-install)</span></div>
-      <div class="card p-4 text-sm border-[var(--rh-amber)]/40"><span class="warn">○</span> <span class="text-white font-mono">PHP</span> <span class="text-[var(--rh-muted)] text-xs">not yet</span></div>
+    <div class="space-y-6">
+      <div>
+        <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-2">// JavaScript runtimes</div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          <div class="card p-4 text-sm" style="border-left: 3px solid #339933"><span class="ok">✓</span> <span class="text-white font-mono">Node.js</span> <span class="text-[var(--rh-muted)] text-xs block mt-1">setup-node · v18/20/22/24</span></div>
+          <div class="card p-4 text-sm" style="border-left: 3px solid #f9a825"><span class="ok">✓</span> <span class="text-white font-mono">Bun</span> <span class="text-[var(--rh-muted)] text-xs block mt-1">oven-sh/setup-bun · v1.3</span></div>
+          <div class="card p-4 text-sm" style="border-left: 3px solid #70ffaf"><span class="ok">✓</span> <span class="text-white font-mono">Deno</span> <span class="text-[var(--rh-muted)] text-xs block mt-1">denoland/setup-deno</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-2">// JVM &amp; .NET</div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          <div class="card p-4 text-sm" style="border-left: 3px solid #f89820"><span class="ok">✓</span> <span class="text-white font-mono">Java</span> <span class="text-[var(--rh-muted)] text-xs block mt-1">setup-java · OpenJDK 25</span></div>
+          <div class="card p-4 text-sm" style="border-left: 3px solid #512bd4"><span class="ok">✓</span> <span class="text-white font-mono">.NET</span> <span class="text-[var(--rh-muted)] text-xs block mt-1">setup-dotnet · auto-installed via dotnet-install.sh, cached on sprite</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-2">// Systems &amp; scripting</div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          <div class="card p-4 text-sm" style="border-left: 3px solid #00add8"><span class="ok">✓</span> <span class="text-white font-mono">Go</span> <span class="text-[var(--rh-muted)] text-xs block mt-1">setup-go</span></div>
+          <div class="card p-4 text-sm" style="border-left: 3px solid #ce422b"><span class="ok">✓</span> <span class="text-white font-mono">Rust</span> <span class="text-[var(--rh-muted)] text-xs block mt-1">dtolnay/rust-toolchain · cargo 1.90</span></div>
+          <div class="card p-4 text-sm" style="border-left: 3px solid #3776ab"><span class="ok">✓</span> <span class="text-white font-mono">Python</span> <span class="text-[var(--rh-muted)] text-xs block mt-1">setup-python · 3.13 + pip</span></div>
+          <div class="card p-4 text-sm" style="border-left: 3px solid #cc342d"><span class="ok">✓</span> <span class="text-white font-mono">Ruby</span> <span class="text-[var(--rh-muted)] text-xs block mt-1">ruby/setup-ruby</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-2">// BEAM</div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          <div class="card p-4 text-sm" style="border-left: 3px solid #4b275f"><span class="ok">✓</span> <span class="text-white font-mono">Elixir</span> <span class="text-[var(--rh-muted)] text-xs block mt-1">erlef/setup-beam</span></div>
+          <div class="card p-4 text-sm" style="border-left: 3px solid #a90533"><span class="ok">✓</span> <span class="text-white font-mono">Erlang</span> <span class="text-[var(--rh-muted)] text-xs block mt-1">erlef/setup-beam</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-amber)] mb-2">// not yet on Pro (works fine on OSS runner locally)</div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          <div class="card p-4 text-sm border-[var(--rh-amber)]/40" style="border-left: 3px solid #777bb4"><span class="warn">○</span> <span class="text-white font-mono">PHP</span> <span class="text-[var(--rh-muted)] text-xs block mt-1">no managed install path on Sprites; tracked on roadmap</span></div>
+        </div>
+      </div>
     </div>
+  </div>
+</section>
+
+<!-- ================ GH ACTIONS PARITY ================ -->
+<section class="py-20 hairline">
+  <div class="max-w-6xl mx-auto px-5">
+    <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-2">// github actions parity</div>
+    <h2 class="text-3xl font-semibold tracking-tight mb-3">18 of 22 first-class features at full parity.</h2>
+    <p class="text-[var(--rh-muted)] mb-8 max-w-2xl">Same workflow YAML, same context expansion, same step contract. The four outstanding features are roadmapped below — all four work fine on the OSS runner locally; only the Pro hosted target needs to catch up.</p>
+
+    <div class="grid md:grid-cols-2 gap-5">
+      <div class="card p-6">
+        <div class="font-mono text-xs text-[var(--rh-accent)] mb-3">WORKFLOW BASICS · 6/6</div>
+        <ul class="text-sm text-[var(--rh-muted)] space-y-1.5">
+          <li><span class="ok">✓</span> <code class="font-mono">${{ secrets.X }}</code> expansion (via <code class="font-mono">--env-file</code>)</li>
+          <li><span class="ok">✓</span> <code class="font-mono">env:</code> blocks at workflow / job / step scope, with override</li>
+          <li><span class="ok">✓</span> <code class="font-mono">with:</code> action inputs (full <code class="font-mono">${{ }}</code> interpolation)</li>
+          <li><span class="ok">✓</span> <code class="font-mono">if:</code> conditionals on jobs and steps</li>
+          <li><span class="ok">✓</span> <code class="font-mono">run:</code> with <code class="font-mono">bash</code> / <code class="font-mono">pwsh</code> / <code class="font-mono">cmd</code> / explicit <code class="font-mono">shell:</code></li>
+          <li><span class="ok">✓</span> <code class="font-mono">$GITHUB_OUTPUT</code> / <code class="font-mono">$GITHUB_ENV</code> / <code class="font-mono">$GITHUB_PATH</code> / <code class="font-mono">$GITHUB_STEP_SUMMARY</code></li>
+        </ul>
+      </div>
+
+      <div class="card p-6">
+        <div class="font-mono text-xs text-[var(--rh-accent)] mb-3">SCHEDULING · 3/3</div>
+        <ul class="text-sm text-[var(--rh-muted)] space-y-1.5">
+          <li><span class="ok">✓</span> <code class="font-mono">strategy.matrix</code> with <code class="font-mono">include</code> / <code class="font-mono">exclude</code></li>
+          <li><span class="ok">✓</span> Matrix cells in parallel via per-cell <code class="font-mono">git worktree</code></li>
+          <li><span class="ok">✓</span> <code class="font-mono">needs:</code> topological scheduling, bounded concurrency</li>
+        </ul>
+      </div>
+
+      <div class="card p-6">
+        <div class="font-mono text-xs text-[var(--rh-accent)] mb-3">ACTIONS · 5/6</div>
+        <ul class="text-sm text-[var(--rh-muted)] space-y-1.5">
+          <li><span class="ok">✓</span> <code class="font-mono">actions/checkout</code> (host has the repo / sprite gets a real clone)</li>
+          <li><span class="ok">✓</span> <code class="font-mono">actions/setup-*</code> for all 11 supported languages</li>
+          <li><span class="ok">✓</span> <code class="font-mono">actions/cache</code> + <code class="font-mono">/save</code> + <code class="font-mono">/restore</code> with all 3 outputs</li>
+          <li><span class="ok">✓</span> <code class="font-mono">actions/upload-artifact</code> + <code class="font-mono">download-artifact</code></li>
+          <li><span class="ok">✓</span> JS actions (<code class="font-mono">runs.using: node12-25</code>) with full <code class="font-mono">INPUT_*</code> contract</li>
+          <li><span class="warn">○</span> <code class="font-mono">services:</code> on Pro (works locally; sprite needs Docker — roadmap)</li>
+        </ul>
+      </div>
+
+      <div class="card p-6">
+        <div class="font-mono text-xs text-[var(--rh-accent)] mb-3">REUSABLE &amp; ADVANCED · 4/7</div>
+        <ul class="text-sm text-[var(--rh-muted)] space-y-1.5">
+          <li><span class="ok">✓</span> Composite actions — local <code class="font-mono">./.github/actions/*</code> + remote <code class="font-mono">org/repo[/sub]@ref</code> (auto-cloned)</li>
+          <li><span class="ok">✓</span> Local reusable workflows (<code class="font-mono">uses: ./.github/workflows/foo.yml</code>) with <code class="font-mono">with:</code> + <code class="font-mono">secrets: inherit</code></li>
+          <li><span class="ok">✓</span> <code class="font-mono">environment:</code> declarations on jobs (parsed; runs)</li>
+          <li><span class="ok">✓</span> <code class="font-mono">GITHUB_*</code> env vars (workspace, sha, ref, actor, repository, etc.)</li>
+          <li><span class="warn">○</span> Remote reusable workflows (<code class="font-mono">org/repo/.github/workflows/foo.yml@ref</code>) — local form works</li>
+          <li><span class="warn">○</span> <code class="font-mono">concurrency:</code> cancellation (parsed, not enforced)</li>
+          <li><span class="warn">○</span> OIDC (<code class="font-mono">permissions: id-token: write</code>) — use long-lived creds</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================ ROADMAP ================ -->
+<section class="py-20 hairline bg-grid">
+  <div class="max-w-6xl mx-auto px-5">
+    <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-2">// roadmap</div>
+    <h2 class="text-3xl font-semibold tracking-tight mb-3">The four open gaps, with a plan for each.</h2>
+    <p class="text-[var(--rh-muted)] mb-8 max-w-2xl">Every item here is in active design or scoping. None of them block the OSS runner locally — they're specifically about what Pro's hosted sprite can run today vs. what a GH-hosted runner can run.</p>
+
+    <div class="grid md:grid-cols-2 gap-5">
+      <div class="card p-6">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="step-plate" style="font-size:14px">①</span>
+          <div class="font-mono text-xs text-[var(--rh-amber)]">SERVICES ON PRO</div>
+        </div>
+        <div class="text-lg font-semibold text-white mb-2">Postgres / Redis / MySQL service containers.</div>
+        <p class="text-sm text-[var(--rh-muted)] mb-3"><code class="font-mono">jobs.<id>.services:</code> works locally on the OSS runner via the container backend, but Pro sprites don't expose Docker today. Need either Docker-in-sprite or a per-team service-broker.</p>
+        <div class="font-mono text-[12px] text-[var(--rh-muted)]"><span class="text-[var(--rh-accent)]">target:</span> v1 · <span class="text-[var(--rh-accent)]">workaround:</span> use OSS runner locally for service workflows</div>
+      </div>
+
+      <div class="card p-6">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="step-plate" style="font-size:14px">②</span>
+          <div class="font-mono text-xs text-[var(--rh-amber)]">CONCURRENCY: CANCELLATION</div>
+        </div>
+        <div class="text-lg font-semibold text-white mb-2"><code class="font-mono">concurrency: deploy-prod</code> with cancel-in-progress.</div>
+        <p class="text-sm text-[var(--rh-muted)] mb-3">The <code class="font-mono">concurrency:</code> block is parsed but not enforced — runs don't cancel each other when a new run lands in the same group. Required for safe deploy queues. Single-sprite v0 makes this naturally serialized; the cancel-in-progress semantics need orchestrator work.</p>
+        <div class="font-mono text-[12px] text-[var(--rh-muted)]"><span class="text-[var(--rh-accent)]">target:</span> v1 · <span class="text-[var(--rh-accent)]">workaround:</span> sequential dispatch, dedup before invoking</div>
+      </div>
+
+      <div class="card p-6">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="step-plate" style="font-size:14px">③</span>
+          <div class="font-mono text-xs text-[var(--rh-amber)]">REMOTE REUSABLE WORKFLOWS</div>
+        </div>
+        <div class="text-lg font-semibold text-white mb-2"><code class="font-mono">uses: org/repo/.github/workflows/foo.yml@ref</code></div>
+        <p class="text-sm text-[var(--rh-muted)] mb-3">Local <code class="font-mono">uses: ./.github/workflows/foo.yml</code> works; the remote variant doesn't yet (would need git-fetch + parse the upstream workflow + recurse). Composite actions already do remote auto-clone, so the path is well-trodden — just hasn't been written for reusable workflows.</p>
+        <div class="font-mono text-[12px] text-[var(--rh-muted)]"><span class="text-[var(--rh-accent)]">target:</span> v1 · <span class="text-[var(--rh-accent)]">workaround:</span> inline the called workflow into your repo</div>
+      </div>
+
+      <div class="card p-6">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="step-plate" style="font-size:14px">④</span>
+          <div class="font-mono text-xs text-[var(--rh-amber)]">OIDC TOKEN ISSUER</div>
+        </div>
+        <div class="text-lg font-semibold text-white mb-2"><code class="font-mono">permissions: id-token: write</code> + <code class="font-mono">role-to-assume</code>.</div>
+        <p class="text-sm text-[var(--rh-muted)] mb-3"><code class="font-mono">aws-actions/configure-aws-credentials@v4</code> with role-to-assume needs a JWT from an OIDC issuer that AWS trusts. GitHub-hosted runs get this from <code class="font-mono">token.actions.githubusercontent.com</code>; Pro sprites don't have that. Plan: stand up <code class="font-mono">oidc.rehearse.sh</code> with a Pro-team-scoped issuer that customers add to AWS / Azure / GCP as a trusted IdP. One-time setup per cloud.</p>
+        <div class="font-mono text-[12px] text-[var(--rh-muted)]"><span class="text-[var(--rh-accent)]">target:</span> v1.1 · <span class="text-[var(--rh-accent)]">workaround:</span> long-lived IAM keys via <code class="font-mono">--env-file</code> (works today)</div>
+      </div>
+    </div>
+
+    <p class="text-[12px] font-mono text-[var(--rh-muted)] mt-6 max-w-3xl">
+      Tracking these in <a href="https://github.com/plsft/rehearse/issues" class="link">github.com/plsft/rehearse/issues</a> — comment if any of these blocks you and we'll prioritize accordingly.
+    </p>
   </div>
 </section>
 
