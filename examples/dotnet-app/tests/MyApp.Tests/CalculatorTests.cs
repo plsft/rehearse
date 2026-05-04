@@ -1,4 +1,5 @@
 using MyApp;
+using Xunit;
 
 namespace MyApp.Tests;
 
