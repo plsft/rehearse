@@ -8,8 +8,12 @@ existing `.github/workflows/*.yml` and executes them on your laptop with two
 backends — host (subprocess, fast) and container (Docker, with services and
 parity). Free, Apache 2.0, source on `github.com/plsft/rehearse`.
 
-This is a single-developer, alpha-quality project. There is no hosted
-service, no paid tier, no API. Just a CLI you install via npm.
+The OSS runner is Apache 2.0, free, and works fully without an account.
+A hosted execution target — **Rehearse Pro** ([rehearse.sh/pro](https://rehearse.sh/pro))
+— is available for customers who want a private microVM with caches that
+persist between runs. Pro is strictly additive: pass `--remote` with a Pro
+token and the same OSS runner ships your workflow to your VM; drop the
+flag and you're back to local. The OSS runner is and always will be free.
 
 ## Quick start
 
@@ -24,20 +28,19 @@ runner install-hook                            # pre-push git hook
 
 ## Numbers
 
-Head-to-head against [`nektos/act`](https://github.com/nektos/act) on a
-Windows 11 laptop, warm runs:
+Head-to-head against [`nektos/act`](https://github.com/nektos/act) on
+GitHub-hosted Linux, v0.3.11 warm:
 
 | Target | Rehearse | act | Speedup |
 | --- | ---: | ---: | ---: |
-| typecheck + 202 tests, 2 parallel jobs | **9.09s** | 30.28s | **3.33×** |
-| node matrix `[18.x, 20.x, 22.x]` | **4.63s** | 24.55s | **5.30×** |
-| `services: postgres:16-alpine` | **20.50s** | timeout (>360s) | act fails |
-| real OSS workflow (honojs/hono `bun` job) | **6.09s** | n/a (act lacks bun) | — |
+| `our-ci` (typecheck + tests, 2 parallel jobs) | **12.19s** | 63.78s | **5.23×** |
+| `node-matrix` `[18.x, 20.x, 22.x]` (3 parallel cells) | **1.12s** | 10.07s | **8.99×** |
+| `service-postgres` (postgres:16 + 4 psql) | **10.97s** | timeout (>360s) | **32.82×** — act fails |
+| `hono-bun` (real OSS, honojs/hono `bun` job) | **7.58s** | n/a (act lacks bun) | — |
 
-Full methodology and reproducibility instructions in
-[`bench/RESULTS.md`](bench/RESULTS.md). Cold-vs-cold is much narrower —
-a fresh `pnpm install` dominates everything; the wedge is the warm dev
-pre-push loop.
+Per-OS numbers and full methodology in
+[`bench/RESULTS.md`](bench/RESULTS.md). Reproducible with
+`gh workflow run bench.yml`.
 
 ## Repo layout
 
@@ -47,41 +50,33 @@ ts-ci/         — @rehearse/ci         — author workflows in TypeScript
 git-engine/    — @rehearse/git-core   — pure-TypeScript git protocol
 cli/           — @rehearse/cli        — `rh` CLI (compile / convert TS pipelines)
 bench/         — runner-vs-act bench harness + results
-poc/           — single-file proofs that informed the runner architecture
+poc/           — fixture workflows used by the bench harness (vite/hono/etc.)
 .rehearse/      — TypeScript source for this repo's own CI
 .github/       — generated workflow YAML (do not edit by hand)
 ```
 
 ## What's supported today
 
-- `run:` steps with `bash` / `pwsh` / `cmd`
-- `uses:` for the top ~15 most-popular actions in-process
-  (checkout, setup-node/python/go/bun, cache, artifacts)
-- `services:` with health checks (Docker network alias wired correctly)
-- `strategy.matrix` (variables × include − exclude)
-- `needs:` with parallel scheduling (across distinct jobs)
-- `if:` on jobs and steps — useful subset of the expression language
-- Local composite actions (`./.github/actions/*`)
-- `${{ matrix… }}`, `${{ env… }}`, `${{ secrets… }}`, `${{ runner… }}`,
-  `${{ needs.<job>.outputs.<n> }}`, `${{ steps.<id>.outputs.<n> }}`,
-  `${{ github.* }}` (subset)
+- `run:` steps with `bash` / `pwsh` / `cmd` + full `$GITHUB_OUTPUT` / `$GITHUB_ENV` / `$GITHUB_PATH` / `$GITHUB_STEP_SUMMARY` contract
+- 16 in-process action shims: `checkout`, `setup-{node,python,go,java,dotnet,bun,pnpm,deno,ruby}`, `rust-toolchain`, `cache` + `/save` + `/restore`, `upload-artifact`, `download-artifact`, `codecov`, `github-script`. `setup-dotnet` is a real shim that runs Microsoft's `dotnet-install.sh` and caches the SDK.
+- JavaScript actions (`runs.using: node12-25`) — auto-cloned at the requested ref, full `INPUT_*` / `GITHUB_OUTPUT` contract
+- `services:` with health checks (Docker network alias wired correctly) — local container backend only
+- `strategy.matrix` (variables × include − exclude) — cells run in parallel via per-cell `git worktree`
+- `needs:` with topological scheduling and bounded concurrency
+- `if:` on jobs and steps — full context: matrix / env / secrets / vars / needs / steps / job / runner / inputs / github
+- Local composite actions (`./.github/actions/*`) AND remote (`org/repo[/sub]@ref` — auto-cloned)
+- Local reusable workflows (`uses: ./.github/workflows/foo.yml`) with `with:` + `secrets: inherit`
+- `${{ matrix… }}`, `${{ env… }}`, `${{ secrets… }}`, `${{ vars… }}`, `${{ runner… }}`, `${{ needs.<job>.outputs.<n> }}`, `${{ steps.<id>.outputs.<n> }}`, `${{ github.* }}`
+- `runner --remote` ships the workflow to a Pro VM (auto-detects git origin + SHA + monorepo subdir; ships `--env-file` secrets to `${{ secrets.* }}`)
 
 ## Known gaps
 
-- **Per-cell matrix workspace isolation** — cells share the host workspace,
-  so they currently run *sequentially* to avoid races on writes (e.g.
-  `coverage/.tmp`). Per-cell git-worktree is on the roadmap and will let
-  cells run in parallel.
-- **JS-action runtime** — composite is supported; `runs.using: node20`
-  actions still skip with a documented "no shim" reason.
-- **Real `actions/upload-artifact` / `download-artifact`** — currently
-  no-op shims. Local-fs implementation is straightforward; not yet wired.
-- **Reusable workflows** (`uses: ./.github/workflows/foo.yml`).
-- **Remote composite actions** (`org/repo/path@ref` — needs git fetch).
-- **OIDC** / `id-token: write`.
-- **`concurrency:` cancellation**.
+- **Remote reusable workflows** (`org/repo/.github/workflows/foo.yml@ref`) — local form works
+- **OIDC** / `id-token: write` — use long-lived creds via `--env-file` for now
+- **`concurrency:` cancellation** — parsed, not enforced
+- **Pro-side `services:`** — works locally via container backend, not yet on hosted Pro VMs
 
-The roadmap lives on the GitHub issues for the repo.
+Roadmap lives on the GitHub issues for the repo.
 
 ## Local development
 
@@ -89,7 +84,7 @@ The roadmap lives on the GitHub issues for the repo.
 # Requires Node 22+ and pnpm 9+
 pnpm install
 pnpm turbo typecheck       # passes across all 5 workspace packages
-pnpm turbo test             # 264 tests passing
+pnpm turbo test             # 323 tests passing across all packages
 pnpm --filter @rehearse/runner build
 node runner/dist/cli.js run .github/workflows/ci.yml
 ```

@@ -14,3 +14,18 @@ coverage
 poc/playground
 .runner
 examples/*/node_modules
+
+# Per-developer Claude Code settings — may contain tokens; do not commit
+.claude/settings.local.json
+
+# claude-mem placeholder files — auto-generated noise
+**/CLAUDE.md
+# but keep our authoritative root onboarding doc + per-package roots
+!/CLAUDE.md
+!/runner/CLAUDE.md
+!/cli/CLAUDE.md
+!/ts-ci/CLAUDE.md
+!/git-engine/CLAUDE.md
+!/site/CLAUDE.md
+!/bench/CLAUDE.md
+!/examples/CLAUDE.md

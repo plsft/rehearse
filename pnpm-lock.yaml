@@ -44,9 +44,6 @@ importers:
       tsx:
         specifier: ^4.19.2
         version: 4.21.0
-      yaml:
-        specifier: ^2.6.1
-        version: 2.8.3
     devDependencies:
       '@types/node':
         specifier: ^22.10.0
@@ -76,9 +73,6 @@ importers:
       '@rehearse/ci':
         specifier: workspace:*
         version: link:../ts-ci
-      '@rehearse/git-core':
-        specifier: workspace:*
-        version: link:../git-engine
       commander:
         specifier: ^12.1.0
         version: 12.1.0
@@ -128,6 +122,10 @@ importers:
         version: 4.87.0
 
   ts-ci:
+    dependencies:
+      yaml:
+        specifier: ^2.6.1
+        version: 2.8.3
     devDependencies:
       typescript:
         specifier: ^5.8.0
@@ -135,9 +133,6 @@ importers:
       vitest:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@22.19.17)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.3)
-      yaml:
-        specifier: ^2.6.1
-        version: 2.8.3
 
 packages:
 
