@@ -1,13 +1,20 @@
 # @rehearse/git-core
 
-> Pure-TypeScript implementation of the git protocol. No native
-> dependencies. Runs on Cloudflare Workers, Node, Bun, Deno, and the
-> browser.
+> **Git, anywhere TypeScript runs.** Pure-TypeScript implementation
+> of the git protocol — objects, packfiles, smart-HTTP wire,
+> Myers diff, three-way merge, refs. **No native dependencies. No
+> child-process spawn.** Runs in Cloudflare Workers, browsers, Deno,
+> Node, and Bun.
 
-A complete-enough git for in-process work: parse and serialize objects,
-read and write packfiles, speak the smart-HTTP wire protocol, do diffs
-and three-way merges, manage refs. ~2.7k lines of source, ~2.9k lines
-of tests. **162 tests passing across 8 suites.**
+The unique-fit use case: anywhere the system `git` binary isn't an option.
+Cloudflare Workers (no native fork), browser sandboxes (no shell), Deno
+Deploy (no native FFI), edge runtimes (cold-start sensitive), embedded
+TS environments. Most "git for JS" libraries shell out to the system
+binary; `@rehearse/git-core` is the wire protocol implemented from
+scratch in TypeScript so it works without one.
+
+~2.7k lines of source, ~2.9k lines of tests. **162 tests passing across
+8 suites.** Apache 2.0.
 
 [![npm](https://img.shields.io/npm/v/@rehearse/git-core)](https://www.npmjs.com/package/@rehearse/git-core)
 [![License](https://img.shields.io/npm/l/@rehearse/git-core)](./LICENSE)

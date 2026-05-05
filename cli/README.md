@@ -1,12 +1,26 @@
 # @rehearse/cli
 
-> `rh` — command-line tool for authoring GitHub Actions workflows in
-> TypeScript and compiling them to YAML.
+> **The migration on-ramp.** `rh` converts your existing GitHub Actions
+> YAML to typed TypeScript in one command, then keeps it compiled
+> on every save. Use it to adopt typed CI on an existing repo without
+> rewriting a thing.
 
 The CLI front-end for [`@rehearse/ci`](https://www.npmjs.com/package/@rehearse/ci).
-Initialise a project, compile TypeScript pipelines to `.github/workflows/*.yml`,
-convert existing YAML to TypeScript, watch for changes, estimate
-GitHub-hosted CI cost.
+Six commands cover the full workflow:
+
+- `rh ci init` — detect your stack (Bun / Node / Rust / Go / Python / .NET) and scaffold a typed pipeline
+- `rh ci convert <yaml>` — **YAML → TypeScript migration in one command** (the killer feature for adopting the SDK on existing repos)
+- `rh ci compile` — TypeScript → standard GitHub Actions YAML
+- `rh ci validate` — type-check pipelines without writing output
+- `rh ci watch` — recompile on save (pair with `runner watch` for the inner loop)
+- `rh ci estimate` — show GitHub-hosted CI cost per run + per month
+
+This pairs with [`@rehearse/runner`](https://www.npmjs.com/package/@rehearse/runner)
+(binary: `runner`) for local execution. Together they give you CI in
+TypeScript that runs on your laptop, on a Pro VM, and on real GitHub
+Actions — same source, three execution targets, no lock-in. See
+[rehearse.sh/vs](https://rehearse.sh/vs) for the comparison vs
+hosted-runner SaaS (Blacksmith, Ubicloud, RunsOn).
 
 [![npm](https://img.shields.io/npm/v/@rehearse/cli)](https://www.npmjs.com/package/@rehearse/cli)
 [![License](https://img.shields.io/npm/l/@rehearse/cli)](./LICENSE)

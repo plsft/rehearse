@@ -1,14 +1,28 @@
 # @rehearse/ci
 
-> Type-safe GitHub Actions pipelines in TypeScript. Compile to plain
-> YAML on your machine. **The compiled YAML has zero `@rehearse/ci`
-> dependency** — install us at author time, ship the YAML.
+> **The TypeScript-authored CI SDK.** Write GitHub Actions workflows in
+> typed TypeScript with full IDE autocomplete, compile to standard YAML
+> on your machine, ship the YAML. **Zero runtime dependency on us** —
+> the compiled YAML works on stock GitHub Actions even if you uninstall
+> the SDK.
 
-`@rehearse/ci` is the authoring SDK. Write your workflows in TypeScript,
-get IDE autocomplete and refactor support, then compile to standard
-GitHub Actions YAML you commit alongside your TS source. The CLI ships
-separately as [`@rehearse/cli`](https://www.npmjs.com/package/@rehearse/cli)
-(binary: `rh`).
+`@rehearse/ci` is the only OSS SDK in this category. The hosted-runner
+SaaS layer (Blacksmith, Ubicloud, RunsOn) doesn't try to do this; YAML
+authoring tools that do exist (Pulumi, hand-written generators, Earthly)
+either lock you into a proprietary execution model or don't compile to
+standard GH Actions YAML.
+
+The forward path (`compile`: TS → YAML) is **100% lossless** — every
+SDK feature produces canonical GH Actions YAML, verified by a comprehensive
+snapshot test suite. The reverse path (`convert`: YAML → TS) is a
+migration starter: handles the common shapes (triggers / jobs / runner /
+steps / env / permissions / outputs / conditions) so you can adopt the
+SDK on existing repos in one command, then hand-port the advanced bits
+(matrix / services / concurrency).
+
+The CLI ships separately as [`@rehearse/cli`](https://www.npmjs.com/package/@rehearse/cli)
+(binary: `rh`). Pair both if you want `rh ci init` / `compile` / `convert`
+ergonomics.
 
 [![npm](https://img.shields.io/npm/v/@rehearse/ci)](https://www.npmjs.com/package/@rehearse/ci)
 [![License](https://img.shields.io/npm/l/@rehearse/ci)](./LICENSE)

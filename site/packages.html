@@ -102,6 +102,69 @@
   </div>
 </section>
 
+<!-- ================ @rehearse/ci (LEAD — no real competitor in market) ================ -->
+<section id="ci" class="py-20 hairline">
+  <div class="max-w-3xl mx-auto px-5">
+    <div class="font-mono text-xs text-[var(--rh-accent)]">★ LEAD PACKAGE — UNIQUE IN MARKET</div>
+    <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">@rehearse/ci</h2>
+    <p class="mt-2 font-mono text-sm text-[var(--rh-muted)]">library · <a href="https://www.npmjs.com/package/@rehearse/ci" class="link">npm</a> · <a href="https://github.com/plsft/rehearse/tree/main/ts-ci" class="link">source</a></p>
+
+    <p class="mt-5 text-[var(--rh-muted)] leading-relaxed">
+      <span class="text-white">Author GitHub Actions pipelines in
+      TypeScript with type safety and IDE autocomplete</span>, then compile
+      to plain GitHub Actions YAML. The generated YAML has zero runtime
+      dependency on us — you can eject any time. <span class="accent-text">No
+      real competitor exists for this</span> — hosted-runner SaaS (Blacksmith,
+      Ubicloud, RunsOn) doesn't try; YAML alternatives lock you into a
+      proprietary execution model.
+    </p>
+
+    <h3 class="mt-10 text-lg font-semibold text-white">Why it exists</h3>
+    <p class="mt-2 text-[var(--rh-muted)] leading-relaxed">
+      YAML for CI is unmaintainable past a few hundred lines. No types, no
+      autocomplete, copy-paste errors that fail in CI 90 seconds later. This
+      SDK gives you typed builders that compile to standard GitHub Actions
+      YAML — the forward path is 100% lossless and snapshot-tested.
+    </p>
+
+    <h3 class="mt-8 text-lg font-semibold text-white">What it does</h3>
+    <ul class="mt-3 space-y-2 text-[var(--rh-muted)] leading-relaxed">
+      <li><span class="ok">✓</span> Typed builders: <code class="font-mono">pipeline()</code>, <code class="font-mono">job()</code>, <code class="font-mono">step.run() / .checkout() / .action()</code>, <code class="font-mono">triggers.push() / .pullRequest() / .schedule()</code>, <code class="font-mono">Runner.github() / .selfHosted() / .custom()</code></li>
+      <li><span class="ok">✓</span> Context helpers: <code class="font-mono">secrets()</code>, <code class="font-mono">vars()</code>, <code class="font-mono">github()</code>, <code class="font-mono">env()</code>, <code class="font-mono">needs()</code>, <code class="font-mono">steps()</code>, <code class="font-mono">expr()</code>, <code class="font-mono">hashFiles()</code> — all validated, throw on empty/whitespace</li>
+      <li><span class="ok">✓</span> Language presets: <code class="font-mono">node</code>, <code class="font-mono">bun</code>, <code class="font-mono">python</code>, <code class="font-mono">rust</code>, <code class="font-mono">go</code>, <code class="font-mono">docker</code> — each exporting <code class="font-mono">setup() / install() / test() / build() / lint()</code> with correct action references</li>
+      <li><span class="ok">✓</span> Hand-rolled YAML serializer — no external YAML library at runtime</li>
+      <li><span class="ok">✓</span> YAML → TypeScript <span class="text-white">migration starter</span> (<code class="font-mono">convert()</code>) — handles common shapes (push/pr/dispatch/schedule, run/uses/with/env/if). Drops <code class="font-mono">matrix</code> / <code class="font-mono">services</code> / <code class="font-mono">concurrency</code> / job-level <code class="font-mono">permissions</code>; emits warnings. Use it to bootstrap, then hand-port the advanced bits.</li>
+      <li><span class="ok">✓</span> Cost estimator (<code class="font-mono">estimate()</code>) — per-run and monthly GitHub-hosted CI cost from a <span class="text-white">list-price snapshot</span> baked into the package. Math is real (per-job × per-min × runs/month against the public price list); price tables refresh per release.</li>
+    </ul>
+
+    <h3 class="mt-8 text-lg font-semibold text-white">How it's used</h3>
+    <pre class="mt-4 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="comment">// .rehearse/pipelines/ci.ts</span>
+<span class="kw">import</span> { <span class="fn">pipeline</span>, <span class="fn">job</span>, <span class="fn">step</span>, <span class="fn">triggers</span>, <span class="fn">Runner</span> } <span class="kw">from</span> <span class="str">'@rehearse/ci'</span>;
+<span class="kw">import</span> { <span class="fn">node</span> } <span class="kw">from</span> <span class="str">'@rehearse/ci/presets'</span>;
+
+<span class="kw">export const</span> <span class="var">ci</span> = <span class="fn">pipeline</span>(<span class="str">'CI'</span>, {
+  triggers: [<span class="fn">triggers</span>.<span class="fn">pullRequest</span>(), <span class="fn">triggers</span>.<span class="fn">push</span>({ branches: [<span class="str">'main'</span>] })],
+  jobs: [
+    <span class="fn">job</span>(<span class="str">'test'</span>, {
+      runner: <span class="fn">Runner</span>.<span class="fn">github</span>(<span class="str">'ubuntu-latest'</span>),
+      steps: [<span class="fn">step</span>.<span class="fn">checkout</span>(), <span class="fn">node</span>.<span class="fn">setup</span>(<span class="str">'20'</span>), <span class="fn">node</span>.<span class="fn">install</span>(), <span class="fn">node</span>.<span class="fn">test</span>()],
+    }),
+  ],
+});</pre>
+    <p class="mt-3 text-sm text-[var(--rh-muted)]">
+      Compile via <code class="font-mono">rh ci compile</code> (uses
+      <a href="#cli" class="link">@rehearse/cli</a>) → produces
+      <code class="font-mono">.github/workflows/ci.yml</code>.
+    </p>
+
+    <h3 class="mt-8 text-lg font-semibold text-white">Numbers</h3>
+    <ul class="mt-3 space-y-1 text-sm text-[var(--rh-muted)]">
+      <li>Snapshot tests covering every preset and the YAML compiler — every output is committed</li>
+      <li><strong class="text-white">Zero runtime dependencies.</strong> The <code class="font-mono">yaml</code> package is a dev-only dep used by the converter (YAML → TS direction)</li>
+    </ul>
+  </div>
+</section>
+
 <!-- ================ @rehearse/runner ================ -->
 <section id="runner" class="py-20 hairline">
   <div class="max-w-3xl mx-auto px-5">
@@ -178,77 +241,78 @@
   </div>
 </section>
 
-<!-- ================ @rehearse/ci ================ -->
-<section id="ci" class="py-20 hairline">
+<!-- ================ @rehearse/cli (the migration on-ramp) ================ -->
+<section id="cli" class="py-20 hairline">
   <div class="max-w-3xl mx-auto px-5">
-    <div class="font-mono text-xs text-[var(--rh-accent)]">PACKAGE</div>
-    <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">@rehearse/ci</h2>
-    <p class="mt-2 font-mono text-sm text-[var(--rh-muted)]">library · <a href="https://www.npmjs.com/package/@rehearse/ci" class="link">npm</a> · <a href="https://github.com/plsft/rehearse/tree/main/ts-ci" class="link">source</a></p>
+    <div class="font-mono text-xs text-[var(--rh-accent)]">PACKAGE — THE MIGRATION ON-RAMP</div>
+    <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">@rehearse/cli</h2>
+    <p class="mt-2 font-mono text-sm text-[var(--rh-muted)]">binary: <code class="text-white">rh</code> · <a href="https://www.npmjs.com/package/@rehearse/cli" class="link">npm</a> · <a href="https://github.com/plsft/rehearse/tree/main/cli" class="link">source</a></p>
 
     <p class="mt-5 text-[var(--rh-muted)] leading-relaxed">
-      Author GitHub Actions pipelines in TypeScript with type safety and IDE
-      autocomplete, then compile to plain GitHub Actions YAML. <span class="text-white">The
-      generated YAML has zero runtime dependency on us — you can eject any time.</span>
+      The <code class="font-mono">rh</code> command — companion CLI for the
+      TypeScript-pipeline workflow. <span class="text-white">The killer feature:
+      <code class="font-mono">rh ci convert</code> turns your existing GitHub
+      Actions YAML into typed TypeScript in one command.</span> Adopt typed
+      CI on a real repo without rewriting a thing.
     </p>
 
-    <h3 class="mt-10 text-lg font-semibold text-white">Why it exists</h3>
+    <h3 class="mt-10 text-lg font-semibold text-white">Six subcommands</h3>
+    <pre class="mt-4 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>rh ci init      <span class="comment"># scaffold .rehearse/pipelines/ci.ts + .rehearse/package.json + rehearse.config.mjs</span>
+<span class="prompt"></span>rh ci convert   <span class="comment"># ★ existing .github/workflows/foo.yml → .rehearse/pipelines/foo.ts (the migration on-ramp)</span>
+<span class="prompt"></span>rh ci compile   <span class="comment"># .rehearse/pipelines/**/*.ts → .github/workflows/*.yml</span>
+<span class="prompt"></span>rh ci validate  <span class="comment"># type-check pipelines without writing output</span>
+<span class="prompt"></span>rh ci watch     <span class="comment"># recompile on save (inner loop for pipeline authoring)</span>
+<span class="prompt"></span>rh ci estimate  <span class="comment"># GitHub-hosted CI cost per run and per month, given step durations</span></pre>
+
+    <h3 class="mt-8 text-lg font-semibold text-white">Why it's separate from @rehearse/ci</h3>
     <p class="mt-2 text-[var(--rh-muted)] leading-relaxed">
-      YAML for CI is unmaintainable past a few hundred lines. No types, no
-      autocomplete, copy-paste errors that fail in CI 90 seconds later. This
-      SDK gives you typed builders that compile to standard GitHub Actions
-      YAML.
+      <code class="font-mono">@rehearse/ci</code> is a library — you
+      <code class="font-mono">import</code> from it and write TypeScript. The
+      CLI wraps that library in commands that handle the file-system side:
+      walking <code class="font-mono">.rehearse/pipelines/</code>, importing
+      <code class="font-mono">.ts</code> files via <code class="font-mono">tsx</code>,
+      writing <code class="font-mono">.github/workflows/*.yml</code>, parsing
+      existing YAML for the reverse direction. Separating these means
+      <code class="font-mono">@rehearse/ci</code> stays runtime-dep-free —
+      <code class="font-mono">tsx</code> would otherwise pull in chokidar,
+      esbuild, and others.
     </p>
 
-    <h3 class="mt-8 text-lg font-semibold text-white">What it does</h3>
-    <ul class="mt-3 space-y-2 text-[var(--rh-muted)] leading-relaxed">
-      <li><span class="ok">✓</span> Typed builders: <code class="font-mono">pipeline()</code>, <code class="font-mono">job()</code>, <code class="font-mono">step.run() / .checkout() / .action()</code>, <code class="font-mono">triggers.push() / .pullRequest() / .schedule()</code>, <code class="font-mono">Runner.github() / .selfHosted() / .custom()</code></li>
-      <li><span class="ok">✓</span> Context helpers: <code class="font-mono">secrets()</code>, <code class="font-mono">vars()</code>, <code class="font-mono">github()</code>, <code class="font-mono">env()</code>, <code class="font-mono">needs()</code>, <code class="font-mono">steps()</code>, <code class="font-mono">expr()</code>, <code class="font-mono">hashFiles()</code> — all validated, throw on empty/whitespace</li>
-      <li><span class="ok">✓</span> Language presets: <code class="font-mono">node</code>, <code class="font-mono">bun</code>, <code class="font-mono">python</code>, <code class="font-mono">rust</code>, <code class="font-mono">go</code>, <code class="font-mono">docker</code> — each exporting <code class="font-mono">setup() / install() / test() / build() / lint()</code> with correct action references</li>
-      <li><span class="ok">✓</span> Hand-rolled YAML serializer — no external YAML library at runtime</li>
-      <li><span class="ok">✓</span> YAML → TypeScript <span class="text-white">migration starter</span> (<code class="font-mono">convert()</code>) — handles common shapes (push/pr/dispatch/schedule, run/uses/with/env/if). Drops <code class="font-mono">matrix</code> / <code class="font-mono">services</code> / <code class="font-mono">concurrency</code> / job-level <code class="font-mono">permissions</code>; emits warnings. Use it to bootstrap, then hand-port the advanced bits.</li>
-      <li><span class="ok">✓</span> Cost estimator (<code class="font-mono">estimate()</code>) — per-run and monthly GitHub-hosted CI cost from a <span class="text-white">list-price snapshot</span> baked into the package. Math is real (per-job × per-min × runs/month against the public price list); price tables refresh per release.</li>
-    </ul>
-
-    <h3 class="mt-8 text-lg font-semibold text-white">How it's used</h3>
-    <pre class="mt-4 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="comment">// .rehearse/pipelines/ci.ts</span>
-<span class="kw">import</span> { <span class="fn">pipeline</span>, <span class="fn">job</span>, <span class="fn">step</span>, <span class="fn">triggers</span>, <span class="fn">Runner</span> } <span class="kw">from</span> <span class="str">'@rehearse/ci'</span>;
-<span class="kw">import</span> { <span class="fn">node</span> } <span class="kw">from</span> <span class="str">'@rehearse/ci/presets'</span>;
-
-<span class="kw">export const</span> <span class="var">ci</span> = <span class="fn">pipeline</span>(<span class="str">'CI'</span>, {
-  triggers: [<span class="fn">triggers</span>.<span class="fn">pullRequest</span>(), <span class="fn">triggers</span>.<span class="fn">push</span>({ branches: [<span class="str">'main'</span>] })],
-  jobs: [
-    <span class="fn">job</span>(<span class="str">'test'</span>, {
-      runner: <span class="fn">Runner</span>.<span class="fn">github</span>(<span class="str">'ubuntu-latest'</span>),
-      steps: [<span class="fn">step</span>.<span class="fn">checkout</span>(), <span class="fn">node</span>.<span class="fn">setup</span>(<span class="str">'20'</span>), <span class="fn">node</span>.<span class="fn">install</span>(), <span class="fn">node</span>.<span class="fn">test</span>()],
-    }),
-  ],
-});</pre>
-    <p class="mt-3 text-sm text-[var(--rh-muted)]">
-      Compile via <code class="font-mono">rh ci compile</code> (uses
-      <a href="#cli" class="link">@rehearse/cli</a>) → produces
-      <code class="font-mono">.github/workflows/ci.yml</code>.
+    <h3 class="mt-8 text-lg font-semibold text-white">Stack detection</h3>
+    <p class="mt-2 text-[var(--rh-muted)] leading-relaxed">
+      <code class="font-mono">rh ci init</code> detects your project
+      (<code class="font-mono">bun.lockb</code> → Bun, <code class="font-mono">Cargo.toml</code> →
+      Rust, <code class="font-mono">go.mod</code> → Go, etc.) and scaffolds an
+      appropriate template. Falls back to a generic template for unknown stacks.
     </p>
 
-    <h3 class="mt-8 text-lg font-semibold text-white">Numbers</h3>
-    <ul class="mt-3 space-y-1 text-sm text-[var(--rh-muted)]">
-      <li>Snapshot tests covering every preset and the YAML compiler — every output is committed</li>
-      <li><strong class="text-white">Zero runtime dependencies.</strong> The <code class="font-mono">yaml</code> package is a dev-only dep used by the converter (YAML → TS direction)</li>
-    </ul>
+    <h3 class="mt-8 text-lg font-semibold text-white">Module-resolution decoupling</h3>
+    <p class="mt-2 text-[var(--rh-muted)] leading-relaxed">
+      <code class="font-mono">rh ci init</code> writes a
+      <code class="font-mono">.rehearse/package.json</code> with
+      <code class="font-mono">{"type": "module"}</code> to scope ESM resolution
+      to the pipelines subtree — your host project's <code class="font-mono">package.json</code>
+      can be CJS, ESM, or unset and <code class="font-mono">rh ci compile</code>
+      still works. The config file is <code class="font-mono">rehearse.config.mjs</code>
+      (extension-explicit ESM) for the same reason.
+    </p>
   </div>
 </section>
 
-<!-- ================ @rehearse/git-core ================ -->
+<!-- ================ @rehearse/git-core (specialty: git anywhere TS runs) ================ -->
 <section id="git-core" class="py-20 hairline">
   <div class="max-w-3xl mx-auto px-5">
-    <div class="font-mono text-xs text-[var(--rh-accent)]">PACKAGE</div>
+    <div class="font-mono text-xs text-[var(--rh-accent)]">PACKAGE — SPECIALTY (SANDBOXED RUNTIMES)</div>
     <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">@rehearse/git-core</h2>
     <p class="mt-2 font-mono text-sm text-[var(--rh-muted)]">library · <a href="https://www.npmjs.com/package/@rehearse/git-core" class="link">npm</a> · <a href="https://github.com/plsft/rehearse/tree/main/git-engine" class="link">source</a></p>
 
     <p class="mt-5 text-[var(--rh-muted)] leading-relaxed">
       Full git protocol implementation in TypeScript with <span class="text-white">zero
-      native dependencies</span>. Runs on Cloudflare Workers, Node, Bun, and the
-      browser. Ships as a standalone library — install it directly when you
-      need git inside a sandboxed JS runtime.
+      native dependencies</span>. <span class="text-white">The unique-fit use case:
+      anywhere the system <code class="font-mono">git</code> binary isn't an option</span> —
+      Cloudflare Workers, browsers, Deno Deploy, edge runtimes, embedded TS
+      environments. Ships standalone — install it directly when you need git
+      inside a sandboxed JS runtime.
     </p>
 
     <h3 class="mt-10 text-lg font-semibold text-white">Why it exists</h3>
@@ -309,62 +373,6 @@
       <li>Anywhere you need git inside a JS-only sandbox: edge workers, browser-based code editors, embedded VCS UIs</li>
       <li>Future runner work: in-process checkout for remote refs, Worker-based runners</li>
     </ul>
-  </div>
-</section>
-
-<!-- ================ @rehearse/cli ================ -->
-<section id="cli" class="py-20 hairline">
-  <div class="max-w-3xl mx-auto px-5">
-    <div class="font-mono text-xs text-[var(--rh-accent)]">PACKAGE</div>
-    <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">@rehearse/cli</h2>
-    <p class="mt-2 font-mono text-sm text-[var(--rh-muted)]">binary: <code class="text-white">rh</code> · <a href="https://www.npmjs.com/package/@rehearse/cli" class="link">npm</a> · <a href="https://github.com/plsft/rehearse/tree/main/cli" class="link">source</a></p>
-
-    <p class="mt-5 text-[var(--rh-muted)] leading-relaxed">
-      The <code class="font-mono">rh</code> command — companion CLI for the
-      TypeScript-pipeline workflow. Scaffold, compile, convert, validate,
-      watch, estimate.
-    </p>
-
-    <h3 class="mt-10 text-lg font-semibold text-white">Why it's separate from @rehearse/ci</h3>
-    <p class="mt-2 text-[var(--rh-muted)] leading-relaxed">
-      <code class="font-mono">@rehearse/ci</code> is a library — you
-      <code class="font-mono">import</code> from it and write TypeScript. The
-      CLI wraps that library in commands that handle the file-system side:
-      walking <code class="font-mono">.rehearse/pipelines/</code>, importing
-      <code class="font-mono">.ts</code> files via <code class="font-mono">tsx</code>,
-      writing <code class="font-mono">.github/workflows/*.yml</code>, parsing
-      existing YAML for the reverse direction. Separating these means
-      <code class="font-mono">@rehearse/ci</code> stays runtime-dep-free —
-      <code class="font-mono">tsx</code> would otherwise pull in chokidar,
-      esbuild, and others.
-    </p>
-
-    <h3 class="mt-8 text-lg font-semibold text-white">Six subcommands</h3>
-    <pre class="mt-4 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>rh ci init      <span class="comment"># scaffold .rehearse/pipelines/ci.ts + .rehearse/package.json + rehearse.config.mjs</span>
-<span class="prompt"></span>rh ci compile   <span class="comment"># .rehearse/pipelines/**/*.ts → .github/workflows/*.yml</span>
-<span class="prompt"></span>rh ci convert   <span class="comment"># existing .github/workflows/foo.yml → .rehearse/pipelines/foo.ts</span>
-<span class="prompt"></span>rh ci validate  <span class="comment"># type-check pipelines without writing output</span>
-<span class="prompt"></span>rh ci watch     <span class="comment"># recompile on save (inner loop for pipeline authoring)</span>
-<span class="prompt"></span>rh ci estimate  <span class="comment"># GitHub-hosted CI cost per run and per month, given step durations</span></pre>
-
-    <h3 class="mt-8 text-lg font-semibold text-white">Stack detection</h3>
-    <p class="mt-2 text-[var(--rh-muted)] leading-relaxed">
-      <code class="font-mono">rh ci init</code> detects your project
-      (<code class="font-mono">bun.lockb</code> → Bun, <code class="font-mono">Cargo.toml</code> →
-      Rust, <code class="font-mono">go.mod</code> → Go, etc.) and scaffolds an
-      appropriate template. Falls back to a generic template for unknown stacks.
-    </p>
-
-    <h3 class="mt-8 text-lg font-semibold text-white">Module-resolution decoupling</h3>
-    <p class="mt-2 text-[var(--rh-muted)] leading-relaxed">
-      <code class="font-mono">rh ci init</code> writes a
-      <code class="font-mono">.rehearse/package.json</code> with
-      <code class="font-mono">{"type": "module"}</code> to scope ESM resolution
-      to the pipelines subtree — your host project's <code class="font-mono">package.json</code>
-      can be CJS, ESM, or unset and <code class="font-mono">rh ci compile</code>
-      still works. The config file is <code class="font-mono">rehearse.config.mjs</code>
-      (extension-explicit ESM) for the same reason.
-    </p>
   </div>
 </section>
 
