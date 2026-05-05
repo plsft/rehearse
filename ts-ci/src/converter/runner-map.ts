@@ -3,9 +3,9 @@
  * SDK. The right-hand side is emitted as TypeScript source.
  */
 export const RUNNER_MAP: Record<string, string> = {
-  'ubuntu-latest': "Runner.ubicloud('standard-4')",
-  'ubuntu-22.04': "Runner.ubicloud('standard-4')",
-  'ubuntu-24.04': "Runner.ubicloud('standard-4')",
+  'ubuntu-latest': "Runner.github('ubuntu-latest')",
+  'ubuntu-22.04': "Runner.github('ubuntu-22.04')",
+  'ubuntu-24.04': "Runner.github('ubuntu-24.04')",
   'macos-latest': "Runner.github('macos-latest')",
   'macos-13': "Runner.github('macos-13')",
   'macos-14': "Runner.github('macos-14')",

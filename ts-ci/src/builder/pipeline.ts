@@ -17,7 +17,7 @@ export interface PipelineConfig {
  * @example
  * const ci = pipeline('CI', {
  *   triggers: [triggers.pullRequest()],
- *   jobs: [job('build', { runner: Runner.ubicloud('standard-4'), steps: [...] })],
+ *   jobs: [job('build', { runner: Runner.github('ubuntu-latest'), steps: [...] })],
  * });
  */
 export function pipeline(name: string, config: PipelineConfig): Pipeline {

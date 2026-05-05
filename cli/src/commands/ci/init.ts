@@ -43,7 +43,7 @@ export const ci = pipeline('CI', {
   triggers: [triggers.pullRequest(), triggers.push({ branches: ['main'] })],
   jobs: [
     job('test', {
-      runner: Runner.ubicloud('standard-4'),
+      runner: Runner.github('ubuntu-latest'),
       // bun.build() omitted by default — \`bun init\` doesn't scaffold a
       // build script. Add it back if your package.json has one.
       steps: [step.checkout(), bun.setup(), bun.install(), bun.test()],
@@ -58,7 +58,7 @@ export const ci = pipeline('CI', {
   triggers: [triggers.pullRequest(), triggers.push({ branches: ['main'] })],
   jobs: [
     job('test', {
-      runner: Runner.ubicloud('standard-4'),
+      runner: Runner.github('ubuntu-latest'),
       // node.build() omitted by default — \`npm init -y\` scaffolds no
       // build script. Add it back if your package.json has one.
       steps: [step.checkout(), node.setup('20'), node.install(), node.test()],
@@ -73,7 +73,7 @@ export const ci = pipeline('CI', {
   triggers: [triggers.pullRequest(), triggers.push({ branches: ['main'] })],
   jobs: [
     job('test', {
-      runner: Runner.ubicloud('standard-4'),
+      runner: Runner.github('ubuntu-latest'),
       steps: [step.checkout(), rust.setup(), rust.cache(), rust.check(), rust.clippy(), rust.test()],
     }),
   ],
@@ -86,7 +86,7 @@ export const ci = pipeline('CI', {
   triggers: [triggers.pullRequest(), triggers.push({ branches: ['main'] })],
   jobs: [
     job('test', {
-      runner: Runner.ubicloud('standard-4'),
+      runner: Runner.github('ubuntu-latest'),
       steps: [step.checkout(), go.setup(), go.cache(), go.test(), go.build()],
     }),
   ],
@@ -99,7 +99,7 @@ export const ci = pipeline('CI', {
   triggers: [triggers.pullRequest(), triggers.push({ branches: ['main'] })],
   jobs: [
     job('test', {
-      runner: Runner.ubicloud('standard-4'),
+      runner: Runner.github('ubuntu-latest'),
       steps: [step.checkout(), python.setup('3.12'), python.cache(), python.install(), python.lint(), python.test()],
     }),
   ],
@@ -111,7 +111,7 @@ export const ci = pipeline('CI', {
   triggers: [triggers.pullRequest(), triggers.push({ branches: ['main'] })],
   jobs: [
     job('build', {
-      runner: Runner.ubicloud('standard-4'),
+      runner: Runner.github('ubuntu-latest'),
       steps: [step.checkout(), step.run('echo "Configure your build"')],
     }),
   ],

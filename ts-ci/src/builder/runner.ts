@@ -1,6 +1,11 @@
 import type { RunnerSpec, UbicloudSize } from '../types.js';
 
 export const Runner = {
+  /**
+   * @deprecated Emits `runs-on: ubicloud-<size>`, which only works on GitHub
+   * orgs with Ubicloud configured. For portable workflows use
+   * `Runner.github('ubuntu-latest')`. Retained for explicit Ubicloud users.
+   */
   ubicloud(size: UbicloudSize = 'standard-4'): RunnerSpec {
     return { kind: 'ubicloud', size };
   },

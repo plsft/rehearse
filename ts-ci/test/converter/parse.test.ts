@@ -26,7 +26,7 @@ describe('convert', () => {
     expect(source).toContain('pipeline');
     expect(source).toContain('triggers.pullRequest');
     expect(source).toContain('triggers.push');
-    expect(source).toContain("Runner.ubicloud('standard-4')");
+    expect(source).toContain("Runner.github('ubuntu-latest')");
     expect(source).toContain('step.checkout');
     expect(source).toContain('step.run');
   });

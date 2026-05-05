@@ -33,7 +33,7 @@ export interface JobConfig {
  *
  * @example
  * job('build', {
- *   runner: Runner.ubicloud('standard-4'),
+ *   runner: Runner.github('ubuntu-latest'),
  *   steps: [step.checkout(), node.setup('20'), node.test()],
  * });
  */
