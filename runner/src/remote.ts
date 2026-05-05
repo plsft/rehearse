@@ -1,6 +1,6 @@
 /**
  * --remote helpers — git-context auto-detection so the same workflow that
- * runs locally can ship to a Pro sprite and clone the right source.
+ * runs locally can ship to a Pro VM and clone the right source.
  */
 import { spawnSync } from 'node:child_process';
 import { relative, sep } from 'node:path';
@@ -13,7 +13,7 @@ export interface GitContext {
 }
 
 /**
- * Detect git remote + current SHA + subpath from `cwd` so the sprite can
+ * Detect git remote + current SHA + subpath from `cwd` so the VM can
  * clone the exact same source AND `cd` into the right subdirectory before
  * running the workflow. Returns nulls (not throws) if cwd isn't a git repo
  * or `origin` isn't set — the remote run can still proceed, just without
@@ -23,7 +23,7 @@ export interface GitContext {
  * `<repo>/services/api/` and the workflow does `npm install`, the daemon
  * needs to be in `<clone>/services/api/` — not the clone root.
  *
- * SSH URLs are normalized to HTTPS because the sprite has no SSH key. If
+ * SSH URLs are normalized to HTTPS because the VM has no SSH key. If
  * REHEARSE_REPO_TOKEN / GH_TOKEN / GITHUB_TOKEN is set, it's embedded into
  * the URL as `https://x-access-token:<tok>@host/...` so private repos work.
  * The token is redacted from any log output by `redactToken`.

@@ -43,11 +43,11 @@ program
   .option('--quiet', 'minimal output (machine-readable result only)')
   .option('--bench', 'output a single JSON line for benchmarking')
   .option('--env-file <file>', 'load env vars from file (KEY=VALUE per line)')
-  .option('--remote', 'execute on a Rehearse Pro hosted sprite (requires REHEARSE_TOKEN)')
+  .option('--remote', 'execute on a Rehearse Pro VM (requires REHEARSE_TOKEN)')
   .option('--api-url <url>', 'override Pro API URL', 'https://api.rehearse.sh')
-  .option('--repo-url <url>', 'override the git remote URL shipped to the sprite (auto-detected from `git remote get-url origin`)')
-  .option('--repo-ref <ref>', 'override the git ref shipped to the sprite (auto-detected from `git rev-parse HEAD`)')
-  .option('--repo-subdir <path>', 'override the in-repo subdirectory the sprite cd-s into after clone (auto-detected from cwd)')
+  .option('--repo-url <url>', 'override the git remote URL shipped to the VM (auto-detected from `git remote get-url origin`)')
+  .option('--repo-ref <ref>', 'override the git ref shipped to the VM (auto-detected from `git rev-parse HEAD`)')
+  .option('--repo-subdir <path>', 'override the in-repo subdirectory the VM cd-s into after clone (auto-detected from cwd)')
   .action(async (workflow, opts) => {
     const env = opts.envFile ? loadEnvFile(opts.envFile) : {};
 
@@ -89,12 +89,12 @@ program
 /**
  * --remote: ship the workflow YAML to api.rehearse.sh/v1/runs/stream and
  * stream stdout/stderr back as it happens. The Pro API forwards to the
- * team's dedicated Sprite microVM with persistent caches.
+ * team's dedicated VM with persistent caches.
  *
  * Repo context (origin URL + current SHA) is auto-detected from cwd so that
- * `actions/checkout` on the sprite clones the right repo at the right ref.
+ * `actions/checkout` on the VM clones the right repo at the right ref.
  * Override with --repo-url / --repo-ref. Pass GH_TOKEN or GITHUB_TOKEN in
- * the environment to clone private repos (embedded in the URL the sprite
+ * the environment to clone private repos (embedded in the URL the VM
  * receives; never logged).
  */
 async function runRemote(args: {
@@ -106,7 +106,7 @@ async function runRemote(args: {
   repoRefOverride?: string;
   repoSubdirOverride?: string;
   /**
-   * Env vars (typically loaded from --env-file). Shipped to the sprite where
+   * Env vars (typically loaded from --env-file). Shipped to the VM where
    * they become BOTH process env AND `${{ secrets.* }}` for workflow
    * expansion. This is what makes `runner run --remote` usable for deploys
    * (AWS_ACCESS_KEY_ID, AZURE_CREDENTIALS, GH_TOKEN, etc.).
@@ -134,7 +134,7 @@ async function runRemote(args: {
   if (!repoUrl) {
     process.stderr.write(
       pc.yellow(
-        '[remote] no git remote detected — sprite will run the workflow without source ' +
+        '[remote] no git remote detected — VM will run the workflow without source ' +
           'checkout. If your workflow uses actions/checkout, pass --repo-url / --repo-ref ' +
           'or run from a clone with `origin` set.\n',
       ),
@@ -199,7 +199,7 @@ async function runRemote(args: {
   const status = finalExit === 0 ? 'success' : 'failure';
   const color = finalExit === 0 ? pc.green : pc.red;
   process.stderr.write(
-    color(`[remote] ${status} · exit=${finalExit} · sprite=${finalDuration}ms · wall=${wallSeconds}s\n`),
+    color(`[remote] ${status} · exit=${finalExit} · vm=${finalDuration}ms · wall=${wallSeconds}s\n`),
   );
   if (runId) process.stderr.write(pc.dim(`[remote] run id: ${runId}\n`));
   return finalExit === 0 ? 0 : 1;

@@ -9,13 +9,13 @@
  *      `<install-dir>` and `<install-dir>/tools` go on PATH.
  *   4. Set `DOTNET_ROOT` so `dotnet` resolves SDKs/runtimes correctly.
  *
- * Cache strategy: the SDK lives on the persistent rootfs (sprite) or the
+ * Cache strategy: the SDK lives on the persistent rootfs (Pro VM) or the
  * developer's home dir (local). First-run install is ~30-60s per channel
  * (network-bound); subsequent runs detect the version is already present
  * and skip the network entirely.
  *
  * Why this matters: the previous shim was a no-op that assumed the host
- * already had dotnet on PATH. That breaks on Sprites (no dotnet shipped)
+ * already had dotnet on PATH. That breaks on Pro VMs (no dotnet shipped)
  * and on any developer laptop that doesn't have the requested SDK version.
  */
 import { spawnSync } from 'node:child_process';
@@ -76,7 +76,7 @@ export async function setupDotnetShim(step: PlannedStep, session: JobSession): P
   session.env.DOTNET_CLI_TELEMETRY_OPTOUT = session.env.DOTNET_CLI_TELEMETRY_OPTOUT ?? '1';
   session.env.DOTNET_NOLOGO = session.env.DOTNET_NOLOGO ?? 'true';
   session.env.DOTNET_SKIP_FIRST_TIME_EXPERIENCE = session.env.DOTNET_SKIP_FIRST_TIME_EXPERIENCE ?? '1';
-  // Many minimal Linux base images (Sprites included) ship without libicu.
+  // Many minimal Linux base images (Pro VM included) ship without libicu.
   // .NET hard-requires ICU for globalization unless we set this flag, in
   // which case `dotnet` runs in invariant culture mode — fine for >99% of
   // CI builds (compile + test). Customer can override by setting the var

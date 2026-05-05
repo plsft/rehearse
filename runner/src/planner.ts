@@ -78,12 +78,13 @@ function pickBackend(job: ParsedJob, opts: RunOptions): BackendName {
   return 'host';
 }
 
-function stepLabel(step: ParsedStep, idx: number): string {
-  if (step.name) return step.name;
-  if (step.uses) return step.uses;
+function stepLabel(step: ParsedStep, idx: number, ctx: ExpressionContext): string {
+  if (step.name) return substituteString(step.name, ctx) ?? step.name;
+  if (step.uses) return substituteString(step.uses, ctx) ?? step.uses;
   if (step.run) {
     const first = step.run.split('\n')[0]!.trim();
-    return first.length > 60 ? first.slice(0, 57) + '…' : first;
+    const expanded = substituteString(first, ctx) ?? first;
+    return expanded.length > 60 ? expanded.slice(0, 57) + '…' : expanded;
   }
   return `step ${idx + 1}`;
 }
@@ -99,7 +100,7 @@ function planSteps(rawSteps: ParsedStep[], ctx: ExpressionContext, opts: RunOpti
     const ifCondition = raw.if ? raw.if : undefined;
     const planned: PlannedStep = {
       index,
-      label: stepLabel(raw, index),
+      label: stepLabel(raw, index, ctx),
       raw,
       env,
       with: w,
@@ -164,7 +165,10 @@ export function plan(workflow: ParsedWorkflow, opts: RunOptions): PlannedJob[] {
       const id = cells.length === 1 ? jobKey : `${jobKey}:${cellId(cell)}`;
       const env = substituteEnv(rawJob.env as Record<string, string> | undefined, ctx);
       const steps = planSteps(rawJob.steps ?? [], ctx, opts);
-      const runsOn = String(Array.isArray(rawJob['runs-on']) ? rawJob['runs-on'][0] : rawJob['runs-on'] ?? 'ubuntu-latest');
+      const rawRunsOn = String(Array.isArray(rawJob['runs-on']) ? rawJob['runs-on'][0] : rawJob['runs-on'] ?? 'ubuntu-latest');
+      // Substitute ${{ matrix.* }} so the displayed runs-on shows the
+      // expanded label (e.g. "ubuntu-latest" instead of "${{ matrix.os }}").
+      const runsOn = substituteString(rawRunsOn, ctx) ?? rawRunsOn;
       out.push({
         id,
         jobKey,

@@ -45,8 +45,8 @@ if (!existsSync(runnerCli)) {
 // Apps we skip on Pro and document why. The `--only` override still runs
 // these so you can confirm the limitation hasn't changed.
 const PRO_UNSUPPORTED = {
-  'php-app': 'PHP runtime not on Sprites; composer not found; shivammathur/setup-php@v2 needs apt-get',
-  'python-api': 'declares `services: postgres` which needs Docker on the sprite (not available in Pro v0)',
+  'php-app': 'PHP runtime not on the Pro VM; composer not found; shivammathur/setup-php@v2 needs apt-get',
+  'python-api': 'declares `services: postgres` which needs Docker on the VM (not available in Pro v0)',
 };
 
 const apps = readdirSync(examplesDir, { withFileTypes: true })

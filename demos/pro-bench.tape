@@ -6,8 +6,8 @@
 # Output: demos/pro-bench.mp4 (~80 seconds)
 #
 # Pre-recording: REHEARSE_TOKEN_DEMO must be set in the recording shell, and
-# the team's sprite cache should be wiped via the dashboard or ssh into the
-# sprite (rm -rf /home/sprite/.npm/_cacache /tmp/bench).
+# the team's VM cache should be wiped via the dashboard or ssh into the
+# VM (rm -rf ~/.npm/_cacache /tmp/bench).
 #
 # What you'll see:
 #   1. The workflow (npm install of 8 popular packages) — 5s
@@ -56,7 +56,7 @@ Sleep 6s
 # §2 — Run 1, cold
 Type "clear" Enter
 Sleep 200ms
-Type "# Run 1 — cold cache, fresh sprite. We're paying full network freight." Enter
+Type "# Run 1 — cold cache, fresh VM. We're paying full network freight." Enter
 Sleep 800ms
 Type "runner run --remote .github/workflows/ci.yml" Enter
 Sleep 16s
@@ -64,7 +64,7 @@ Sleep 16s
 # §3 — Run 2, warm
 Type "" Enter
 Sleep 400ms
-Type "# Run 2 — same workflow. The npm cache from run 1 survived on the sprite." Enter
+Type "# Run 2 — same workflow. The npm cache from run 1 survived on the VM." Enter
 Sleep 800ms
 Type "runner run --remote .github/workflows/ci.yml" Enter
 Sleep 9s
