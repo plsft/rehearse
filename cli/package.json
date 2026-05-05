@@ -1,6 +1,6 @@
 {
   "name": "@rehearse/cli",
-  "version": "0.3.14",
+  "version": "0.3.15",
   "description": "Rehearse CLI — compile and convert TypeScript GitHub Actions pipelines (rh)",
   "license": "Apache-2.0",
   "type": "module",
