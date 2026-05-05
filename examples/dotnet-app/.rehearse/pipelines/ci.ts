@@ -2,11 +2,12 @@
  * CI pipeline for the dotnet-app example.
  *
  * Demonstrates:
- *   - actions/setup-dotnet@v4 — shimmed in @rehearse/runner as a host
- *     no-op (the runner uses whatever `dotnet` is on PATH instead of
- *     downloading the SDK), so local runs are instant.
- *   - matrix across [net8.0, net9.0] — runs in parallel via per-cell
- *     git worktree
+ *   - actions/setup-dotnet@v4 — real shim in @rehearse/runner. Uses host
+ *     `dotnet` if present at the right version; otherwise runs Microsoft's
+ *     dotnet-install.sh and caches the SDK to ~/.dotnet/. On Pro VMs the
+ *     SDK persists across runs (~7ms cached vs ~16s first install).
+ *   - matrix across [net8.0, net9.0, net10.0] — runs in parallel via
+ *     per-cell git worktree
  *   - dotnet restore / build / test pipeline with coverlet coverage
  *   - upload-artifact for the TRX test results per matrix cell
  *   - actions/cache for the NuGet packages directory
@@ -22,7 +23,7 @@ export const ci = pipeline('dotnet app CI', {
     job('test', {
       runner: Runner.ubicloud('standard-4'),
       matrix: {
-        variables: { framework: ['net8.0', 'net9.0'] },
+        variables: { framework: ['net8.0', 'net9.0', 'net10.0'] },
         failFast: false,
       },
       env: {
@@ -36,7 +37,7 @@ export const ci = pipeline('dotnet app CI', {
         step.action('actions/setup-dotnet@v4', {
           name: 'Setup .NET',
           with: {
-            'dotnet-version': '8.0.x\n9.0.x',
+            'dotnet-version': '8.0.x\n9.0.x\n10.0.x',
           },
         }),
 
