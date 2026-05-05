@@ -4,10 +4,10 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#08090c" />
-<title>Rehearse Pro — hosted CI runner with persistent caches</title>
-<meta name="description" content="Rehearse Pro: hosted CI runner on private microVMs. Caches survive between runs. Same workflow YAML. $49/mo." />
-<meta property="og:title" content="Rehearse Pro — hosted CI runner with persistent caches" />
-<meta property="og:description" content="Private dedicated microVM. Caches survive between runs. Same workflow YAML. $49/mo." />
+<title>Rehearse Pro — for when the laptop isn't enough</title>
+<meta name="description" content="Rehearse Pro: single-tenant VM you offload to when local CI isn't enough. Whole-rootfs persistence — every cache, every artifact, every tool install survives between runs forever. $49/mo flat, unlimited minutes." />
+<meta property="og:title" content="Rehearse Pro — for when the laptop isn't enough" />
+<meta property="og:description" content="Single-tenant VM with whole-rootfs persistence. Every cache survives between runs. $49/mo flat, unlimited minutes." />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -28,7 +28,7 @@
       <a href="/" class="nav-link">OSS runner</a>
       <a href="/pro" class="nav-link text-white">Pro</a>
       <a href="/pricing" class="nav-link">Pricing</a>
-      
+      <a href="/vs" class="nav-link">vs</a>
       <a href="/security" class="nav-link">Security</a>
       <a href="/docs/pro" class="nav-link">Docs</a>
       <a href="https://pro.rehearse.sh/sign-in" class="nav-link">Sign in</a>
@@ -44,22 +44,36 @@
 <section class="bg-grid pt-36 pb-20 relative">
   <div class="max-w-6xl mx-auto px-5">
     <div class="max-w-3xl mx-auto text-center">
-      <div class="tag mb-5"><span class="w-1.5 h-1.5 rounded-full bg-[var(--rh-accent)] inline-block"></span> rehearse pro · hosted runner · $49 / month</div>
+      <div class="tag mb-5"><span class="w-1.5 h-1.5 rounded-full bg-[var(--rh-accent)] inline-block"></span> rehearse pro · the offload target · $49 / month flat</div>
       <h1 class="text-4xl sm:text-5xl lg:text-[3.7rem] leading-[1.04] font-semibold tracking-tight gradient-text">
-        Your CI on a private microVM.<br/>Caches that actually persist.
+        For when the laptop<br/><span class="text-white">isn't enough.</span>
       </h1>
       <p class="mt-6 text-lg text-[var(--rh-muted)] max-w-2xl mx-auto">
-        GitHub Actions throws away your runner after every job. So you re-download Node, re-install dependencies, re-build the same artifacts on every push.
-        Rehearse Pro gives you <span class="text-white">a dedicated, hardware-isolated microVM that keeps your caches between runs</span>. <code class="font-mono text-white/90">npm</code>, <code class="font-mono text-white/90">pip</code>, <code class="font-mono text-white/90">cargo</code> caches survive. Same workflow YAML you already have. Opt in with one flag: <code class="font-mono text-white/90">runner run --remote</code>.
+        Most CI runs locally on your machine in seconds — that's what
+        the <a href="/" class="link">OSS runner</a> is for. Pro is the single-tenant VM you
+        offload to when:
+      </p>
+      <ul class="mt-5 space-y-2 text-[var(--rh-muted)] max-w-xl mx-auto text-left text-[15px]">
+        <li>(a) the workload is too heavy for a laptop (think 30-min Rust builds, full E2E suites)</li>
+        <li>(b) you're on the train and want CI running while you sleep</li>
+        <li>(c) you need a clean Linux env from a Mac/Windows host</li>
+        <li>(d) you want a long-lived warm cache that follows you across machines</li>
+      </ul>
+      <p class="mt-6 text-lg text-[var(--rh-muted)] max-w-2xl mx-auto">
+        <span class="text-white">Whole-rootfs persistence</span> — every cache, every build artifact,
+        every tool install survives between runs forever. Not just
+        <code class="font-mono text-white/90">actions/cache</code> paths. Not just declared volumes.
+        <span class="text-white">Everything.</span> One flag: <code class="font-mono text-white/90">runner run --remote</code>.
       </p>
       <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
-        <a href="/pricing" class="btn btn-primary">Start Pro — $49/mo</a>
-        <a href="/docs/pro" class="btn btn-ghost">How it works →</a>
+        <a href="/pricing" class="btn btn-primary">Start Pro — $49/mo flat</a>
+        <a href="/vs" class="btn btn-ghost">vs Blacksmith / Ubicloud →</a>
       </div>
       <div class="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2 text-[12.5px] font-mono text-[var(--rh-muted)]">
-        <span><span class="ok">●</span> Dedicated microVM, 100 GB storage</span>
-        <span><span class="ok">●</span> ~2× faster npm install (measured)</span>
-        <span><span class="ok">●</span> Same workflow YAML, opt-in flag</span>
+        <span><span class="ok">●</span> Single-tenant VM, hardware-isolated</span>
+        <span><span class="ok">●</span> Unlimited minutes</span>
+        <span><span class="ok">●</span> Whole-rootfs persistence (not just declared paths)</span>
+        <span><span class="ok">●</span> Cancel anytime, OSS runner stays free</span>
       </div>
     </div>
   </div>
@@ -68,27 +82,38 @@
 <section class="py-24 hairline">
   <div class="max-w-6xl mx-auto px-5">
     <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-2">// what you get</div>
-    <h2 class="text-3xl font-semibold tracking-tight mb-12">CI that remembers.</h2>
+    <h2 class="text-3xl font-semibold tracking-tight mb-3">CI that remembers everything.</h2>
+    <p class="text-[var(--rh-muted)] mb-12 max-w-2xl text-[15px]">The big differentiator vs Blacksmith / RunsOn / Ubicloud isn't price-per-minute — it's that Rehearse Pro persists the <em>whole filesystem</em>, not just paths you remembered to declare in <code class="font-mono">actions/cache</code> or a sticky-disks mount.</p>
     <div class="grid md:grid-cols-2 gap-6">
+      <div class="card p-7 border-[var(--rh-accent)]/40">
+        <div class="text-[12px] font-mono text-[var(--rh-accent)] mb-2">★ // whole-rootfs persistence</div>
+        <h3 class="font-semibold text-lg mb-2">Every byte survives. No declarations needed.</h3>
+        <p class="text-[var(--rh-muted)] text-sm">Your VM's entire filesystem persists between runs — <code class="font-mono">~/.npm</code>, <code class="font-mono">~/.cache/pip</code>, <code class="font-mono">~/.cargo/registry</code>, <code class="font-mono">~/.cache/go-build</code>, <code class="font-mono">~/.nuget/packages</code>, <code class="font-mono">node_modules</code>, <code class="font-mono">target/</code>, <code class="font-mono">/tmp</code>, side-installed SDKs. <span class="text-white">No <code class="font-mono">actions/cache</code> blocks needed. No sticky-disk mount declarations. Just runs.</span> Hosted-runner SaaS competitors (Blacksmith Sticky Disks, RunsOn) require you to declare paths up-front — Pro doesn't.</p>
+      </div>
       <div class="card p-7">
-        <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// persistent caches</div>
-        <h3 class="font-semibold text-lg mb-2">Your <code class="font-mono">~/.npm</code> survives.</h3>
-        <p class="text-[var(--rh-muted)] text-sm">Every CI run lands on the same private microVM with your caches intact: <code class="font-mono">~/.npm</code>, <code class="font-mono">~/.cache/pip</code>, <code class="font-mono">~/.cargo</code>, <code class="font-mono">~/.gradle</code>, <code class="font-mono">node_modules</code>. We measured a typical npm install dropping from 10.5s cold to 5.1s warm — ~2× on the install step.</p>
+        <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// flat-rate billing</div>
+        <h3 class="font-semibold text-lg mb-2">$49/mo flat. Unlimited minutes.</h3>
+        <p class="text-[var(--rh-muted)] text-sm">No per-minute meter, no overage charges, no "noisy neighbor" surprises on your invoice. Heavy users (50,000 min/mo+) save real money vs per-minute competitors. Light users get the OSS runner free for everything that doesn't need a remote VM. <a href="/vs" class="link">See the math →</a></p>
       </div>
       <div class="card p-7">
         <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// isolated</div>
-        <h3 class="font-semibold text-lg mb-2">Hardware-isolated microVM.</h3>
-        <p class="text-[var(--rh-muted)] text-sm">One dedicated microVM per team — not a shared host, not a container on someone else's kernel. Hardware-level isolation, persistent ext4 filesystem, 100 GB of storage.</p>
+        <h3 class="font-semibold text-lg mb-2">Single-tenant VM. Not a shared pool.</h3>
+        <p class="text-[var(--rh-muted)] text-sm">One dedicated microVM per customer — not a shared host, not a container on someone else's kernel, not a sticky-disk slice. Hardware-level isolation. Your code never lands on another customer's box. Real security boundary for compliance-conscious teams.</p>
       </div>
       <div class="card p-7">
-        <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// same cli, local + cloud</div>
-        <h3 class="font-semibold text-lg mb-2">One binary, two backends.</h3>
-        <p class="text-[var(--rh-muted)] text-sm"><code class="font-mono">runner run</code> executes locally; <code class="font-mono">runner run --remote</code> ships the same workflow to your VM. Same YAML, same output format, same command. Switch with one flag — no config files, no second tool to learn.</p>
+        <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// same cli, three targets</div>
+        <h3 class="font-semibold text-lg mb-2">One binary, three execution targets.</h3>
+        <p class="text-[var(--rh-muted)] text-sm"><code class="font-mono">runner run</code> for local. <code class="font-mono">runner run --remote</code> for Pro. <code class="font-mono">git push</code> for GitHub Actions. Same YAML, same output format, same exit codes. Switch with one flag — no config files, no second tool, no lock-in. Drop the flag and you're back to free OSS execution.</p>
       </div>
       <div class="card p-7">
         <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// streaming logs</div>
-        <h3 class="font-semibold text-lg mb-2">Live output.</h3>
-        <p class="text-[var(--rh-muted)] text-sm">Daemon streams stdout and stderr line-by-line over a long-lived HTTP connection. Your terminal updates as the workflow runs, not at the end. Closes when the run finishes with the real exit code.</p>
+        <h3 class="font-semibold text-lg mb-2">Live output, no buffering.</h3>
+        <p class="text-[var(--rh-muted)] text-sm">Daemon streams stdout and stderr line-by-line over a long-lived HTTP connection. Your terminal updates as the workflow runs, not at the end. Closes with the real exit code so your shell scripts work.</p>
+      </div>
+      <div class="card p-7">
+        <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// secrets via --env-file</div>
+        <h3 class="font-semibold text-lg mb-2">Ship secrets, deploy from CI.</h3>
+        <p class="text-[var(--rh-muted)] text-sm"><code class="font-mono">--env-file .env</code> ships your local credentials to the VM as <code class="font-mono">${{ secrets.* }}</code>. Deploy to AWS / Cloudflare / Fly without provisioning anything in CI itself. The VM has <code class="font-mono">curl</code> / <code class="font-mono">ssh</code> / <code class="font-mono">rsync</code>; install <code class="font-mono">aws</code> / <code class="font-mono">terraform</code> on first use, cached forever after.</p>
       </div>
     </div>
   </div>

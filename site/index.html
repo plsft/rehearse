@@ -4,10 +4,10 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#08090c" />
-<title>Rehearse — GitHub Actions, locally. 5–30× faster than act.</title>
-<meta name="description" content="Run your .github/workflows/*.yml on your laptop in seconds, not minutes. 5–9× faster than act on standard workflows, 30× on services. Same YAML. No new config. Free, Apache 2.0." />
-<meta property="og:title" content="Rehearse — GitHub Actions, locally" />
-<meta property="og:description" content="Run your .github/workflows/*.yml on your laptop in seconds. Free, Apache 2.0." />
+<title>Rehearse — CI feedback in seconds, before you push.</title>
+<meta name="description" content="Run your .github/workflows/*.yml on every save. Sub-second feedback on a laptop. ~63× faster than GitHub Actions on a 9-cell matrix. Same YAML, three execution targets, no lock-in. Apache 2.0." />
+<meta property="og:title" content="Rehearse — CI feedback in seconds, before you push" />
+<meta property="og:description" content="Run your GitHub Actions workflow on every save. Sub-second on a laptop. ~63× faster than GH Actions on real workflows. Apache 2.0." />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -19,11 +19,11 @@
 <body class="antialiased" x-data="{ scrolled: false, copied: '' }" x-init="window.addEventListener('scroll', () => scrolled = window.scrollY > 8)">
 
 <!-- ============== ANNOUNCEMENT ============== -->
-<a href="/pro" class="block bg-[var(--rh-accent-glow)] border-b border-[var(--rh-accent)]/30 hover:bg-[var(--rh-accent-dim)]/20 transition-colors fixed inset-x-0 top-0 z-[60]">
+<a href="/vs" class="block bg-[var(--rh-accent-glow)] border-b border-[var(--rh-accent)]/30 hover:bg-[var(--rh-accent-dim)]/20 transition-colors fixed inset-x-0 top-0 z-[60]">
   <div class="max-w-6xl mx-auto px-5 h-7 flex items-center justify-center gap-2 text-[12px] font-mono">
     <span class="text-[var(--rh-accent)]">// new</span>
-    <span class="text-white">Rehearse Pro — same CLI, hosted runner, caches between runs.</span>
-    <span class="text-[var(--rh-muted)]">$49/mo →</span>
+    <span class="text-white">Comparing CI runners? Read our honest take vs Blacksmith / Ubicloud / RunsOn.</span>
+    <span class="text-[var(--rh-muted)]">→</span>
   </div>
 </a>
 
@@ -41,6 +41,7 @@
       <a href="#features" class="nav-link">Features</a>
       <a href="/packages" class="nav-link">Packages</a>
       <a href="/docs" class="nav-link">Docs</a>
+      <a href="/vs" class="nav-link">vs</a>
       <a href="/about" class="nav-link">About</a>
       <a href="/pro" class="nav-link text-white">Pro
         <span class="ml-1 text-[10px] font-mono text-[var(--rh-accent)] border border-[var(--rh-accent)]/40 rounded px-1 py-0.5 align-middle">$49/mo</span>
@@ -60,14 +61,18 @@
   <div class="max-w-6xl mx-auto px-5">
     <!-- Pitch text — centered -->
     <div class="max-w-3xl mx-auto text-center">
-      <div class="tag mb-5"><span class="w-1.5 h-1.5 rounded-full bg-[var(--rh-accent)] inline-block"></span> public alpha · Apache 2.0</div>
+      <div class="tag mb-5"><span class="w-1.5 h-1.5 rounded-full bg-[var(--rh-accent)] inline-block"></span> public alpha · Apache 2.0 · OSS-first</div>
       <h1 class="text-4xl sm:text-5xl lg:text-[3.7rem] leading-[1.04] font-semibold tracking-tight gradient-text">
-        Stop pushing CI failures.
+        CI feedback in seconds, <span class="text-white">before you push.</span>
       </h1>
       <p class="mt-6 text-lg text-[var(--rh-muted)] max-w-2xl mx-auto">
-        Rehearse runs your <code class="font-mono text-white/90">.github/workflows/*.yml</code> on your laptop, in
-        <span class="text-white">seconds</span>. Catch the failure before the
-        push. Same YAML. Same outcome. <span class="accent-text font-semibold">5–9× faster than <code class="font-mono">act</code></span> on standard workflows, <span class="accent-text font-semibold">30× on services</span>.
+        Most CI tools start the clock at <code class="font-mono text-white/90">git push</code>. Rehearse runs your
+        <code class="font-mono text-white/90">.github/workflows/*.yml</code> on your laptop, on every save, in
+        <span class="text-white">sub-second</span>. Same YAML, three execution targets, <span class="accent-text font-semibold">no lock-in</span>.
+        On a real 9-cell matrix workflow:
+        <span class="accent-text font-semibold">1.5s local</span> ·
+        <span class="accent-text font-semibold">5s on a private VM</span> ·
+        <span class="text-white/70">95s on GitHub Actions</span>.
       </p>
 
       <!-- Install command -->
@@ -102,9 +107,9 @@
       </div>
 
       <div class="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2 text-[12.5px] font-mono text-[var(--rh-muted)]">
-        <span><span class="ok">●</span> No new config</span>
-        <span><span class="ok">●</span> Host + container backends</span>
-        <span><span class="ok">●</span> Matrix + services</span>
+        <span><span class="ok">●</span> No new config — your existing YAML</span>
+        <span><span class="ok">●</span> No account, no signup</span>
+        <span><span class="ok">●</span> No telemetry, no phone-home</span>
         <span><span class="ok">●</span> 97% of real workflows just work</span>
       </div>
     </div>
@@ -122,7 +127,7 @@
       </div>
     </div>
     <div class="mt-3 text-[12px] font-mono text-[var(--rh-muted)] text-right">
-      simulated output · real run on a Windows 11 laptop takes ~13s warm (v0.3.17 bench) · GitHub-hosted ~50–110s
+      simulated output · real run on a Windows 11 laptop takes 1.5s warm on the typey demo (v0.3.17) · GitHub Actions ~95s for the same 9-cell matrix
     </div>
   </div>
 </section>
@@ -132,18 +137,48 @@
   <div class="max-w-6xl mx-auto px-5">
     <div class="max-w-3xl">
       <div class="eyebrow">// The benchmark</div>
-      <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">Real workflows. Real numbers.</h2>
+      <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">Real workflows vs GitHub Actions.</h2>
       <p class="mt-4 text-lg text-[var(--rh-muted)]">
-        Four workflows on a fresh GitHub-hosted <code class="font-mono">ubuntu-latest</code>
-        runner, head-to-head against <a href="https://github.com/nektos/act" class="link">nektos/act</a>.
-        Same YAML, same job, same runner image. Both tools timed warm.
-        Reproducible via <code class="font-mono">gh workflow run bench.yml</code>.
-        (A fifth target, <code class="font-mono">hono-node-matrix</code>, is in
-        regression on GH-hosted runners — see caveats below.)
+        Same YAML, three execution targets, wall-clock measured. The
+        speedup is the spin-up tax that hosted runners can't avoid —
+        cold container, fresh toolchain install, cold module caches on
+        every push. The local runner skips all of it; the Pro VM keeps
+        everything warm between runs.
       </p>
     </div>
 
-    <div class="mt-12 term">
+    <!-- Three-target comparison (the lead) -->
+    <div class="mt-12 grid md:grid-cols-3 gap-5">
+      <div class="card p-6">
+        <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">LOCAL · runner run</div>
+        <div class="text-4xl font-semibold text-white">1.5<span class="text-xl text-[var(--rh-muted)]">s</span></div>
+        <p class="mt-2 text-sm text-[var(--rh-muted)]">9-cell matrix workflow on plsft/typey, warm. Sub-second per cell.</p>
+      </div>
+      <div class="card p-6 border-[var(--rh-accent)]/40">
+        <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">PRO · runner run --remote</div>
+        <div class="text-4xl font-semibold text-white">5<span class="text-xl text-[var(--rh-muted)]">s</span></div>
+        <p class="mt-2 text-sm text-[var(--rh-muted)]">Same workflow on a private VM. Network roundtrip + actual VM execution.</p>
+      </div>
+      <div class="card p-6">
+        <div class="font-mono text-xs text-[var(--rh-muted)] mb-2">GH ACTIONS</div>
+        <div class="text-4xl font-semibold text-[var(--rh-muted)]">95<span class="text-xl">s</span></div>
+        <p class="mt-2 text-sm text-[var(--rh-muted)]">Same YAML pushed to GitHub. 9 fresh containers, each downloads Bun cold, each cold-loads every tool.</p>
+      </div>
+    </div>
+
+    <p class="mt-6 text-[12.5px] font-mono text-[var(--rh-muted)]">
+      <span class="text-white">63× faster local · 19× faster on Pro</span> vs GitHub Actions
+      on the same workflow. Reproduce: <a href="https://github.com/plsft/typey" class="link">github.com/plsft/typey</a>.
+    </p>
+
+    <h3 class="mt-16 text-xl font-semibold text-white">Footnote: vs <code class="font-mono">act</code> on standard fixtures</h3>
+    <p class="mt-2 text-sm text-[var(--rh-muted)] max-w-3xl">
+      Most folks comparison-shop us against <a href="https://github.com/nektos/act" class="link">nektos/act</a> — the OSS project we share a category with. Four
+      fixture workflows on a fresh GH-hosted runner, both tools warm,
+      same YAML. Reproducible via <code class="font-mono">gh workflow run bench.yml</code>.
+    </p>
+
+    <div class="mt-6 term">
       <div class="term-header">
         <span class="term-dot dot-r"></span><span class="term-dot dot-y"></span><span class="term-dot dot-g"></span>
         <span class="term-title">$ pnpm tsx bench/compare.ts --skip-cold</span>
@@ -230,28 +265,39 @@
   </div>
 </section>
 
-<!-- ============== LOCAL + CLOUD ============== -->
+<!-- ============== THREE EXECUTION TARGETS ============== -->
 <section class="py-24 hairline bg-track">
   <div class="max-w-6xl mx-auto px-5">
     <div class="max-w-3xl">
-      <div class="eyebrow">// Local + cloud, same binary</div>
-      <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">One CLI. Two backends. Switch with a flag.</h2>
+      <div class="eyebrow">// Same source, three execution targets</div>
+      <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">Pick the loop that matches the task.</h2>
       <p class="mt-4 text-lg text-[var(--rh-muted)]">
-        Run on your laptop for free. When you want a hosted runner with caches that persist between runs, add <code class="font-mono text-white">--remote</code>. Same workflow YAML, same output format, same exit codes. No second tool to learn, no lock-in.
+        Same workflow YAML. Same output format. Same exit codes. Switch
+        targets with a flag — no second tool, no second config, no lock-in.
       </p>
     </div>
-    <div class="grid md:grid-cols-2 gap-6 mt-10">
+    <div class="grid md:grid-cols-3 gap-5 mt-10">
       <div class="card p-6">
-        <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// local</div>
-        <pre class="font-mono text-[13px] text-white/90"><span class="prompt"></span>runner run .github/workflows/ci.yml</pre>
-        <p class="mt-4 text-sm text-[var(--rh-muted)]">Free. Apache 2.0. Host or container backend, your choice. 5–30× faster than <code class="font-mono">act</code> on the bench above.</p>
+        <div class="text-[12px] font-mono text-[var(--rh-accent)] mb-2">// 1 — local (free)</div>
+        <pre class="font-mono text-[13px] text-white/90"><span class="prompt"></span>runner run ci.yml</pre>
+        <p class="mt-4 text-sm text-[var(--rh-muted)]"><span class="text-white">Inner loop.</span> Sub-second feedback on every save. Apache 2.0, no signup, no telemetry. Pair with <code class="font-mono">runner watch</code> or the pre-push hook to catch failures before <code class="font-mono">git push</code>.</p>
       </div>
       <div class="card p-6 border-[var(--rh-accent)]/40">
-        <div class="text-[12px] font-mono text-[var(--rh-accent)] mb-2">// cloud</div>
-        <pre class="font-mono text-[13px] text-white/90"><span class="prompt"></span>runner run --remote .github/workflows/ci.yml</pre>
-        <p class="mt-4 text-sm text-[var(--rh-muted)]">$49/mo. Dedicated microVM with 100 GB persistent storage. Live-streaming logs. ~2× faster <code class="font-mono">npm install</code> on warm runs (measured). <a href="/pro" class="link">Read more →</a></p>
+        <div class="text-[12px] font-mono text-[var(--rh-accent)] mb-2">// 2 — Pro VM ($49/mo)</div>
+        <pre class="font-mono text-[13px] text-white/90"><span class="prompt"></span>runner run --remote ci.yml</pre>
+        <p class="mt-4 text-sm text-[var(--rh-muted)]"><span class="text-white">For when the laptop isn't enough.</span> Single-tenant VM. <span class="text-white">Whole-rootfs persistence</span> — every cache, every build artifact, every tool install survives forever. <a href="/pro" class="link">Read more →</a></p>
+      </div>
+      <div class="card p-6">
+        <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// 3 — GitHub Actions</div>
+        <pre class="font-mono text-[13px] text-white/90"><span class="prompt"></span>git push</pre>
+        <p class="mt-4 text-sm text-[var(--rh-muted)]"><span class="text-white">System of record.</span> Compiled YAML pushes to GH and runs as written — no Rehearse runtime dependency on GH's side. The YAML is yours, you can leave any time.</p>
       </div>
     </div>
+    <p class="mt-6 text-[12.5px] font-mono text-[var(--rh-muted)] max-w-3xl">
+      Compare with hosted-runner replacements (<a href="/vs" class="link">vs Blacksmith / Ubicloud / RunsOn</a>):
+      they only optimize target #3. Rehearse is the only tool that gives
+      you a fast pre-push loop AND an offload target — same source.
+    </p>
   </div>
 </section>
 
@@ -260,14 +306,57 @@
   <div class="max-w-6xl mx-auto px-5">
     <div class="max-w-3xl">
       <div class="eyebrow">// Features</div>
-      <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">A real runner. Not a demo.</h2>
+      <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">What you get that hosted runners can't give you.</h2>
       <p class="mt-4 text-lg text-[var(--rh-muted)]">
-        Parallel jobs. Matrix. Services. Caching. Watch mode. Pre-push hook.
-        All wired in. 121 tests across 13 suites in the runner package alone.
+        These are the differentiators. Hosted-runner replacements
+        (Blacksmith, Ubicloud, RunsOn) start the clock at <code class="font-mono">git push</code> —
+        they can't compete on the inner-loop features no matter how
+        cheap their per-minute price gets.
       </p>
     </div>
 
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mt-12">
+      <!-- ★ INNER-LOOP DIFFERENTIATORS (the things hosted runners can't do) -->
+      <div class="card card-feature border-[var(--rh-accent)]/40">
+        <div class="flex items-center gap-2.5">
+          <span class="step-plate" style="font-size:14px">↻</span>
+          <div class="font-mono text-xs text-[var(--rh-accent)]">★ WATCH MODE</div>
+        </div>
+        <div class="mt-3 text-lg font-semibold text-white">CI on every save.</div>
+        <p class="mt-2 text-sm text-[var(--rh-muted)]">
+          <code class="font-mono">runner watch</code> re-runs your workflow on
+          every file change. Debounced, queue-coalesced. <span class="text-white">No hosted runner can do this</span> —
+          they bill per minute and you'd go bankrupt.
+        </p>
+      </div>
+
+      <div class="card card-feature border-[var(--rh-accent)]/40">
+        <div class="flex items-center gap-2.5">
+          <span class="step-plate" style="font-size:14px">🛡</span>
+          <div class="font-mono text-xs text-[var(--rh-accent)]">★ PRE-PUSH HOOK</div>
+        </div>
+        <div class="mt-3 text-lg font-semibold text-white">Block bad pushes at the source.</div>
+        <p class="mt-2 text-sm text-[var(--rh-muted)]">
+          <code class="font-mono">runner install-hook</code> writes a
+          <code class="font-mono">.git/hooks/pre-push</code> that runs your
+          workflow first. Push only if green. <span class="text-white">CI minutes burned: zero.</span>
+        </p>
+      </div>
+
+      <div class="card card-feature border-[var(--rh-accent)]/40">
+        <div class="flex items-center gap-2.5">
+          <span class="step-plate" style="font-size:14px">⏎</span>
+          <div class="font-mono text-xs text-[var(--rh-accent)]">★ NO LOCK-IN</div>
+        </div>
+        <div class="mt-3 text-lg font-semibold text-white">OSS-first, ejectable.</div>
+        <p class="mt-2 text-sm text-[var(--rh-muted)]">
+          Apache 2.0, no signup, no telemetry, no phone-home. The
+          compiled YAML works on stock GitHub Actions with no Rehearse
+          runtime. <span class="text-white">If we vanish, your CI doesn't notice.</span>
+        </p>
+      </div>
+
+      <!-- TECHNICAL FEATURES (the engine) -->
       <div class="card card-feature">
         <div class="flex items-center gap-2.5">
           <span class="step-plate" style="font-size:14px">⚡</span>
@@ -290,7 +379,7 @@
         <p class="mt-2 text-sm text-[var(--rh-muted)]">
           Postgres, Redis, MySQL — start as services on a private Docker network with
           <code class="font-mono">--network-alias</code> wired correctly. Health-check
-          waiting included. <span class="text-white">act times out on this — confirmed on Linux <em>and</em> Windows.</span>
+          waiting included. <span class="text-white">act times out on this.</span>
         </p>
       </div>
 
@@ -306,33 +395,6 @@
           <code class="font-mono">${{ matrix.* }}</code>. Cells run in
           <span class="text-white">parallel</span> via per-cell
           <code class="font-mono">git worktree</code> — no shared-workspace races.
-        </p>
-      </div>
-
-      <div class="card card-feature">
-        <div class="flex items-center gap-2.5">
-          <span class="step-plate" style="font-size:14px">↻</span>
-          <div class="font-mono text-xs text-[var(--rh-accent)]">WATCH MODE</div>
-        </div>
-        <div class="mt-3 text-lg font-semibold text-white">Inner-loop dev tool.</div>
-        <p class="mt-2 text-sm text-[var(--rh-muted)]">
-          <code class="font-mono">runner watch</code> re-runs your workflow on
-          every save. Debounced, queue-coalesced. Stop typing
-          <code class="font-mono">git push -f</code>; iterate against your CI
-          on every keystroke.
-        </p>
-      </div>
-
-      <div class="card card-feature">
-        <div class="flex items-center gap-2.5">
-          <span class="step-plate" style="font-size:14px">🛡</span>
-          <div class="font-mono text-xs text-[var(--rh-accent)]">PRE-PUSH HOOK</div>
-        </div>
-        <div class="mt-3 text-lg font-semibold text-white">Block bad pushes at the source.</div>
-        <p class="mt-2 text-sm text-[var(--rh-muted)]">
-          <code class="font-mono">runner install-hook</code> writes a
-          <code class="font-mono">.git/hooks/pre-push</code> that runs your
-          workflow first. Push only if green. CI minutes spent: zero.
         </p>
       </div>
 
@@ -494,35 +556,40 @@
 <section id="oss" class="py-24 hairline">
   <div class="max-w-6xl mx-auto px-5">
     <div class="max-w-3xl">
-      <div class="eyebrow">// Open source</div>
-      <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">All Apache 2.0. Use locally for free.</h2>
+      <div class="eyebrow">// Open source — your moat against vendor risk</div>
+      <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">All Apache 2.0. Use locally for free, forever.</h2>
       <p class="mt-4 text-lg text-[var(--rh-muted)]">
-        Four packages on npm. One source repo on GitHub. The OSS runner is free forever — drop the <code class="font-mono">--remote</code> flag and it executes on your laptop with no service tie-in. <a href="/pro" class="link">Pro</a> adds a hosted execution target with persistent caches, but it's strictly additive: same binary, same YAML, same exit codes.
+        Four packages on npm. One source repo on GitHub. The OSS runner
+        is the entire engine — no closed-source layer, no SaaS tie-in,
+        no telemetry. <span class="text-white">If we get acquired, raise prices, or vanish,
+        your CI keeps running on your laptop without us.</span> Hosted-runner
+        SaaS competitors (Blacksmith, Ubicloud, RunsOn) are closed-source
+        — you don't get this guarantee.
       </p>
     </div>
     <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-5 mt-12">
+      <a href="https://www.npmjs.com/package/@rehearse/ci" class="card border-[var(--rh-accent)]/40 hover:border-[var(--rh-accent)]/60 transition">
+        <div class="font-mono text-xs text-[var(--rh-accent)]">★ @rehearse/ci</div>
+        <div class="mt-2 text-lg font-semibold text-white">TypeScript pipeline SDK</div>
+        <p class="mt-2 text-sm text-[var(--rh-muted)]">Author workflows in TS with full IDE autocomplete + types. Compile to standard GitHub Actions YAML. Convert existing YAML → TS in one command. <span class="text-white">No real competitor in this space.</span></p>
+        <div class="mt-4 text-xs font-mono text-[var(--rh-muted)]">npm · Apache 2.0</div>
+      </a>
       <a href="https://www.npmjs.com/package/@rehearse/runner" class="card hover:border-white/20 transition">
         <div class="font-mono text-xs text-[var(--rh-accent)]">@rehearse/runner</div>
         <div class="mt-2 text-lg font-semibold text-white">The runner CLI</div>
         <p class="mt-2 text-sm text-[var(--rh-muted)]">Local-first GH Actions runner: parallel scheduler, host + container backends, matrix, services, watch, pre-push. Binary: <code class="font-mono">runner</code>.</p>
         <div class="mt-4 text-xs font-mono text-[var(--rh-muted)]">npm · Apache 2.0</div>
       </a>
-      <a href="https://www.npmjs.com/package/@rehearse/ci" class="card hover:border-white/20 transition">
-        <div class="font-mono text-xs text-[var(--rh-accent)]">@rehearse/ci</div>
-        <div class="mt-2 text-lg font-semibold text-white">TypeScript pipeline SDK</div>
-        <p class="mt-2 text-sm text-[var(--rh-muted)]">Author workflows in TS, compile to plain GitHub Actions YAML, convert YAML → TS.</p>
+      <a href="https://www.npmjs.com/package/@rehearse/cli" class="card hover:border-white/20 transition">
+        <div class="font-mono text-xs text-[var(--rh-accent)]">@rehearse/cli</div>
+        <div class="mt-2 text-lg font-semibold text-white">TS-pipeline CLI</div>
+        <p class="mt-2 text-sm text-[var(--rh-muted)]">Companion CLI for <code class="font-mono">@rehearse/ci</code>: convert YAML → TS and compile TS → YAML. Binary: <code class="font-mono">rh</code>.</p>
         <div class="mt-4 text-xs font-mono text-[var(--rh-muted)]">npm · Apache 2.0</div>
       </a>
       <a href="https://www.npmjs.com/package/@rehearse/git-core" class="card hover:border-white/20 transition">
         <div class="font-mono text-xs text-[var(--rh-accent)]">@rehearse/git-core</div>
         <div class="mt-2 text-lg font-semibold text-white">Pure-TypeScript git engine</div>
         <p class="mt-2 text-sm text-[var(--rh-muted)]">Pure-TypeScript git for Workers / Node / Bun / browser. Ships standalone — install it directly. 162 tests.</p>
-        <div class="mt-4 text-xs font-mono text-[var(--rh-muted)]">npm · Apache 2.0</div>
-      </a>
-      <a href="https://www.npmjs.com/package/@rehearse/cli" class="card hover:border-white/20 transition">
-        <div class="font-mono text-xs text-[var(--rh-accent)]">@rehearse/cli</div>
-        <div class="mt-2 text-lg font-semibold text-white">TS-pipeline CLI</div>
-        <p class="mt-2 text-sm text-[var(--rh-muted)]">Companion CLI for <code class="font-mono">@rehearse/ci</code>: convert YAML → TS and compile TS → YAML. Binary: <code class="font-mono">rh</code>.</p>
         <div class="mt-4 text-xs font-mono text-[var(--rh-muted)]">npm · Apache 2.0</div>
       </a>
     </div>

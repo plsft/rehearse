@@ -4,8 +4,8 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#08090c" />
-<title>Pricing — Rehearse Pro</title>
-<meta name="description" content="$49/month for a hosted CI runner with persistent caches. Enterprise from $499/month for parallel matrix VMs. Two plans, no surprises." />
+<title>Pricing — Rehearse</title>
+<meta name="description" content="OSS runner: free forever, Apache 2.0. Pro: $49/mo flat unlimited offload. Enterprise: custom. No per-minute meter, no overage charges, no seat surcharges." />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -26,7 +26,7 @@
       <a href="/" class="nav-link">OSS runner</a>
       <a href="/pro" class="nav-link">Pro</a>
       <a href="/pricing" class="nav-link text-white">Pricing</a>
-      
+      <a href="/vs" class="nav-link">vs</a>
       <a href="/security" class="nav-link">Security</a>
       <a href="/docs/pro" class="nav-link">Docs</a>
       <a href="https://pro.rehearse.sh/sign-in" class="nav-link">Sign in</a>
@@ -37,7 +37,8 @@
 <section class="bg-grid pt-36 pb-12">
   <div class="max-w-6xl mx-auto px-5 text-center">
     <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-3">// pricing</div>
-    <h1 class="text-4xl sm:text-5xl font-semibold tracking-tight gradient-text mb-6">Two plans. No surprise.</h1>
+    <h1 class="text-4xl sm:text-5xl font-semibold tracking-tight gradient-text mb-3">Three tiers. No surprises.</h1>
+    <p class="text-[var(--rh-muted)] max-w-2xl mx-auto mb-10">No per-minute meter. No overage charges. No seat surcharges. The OSS runner is free forever — only pay if you want hosted offload.</p>
     <div class="flex justify-center mb-12">
       <div class="inline-flex border border-white/10 rounded-lg overflow-hidden text-[13px] font-mono">
         <button @click="billing='monthly'" :class="billing==='monthly' ? 'bg-white/10 text-white' : 'text-[var(--rh-muted)]'" class="px-4 py-2">Monthly</button>
@@ -45,39 +46,64 @@
       </div>
     </div>
 
-    <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto text-left">
+    <div class="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto text-left">
+      <!-- OSS tier -->
       <div class="card p-8">
-        <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// pro</div>
-        <h2 class="text-2xl font-semibold mb-1">Pro</h2>
-        <p class="text-[var(--rh-muted)] text-sm mb-6">A dedicated microVM that keeps your CI caches between runs. Same workflow YAML.</p>
+        <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// oss · the entire runner, free</div>
+        <h2 class="text-2xl font-semibold mb-1">OSS Runner</h2>
+        <p class="text-[var(--rh-muted)] text-sm mb-6">Full local-first runner: matrix, services, watch, pre-push hook. Apache 2.0. The whole engine, not a teaser.</p>
         <div class="text-4xl font-semibold mb-1">
-          <span x-show="billing==='monthly'">$49<span class="text-[var(--rh-muted)] text-base font-normal"> / month</span></span>
-          <span x-show="billing==='yearly'" x-cloak>$490<span class="text-[var(--rh-muted)] text-base font-normal"> / year</span></span>
+          $0<span class="text-[var(--rh-muted)] text-base font-normal"> / forever</span>
         </div>
-        <p class="text-[12px] font-mono text-[var(--rh-muted)] mb-6">Cancel anytime · 14-day refund · no proration tricks</p>
+        <p class="text-[12px] font-mono text-[var(--rh-muted)] mb-6">Apache 2.0 · No signup · No telemetry · No phone-home</p>
         <ul class="space-y-2 text-sm mb-8">
-          <li><span class="ok">●</span> Dedicated microVM with hardware-level isolation</li>
+          <li><span class="ok">●</span> Local execution on your machine</li>
+          <li><span class="ok">●</span> Sub-second CI on every save (<code class="font-mono">runner watch</code>)</li>
+          <li><span class="ok">●</span> Pre-push hook (<code class="font-mono">runner install-hook</code>)</li>
+          <li><span class="ok">●</span> Host + container backends</li>
+          <li><span class="ok">●</span> Matrix, services, composite actions, JS actions</li>
+          <li><span class="ok">●</span> 97% of real workflows just work</li>
+          <li><span class="ok">●</span> No vendor lock-in — ever</li>
+        </ul>
+        <a href="https://www.npmjs.com/package/@rehearse/runner" class="btn btn-ghost w-full justify-center">Install from npm →</a>
+      </div>
+
+      <!-- Pro tier (highlighted as the offload product) -->
+      <div class="card p-8 border-[var(--rh-accent)]/40">
+        <div class="text-[12px] font-mono text-[var(--rh-accent)] mb-2">// pro · the offload target</div>
+        <h2 class="text-2xl font-semibold mb-1">Pro</h2>
+        <p class="text-[var(--rh-muted)] text-sm mb-6">For when the laptop isn't enough. Single-tenant VM with whole-rootfs persistence — every cache survives forever.</p>
+        <div class="text-4xl font-semibold mb-1">
+          <span x-show="billing==='monthly'">$49<span class="text-[var(--rh-muted)] text-base font-normal"> / month flat</span></span>
+          <span x-show="billing==='yearly'" x-cloak>$490<span class="text-[var(--rh-muted)] text-base font-normal"> / year flat</span></span>
+        </div>
+        <p class="text-[12px] font-mono text-[var(--rh-muted)] mb-6">Unlimited minutes · Cancel anytime · 14-day refund</p>
+        <ul class="space-y-2 text-sm mb-8">
+          <li><span class="ok">●</span> Everything in OSS, plus:</li>
+          <li><span class="ok">●</span> Single-tenant VM, hardware-isolated</li>
+          <li><span class="ok">●</span> <span class="text-white">Whole-rootfs persistence</span> (not just declared paths)</li>
           <li><span class="ok">●</span> 100 GB persistent storage</li>
-          <li><span class="ok">●</span> Caches survive between runs (~2× faster <code class="font-mono">npm install</code>, measured)</li>
+          <li><span class="ok">●</span> <span class="text-white">Unlimited minutes</span> (no per-minute meter)</li>
           <li><span class="ok">●</span> Live streaming logs</li>
-          <li><span class="ok">●</span> Same workflow YAML, opt in via <code class="font-mono">--remote</code> flag</li>
-          <li><span class="ok">●</span> Email support, replied to within 24 hours</li>
+          <li><span class="ok">●</span> Email support within 24h</li>
         </ul>
         <a href="/checkout" class="btn btn-primary w-full justify-center">Start Pro</a>
       </div>
 
-      <div class="card p-8 border-[var(--rh-accent)]/40">
-        <div class="text-[12px] font-mono text-[var(--rh-accent)] mb-2">// enterprise</div>
+      <!-- Enterprise -->
+      <div class="card p-8">
+        <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// enterprise · custom</div>
         <h2 class="text-2xl font-semibold mb-1">Enterprise</h2>
-        <p class="text-[var(--rh-muted)] text-sm mb-6">Larger VMs, parallel matrix execution, dedicated support. Built per customer — no shrink-wrap.</p>
+        <p class="text-[var(--rh-muted)] text-sm mb-6">Larger VMs, parallel matrix execution, dedicated support, security review. Built per customer.</p>
         <div class="text-4xl font-semibold mb-1">
-          Custom<span class="text-[var(--rh-muted)] text-base font-normal"> · let's talk</span>
+          Custom<span class="text-[var(--rh-muted)] text-base font-normal"> · talk to us</span>
         </div>
-        <p class="text-[12px] font-mono text-[var(--rh-muted)] mb-6">Invoice billing · annual contract optional</p>
+        <p class="text-[12px] font-mono text-[var(--rh-muted)] mb-6">Invoice billing · Annual contract optional</p>
         <ul class="space-y-2 text-sm mb-8">
+          <li><span class="ok">●</span> Everything in Pro, plus:</li>
           <li><span class="ok">●</span> Larger machine sizes (negotiated)</li>
           <li><span class="ok">●</span> Multiple parallel VMs for matrix jobs</li>
-          <li><span class="ok">●</span> Slack Connect channel with George</li>
+          <li><span class="ok">●</span> Slack Connect channel</li>
           <li><span class="ok">●</span> Best-effort 4-hour response SLA</li>
           <li><span class="ok">●</span> SOC 2 / DPA / security questionnaires</li>
         </ul>
@@ -85,9 +111,19 @@
       </div>
     </div>
 
-    <p class="text-[12px] font-mono text-[var(--rh-muted)] mt-12 max-w-xl mx-auto">
-      No team tier, no seat surcharges, no usage-based pricing. We tried the matrix. It made the pricing page worse.
-    </p>
+    <div class="mt-12 max-w-3xl mx-auto text-left">
+      <p class="text-[var(--rh-muted)] text-sm">
+        <span class="text-white">Comparing to per-minute hosted runners?</span>
+        Pro at $49/mo flat crosses over Blacksmith Ubuntu ($0.004/min)
+        at exactly <span class="text-white">12,250 minutes/month</span>.
+        Heavy users save real money on flat-rate; light users may pay
+        less per-minute on a competitor's free tier. We did the math
+        honestly — see <a href="/vs" class="link">/vs</a>.
+      </p>
+      <p class="text-[12px] font-mono text-[var(--rh-muted)] mt-4">
+        No team tier, no seat surcharges, no usage-based pricing. We tried the matrix. It made the pricing page worse.
+      </p>
+    </div>
   </div>
 </section>
 

@@ -16,6 +16,7 @@ export default defineConfig({
         pro: resolve(__dirname, 'pro.html'),
         pricing: resolve(__dirname, 'pricing.html'),
         security: resolve(__dirname, 'security.html'),
+        vs: resolve(__dirname, 'vs.html'),
         checkout: resolve(__dirname, 'checkout.html'),
         checkoutSuccess: resolve(__dirname, 'checkout/success.html'),
         docsPro: resolve(__dirname, 'docs/pro.html'),

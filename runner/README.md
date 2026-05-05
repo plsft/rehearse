@@ -1,14 +1,24 @@
 # @rehearse/runner
 
-> **Stop pushing CI failures.** Run your `.github/workflows/*.yml` on your
-> laptop in seconds. Same YAML. **5–9× faster than [`act`](https://github.com/nektos/act)**
-> on standard workflows, **30× on services** where `act` doesn't finish.
+> **CI feedback in seconds, before you push.** Run your
+> `.github/workflows/*.yml` on every save, on your laptop, in
+> sub-second. Same YAML, three execution targets, no lock-in.
 
-`@rehearse/runner` is a local-first runner for GitHub Actions workflows.
+`@rehearse/runner` is the local-first GitHub Actions runner — the only
+OSS tool in this category that gives you CI feedback *before* `git push`.
 Read the YAML you already have, choose a backend per job (host or
-container), execute. Free, Apache 2.0, single binary. Optional hosted
-target via [Rehearse Pro](https://rehearse.sh/pro) — same binary, add
-`--remote`.
+container), execute. Pair with `runner watch` for save-triggered reruns
+or `runner install-hook` for a pre-push gate.
+
+Comparison vs hosted-runner replacements (Blacksmith, Ubicloud, RunsOn):
+they only optimize *post-push*. The runner is the only thing that gives
+you a fast pre-push loop. Honest comparison at
+[rehearse.sh/vs](https://rehearse.sh/vs).
+
+Free, Apache 2.0, single binary. Optional hosted offload via
+[Rehearse Pro](https://rehearse.sh/pro) — same binary, add `--remote`.
+$49/mo flat, unlimited minutes, whole-rootfs cache persistence. Skip it
+and the runner is yours forever.
 
 [![npm](https://img.shields.io/npm/v/@rehearse/runner)](https://www.npmjs.com/package/@rehearse/runner)
 [![License](https://img.shields.io/npm/l/@rehearse/runner)](./LICENSE)

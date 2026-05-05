@@ -1,19 +1,28 @@
 # Rehearse
 
-> **Stop pushing CI failures.** Run your `.github/workflows/*.yml` locally
-> before you push. Same YAML, same outcome, in tens of seconds.
+> **CI feedback in seconds, before you push.** Most CI tools start the
+> clock at `git push`. Rehearse runs your `.github/workflows/*.yml` on
+> your laptop, on every save, in sub-second. Same YAML, three execution
+> targets, no lock-in.
 
-Rehearse is a local-first runner for GitHub Actions workflows. It reads your
-existing `.github/workflows/*.yml` and executes them on your laptop with two
-backends — host (subprocess, fast) and container (Docker, with services and
-parity). Free, Apache 2.0, source on `github.com/plsft/rehearse`.
+Rehearse is the only OSS GitHub Actions toolchain that gives you a
+fast pre-push loop AND an offload target. It reads your existing
+`.github/workflows/*.yml` and executes it three ways:
 
-The OSS runner is Apache 2.0, free, and works fully without an account.
-A hosted execution target — **Rehearse Pro** ([rehearse.sh/pro](https://rehearse.sh/pro))
-— is available for customers who want a private microVM with caches that
-persist between runs. Pro is strictly additive: pass `--remote` with a Pro
-token and the same OSS runner ships your workflow to your VM; drop the
-flag and you're back to local. The OSS runner is and always will be free.
+1. **Locally** (`runner run`) — host subprocess or container backend, sub-second on the typey demo workflow
+2. **Pro VM** (`runner run --remote`) — single-tenant VM with whole-rootfs persistence, ~5s on the same workflow
+3. **GitHub Actions** (`git push`) — same compiled YAML, no Rehearse runtime needed, ~95s for the same workflow
+
+Same source, same output, no lock-in. Free, Apache 2.0,
+source on [github.com/plsft/rehearse](https://github.com/plsft/rehearse).
+
+**Comparison with hosted-runner replacements** (Blacksmith, Ubicloud,
+RunsOn, BuildJet, Namespace): see [rehearse.sh/vs](https://rehearse.sh/vs)
+for the honest take. Short version: those products optimize execution
+target #3 (post-push). Rehearse adds targets #1 and #2 (pre-push +
+offload) — different shape, complementary. The OSS runner is your moat
+against vendor risk: if any hosted-runner SaaS raises prices or
+disappears, your CI keeps running on a laptop without them.
 
 ## Quick start
 
@@ -28,8 +37,27 @@ runner install-hook                            # pre-push git hook
 
 ## Numbers
 
-Head-to-head against [`nektos/act`](https://github.com/nektos/act) on
-GitHub-hosted Linux, v0.3.11 warm:
+### vs GitHub Actions (the comparison most users care about)
+
+The same 9-cell matrix workflow run on three targets — measured today
+against [plsft/typey](https://github.com/plsft/typey), a real third-party Bun
+CLI repo (not a fixture we control):
+
+| Target | Wall | vs GH |
+| --- | ---: | ---: |
+| **Local** (`runner run`, warm) | **1.5s** | **63× faster** |
+| **Pro** (`runner run --remote`, warm) | **5s** | **19× faster** |
+| **GitHub Actions** (3 OS × 3 Bun, 9 cells) | 95s | baseline |
+
+Workflow exercises checkout + setup-bun + install + format + lint + tsc
++ test + build per cell. The speedup is GH's spin-up tax — cold
+container, fresh toolchain install, cold module caches on every push.
+Local skips all of it; Pro keeps everything warm between runs.
+
+### Footnote: vs `nektos/act` (the OSS comparison)
+
+Most folks comparison-shop us against `act` — the OSS project we share
+a category with. v0.3.11 warm, GH-hosted Linux:
 
 | Target | Rehearse | act | Speedup |
 | --- | ---: | ---: | ---: |
