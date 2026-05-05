@@ -10,7 +10,20 @@ async function detectStack(cwd: string): Promise<StackKind> {
       .access(path.join(cwd, rel))
       .then(() => true)
       .catch(() => false);
+  // Bun 1.3+ writes `bun.lock` (text); older Bun used `bun.lockb` (binary).
+  // Check both, plus a fallback peek at package.json's packageManager field.
+  if (await has('bun.lock')) return 'bun';
   if (await has('bun.lockb')) return 'bun';
+  if (await has('package.json')) {
+    try {
+      const pkg = JSON.parse(await fs.readFile(path.join(cwd, 'package.json'), 'utf-8')) as {
+        packageManager?: string;
+      };
+      if (pkg.packageManager?.startsWith('bun@')) return 'bun';
+    } catch {
+      /* not a JSON file; fall through */
+    }
+  }
   if (await has('package-lock.json')) return 'node';
   if (await has('pnpm-lock.yaml')) return 'node';
   if (await has('yarn.lock')) return 'node';
@@ -31,7 +44,9 @@ export const ci = pipeline('CI', {
   jobs: [
     job('test', {
       runner: Runner.ubicloud('standard-4'),
-      steps: [step.checkout(), bun.setup(), bun.install(), bun.test(), bun.build()],
+      // bun.build() omitted by default — \`bun init\` doesn't scaffold a
+      // build script. Add it back if your package.json has one.
+      steps: [step.checkout(), bun.setup(), bun.install(), bun.test()],
     }),
   ],
 });
@@ -44,7 +59,9 @@ export const ci = pipeline('CI', {
   jobs: [
     job('test', {
       runner: Runner.ubicloud('standard-4'),
-      steps: [step.checkout(), node.setup('20'), node.install(), node.test(), node.build()],
+      // node.build() omitted by default — \`npm init -y\` scaffolds no
+      // build script. Add it back if your package.json has one.
+      steps: [step.checkout(), node.setup('20'), node.install(), node.test()],
     }),
   ],
 });

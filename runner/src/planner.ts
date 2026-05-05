@@ -8,6 +8,7 @@ import { expandComposite, resolveAction } from './composite.js';
 import { evalExpr } from './expression.js';
 import { cellId, expandMatrix, parseMatrix } from './matrix.js';
 import { expandReusable, isReusableWorkflowUse } from './reusable.js';
+import { hasShim } from './shims/index.js';
 import type { BackendName, ExpressionContext, PlannedJob, PlannedStep, RunOptions } from './types.js';
 
 /** Build an ExpressionContext stub good enough for matrix-time substitution. */
@@ -114,7 +115,13 @@ function planSteps(rawSteps: ParsedStep[], ctx: ExpressionContext, opts: RunOpti
     // replaced by the action's inner steps, with `${{ inputs.x }}`
     // substituted from the parent's `with:`. Remote composites are
     // git-cloned to .runner/actions/<slug>/ on first use.
-    if (uses) {
+    //
+    // Shim check FIRST: if we have a host-equivalent shim for this `uses`
+    // (e.g., dtolnay/rust-toolchain — host already has rustup), skip the
+    // composite expansion and let the shim handle it at exec time. The
+    // composite version of these actions is designed for fresh containers,
+    // and its sub-steps assume a clean environment we don't always provide.
+    if (uses && !hasShim(uses)) {
       const resolved = resolveAction(uses, repoRoot);
       if (resolved && resolved.action.runs?.using === 'composite') {
         out.push(...expandComposite(planned, resolved, ctx));
