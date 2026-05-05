@@ -58,8 +58,8 @@ poc/           — fixture workflows used by the bench harness (vite/hono/etc.)
 ## What's supported today
 
 - `run:` steps with `bash` / `pwsh` / `cmd` + full `$GITHUB_OUTPUT` / `$GITHUB_ENV` / `$GITHUB_PATH` / `$GITHUB_STEP_SUMMARY` contract
-- 16 in-process action shims: `checkout`, `setup-{node,python,go,java,dotnet,bun,pnpm,deno,ruby}`, `rust-toolchain`, `cache` + `/save` + `/restore`, `upload-artifact`, `download-artifact`, `codecov`, `github-script`. `setup-dotnet` is a real shim that runs Microsoft's `dotnet-install.sh` and caches the SDK.
-- JavaScript actions (`runs.using: node12-25`) — auto-cloned at the requested ref, full `INPUT_*` / `GITHUB_OUTPUT` contract
+- 18 in-process action shims: `checkout`, `setup-{node,python,go,java,dotnet,bun,pnpm,deno,ruby}`, `rust-toolchain`, `cache` + `/save` + `/restore`, `upload-artifact`, `download-artifact`, `codecov`, `github-script`. `setup-dotnet` is a real shim that runs Microsoft's `dotnet-install.sh` and caches the SDK.
+- JavaScript actions (`runs.using: node12 / node16 / node20`, plus forward-compat acceptance of node22 / 24 / 25) — auto-cloned at the requested ref, full `INPUT_*` / `GITHUB_OUTPUT` contract
 - `services:` with health checks (Docker network alias wired correctly) — local container backend only
 - `strategy.matrix` (variables × include − exclude) — cells run in parallel via per-cell `git worktree`
 - `needs:` with topological scheduling and bounded concurrency

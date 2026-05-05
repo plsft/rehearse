@@ -1,11 +1,14 @@
 # @rehearse/runner
 
 > **Stop pushing CI failures.** Run your `.github/workflows/*.yml` on your
-> laptop in seconds. Same YAML. **6–10× faster than [`act`](https://github.com/nektos/act).**
+> laptop in seconds. Same YAML. **5–9× faster than [`act`](https://github.com/nektos/act)**
+> on standard workflows, **30× on services** where `act` doesn't finish.
 
 `@rehearse/runner` is a local-first runner for GitHub Actions workflows.
 Read the YAML you already have, choose a backend per job (host or
-container), execute. Free, Apache 2.0, single binary.
+container), execute. Free, Apache 2.0, single binary. Optional hosted
+target via [Rehearse Pro](https://rehearse.sh/pro) — same binary, add
+`--remote`.
 
 [![npm](https://img.shields.io/npm/v/@rehearse/runner)](https://www.npmjs.com/package/@rehearse/runner)
 [![License](https://img.shields.io/npm/l/@rehearse/runner)](./LICENSE)
@@ -20,7 +23,7 @@ pnpm add -g @rehearse/runner
 # or
 bun add -g @rehearse/runner
 
-runner --version    # 0.2.x
+runner --version    # 0.3.12
 ```
 
 The package installs a single binary called `runner`.
@@ -46,27 +49,25 @@ runner install-hook                  # writes .git/hooks/pre-push
 
 # Audit a workflow's compatibility before running
 runner compat .github/workflows/ci.yml
+
+# Ship to a Rehearse Pro VM (auto-detects git origin + ref + subdir)
+runner run --remote .github/workflows/ci.yml
+runner run --remote --env-file .env .github/workflows/deploy.yml
 ```
 
-## Bench (cross-OS, GitHub-hosted runners)
+## Bench (Linux GH-hosted, head-to-head with `act`)
 
-Same workflow, head-to-head against `act` on a fresh `ubuntu-latest`
-runner. Reproducible via `gh workflow run bench.yml`.
+Same workflow, fresh `ubuntu-latest` runner, v0.3.11 warm. Reproducible
+via `gh workflow run bench.yml`.
 
 | Target | runner | `act` | Speedup |
 | --- | ---: | ---: | ---: |
-| `our-ci` (typecheck + 202 tests, 2 parallel jobs) | **10.58s** | 64.85s | **6.13×** |
-| `node-matrix` (3-cell matrix, parallel via worktrees) | **1.10s** | 11.63s | **10.56×** |
-| `service-postgres` (postgres:16-alpine + 4 psql steps) | **12.00s** | timeout (>360s) | **act fails** |
-| `hono-bun` (real OSS — honojs/hono `bun` job, 26 tests) | **1.72s** | n/a (act image lacks bun) | — |
-| `hono-node-matrix` (real OSS — 3-cell node matrix) | **378ms** | n/a (act image lacks bun) | — |
+| `our-ci` (typecheck + tests, 2 parallel jobs) | **12.19s** | 63.78s | **5.23×** |
+| `node-matrix` (3-cell matrix, parallel via worktrees) | **1.12s** | 10.07s | **8.99×** |
+| `service-postgres` (postgres:16 + 4 psql steps) | **10.97s** | timeout (>360s) | **32.82×** — act fails |
+| `hono-bun` (real OSS — honojs/hono `bun` job) | **7.58s** | n/a (act image lacks bun) | — |
 
-`act`'s `service-postgres` failure isn't OS-specific — it timed out on
-both Linux and Windows GH runners. `act`'s service-container networking
-is broken across hosts; the runner's `--network-alias <name>` per
-service makes the same workflow run cleanly.
-
-Full methodology + per-OS breakdown:
+Full methodology + per-OS breakdown + historical baselines:
 [bench/RESULTS.md](https://github.com/plsft/rehearse/blob/main/bench/RESULTS.md).
 
 ## Cross-OS support
@@ -85,10 +86,17 @@ you only get host-backend execution.
 
 ## What's supported
 
-- `run:` steps in `bash` / `pwsh` / `cmd`
-- Top ~15 actions in-process: `checkout`, `setup-node`/`python`/`go`/`bun`,
-  `cache`, `upload-artifact`, `download-artifact`
-- **JS actions** (`runs.using: node20|18|16`) — auto-cloned at the
+- `run:` steps in `bash` / `pwsh` / `cmd`, with the full
+  `$GITHUB_OUTPUT` / `$GITHUB_ENV` / `$GITHUB_PATH` / `$GITHUB_STEP_SUMMARY`
+  step contract
+- **18 in-process action shims**: `actions/checkout`,
+  `actions/setup-{node,python,go,java,dotnet,bun,pnpm,deno,ruby}`,
+  `dtolnay/rust-toolchain`, `actions/cache` + `/save` + `/restore`,
+  `actions/upload-artifact`, `actions/download-artifact`,
+  `codecov/codecov-action`, `actions/github-script`. `setup-dotnet` is a
+  real shim that runs Microsoft's `dotnet-install.sh` and caches the SDK.
+- **JS actions** (`runs.using: node12 / node16 / node20`, plus our
+  forward-compat acceptance of `node22 / 24 / 25`) — auto-cloned at the
   requested ref, run with the standard `INPUT_*` / `GITHUB_OUTPUT` /
   `GITHUB_ENV` env contract
 - **Composite actions, local and remote** (`./.github/actions/*` and
@@ -99,18 +107,23 @@ you only get host-backend execution.
 - `services:` with health-check waits and a private Docker network alias
 - `strategy.matrix` — cartesian product, `include`, `exclude`. **Cells run
   in parallel via per-cell `git worktree`**
-- `needs:` with parallel scheduling
-- `if:` on jobs and steps (useful expression-language subset)
+- `needs:` with topological scheduling and bounded parallelism
+- `if:` on jobs and steps with the full context surface
+  (`matrix / env / secrets / vars / needs / steps / job / runner / inputs / github`)
 - `actions/cache` semantics on local fs (exact-key + restore-key
-  longest-prefix matching, persistent across runs)
+  longest-prefix matching, persistent across runs, all 3 outputs)
 - `actions/upload-artifact` / `download-artifact` backed by `.runner/artifacts/`
+- `runner run --remote` — ships the workflow YAML + auto-detected git
+  context (origin URL + HEAD SHA + cwd subdir) + secrets (from
+  `--env-file`) to a Rehearse Pro VM, streams stdout/stderr back as
+  ndjson
 
 ## What's not supported yet
 
 - Remote reusable workflows (`org/repo/.github/workflows/foo.yml@ref`) — local form works
 - Docker actions (`runs.using: docker`) — JS-action runtime ships; Docker-action runtime doesn't yet
-- OIDC / `id-token: write`
-- `concurrency:` group cancellation
+- OIDC / `id-token: write` — use long-lived credentials via `--env-file` for now
+- `concurrency:` group cancellation — parsed, not enforced
 
 ## Programmatic API
 
@@ -126,12 +139,20 @@ const result = await run({
 
 console.log(result.status);      // 'success' | 'failure' | 'skipped'
 console.log(result.durationMs);
-for (const j of result.jobs) console.log(j.jobName, j.status, j.durationMs);
+for (const j of result.jobs) console.log(j.jobId, j.status, j.durationMs);
 
 // Static audit: how much of a workflow would run today?
 const audit = compat('.github/workflows/ci.yml');
 console.log(`${audit.coverage.toFixed(1)}% of ${audit.stepsTotal} steps`);
 ```
+
+Lower-level building blocks are also exported:
+[`plan`](./src/planner.ts), [`runJobs`](./src/scheduler.ts),
+[`HostBackend`](./src/backends/host.ts), [`ContainerBackend`](./src/backends/container.ts),
+[`LocalCache`](./src/cache.ts), [`LocalArtifacts`](./src/artifacts.ts),
+[`expandMatrix`](./src/matrix.ts), [`evalExpr`](./src/expression.ts),
+[`isJsActionUses`](./src/js-action.ts), [`expandReusable`](./src/reusable.ts),
+[`createWorktree`](./src/worktree.ts).
 
 ## CLI flags reference
 
@@ -140,12 +161,20 @@ runner run <workflow.yml> [options]
 
   -j, --job <name>        run only this job (matrix variants of it still all run)
   -b, --backend <type>    host | container | auto (default: auto)
-  -p, --max-parallel <n>  max concurrent jobs (default: min(cpus, 4))
+  -p, --max-parallel <n>  max concurrent jobs (omit for scheduler default ~min(cpus, 4))
   -c, --cwd <dir>         working directory (default: inferred from workflow path)
       --fail-fast         cancel sibling jobs on first failure
       --quiet             minimal output
       --bench             single JSON line on stdout
-      --env-file <file>   load env vars from file (KEY=VALUE per line)
+      --env-file <file>   load env vars from file (KEY=VALUE per line). Loaded
+                          values become both process env AND ${{ secrets.* }}
+                          context for workflow expansion.
+      --remote            execute on a Rehearse Pro VM (requires REHEARSE_TOKEN)
+      --api-url <url>     override Pro API URL (default: https://api.rehearse.sh)
+      --repo-url <url>    override the git remote URL shipped to the VM
+                          (auto-detected from `git remote get-url origin`)
+      --repo-ref <ref>    override the git ref (auto-detected from HEAD)
+      --repo-subdir <p>   override the in-repo cwd subdir (auto-detected)
 
 runner watch <workflow.yml> [options]
   Same flags as `run`. Re-runs on file changes (debounced).
@@ -157,6 +186,27 @@ runner install-hook
 runner compat <workflow.yml>
   --json                  machine-readable JSON
 ```
+
+### Pro / `--remote` usage
+
+```bash
+# 1. Install the OSS runner (same binary)
+npm install -g @rehearse/runner@latest
+
+# 2. Set your Pro token (get one at https://pro.rehearse.sh/dashboard/keys)
+export REHEARSE_TOKEN=rh_pro_live_…
+
+# 3. Run any workflow remotely
+runner run --remote .github/workflows/ci.yml
+
+# 4. For deploy workflows, ship long-lived secrets via --env-file
+runner run --remote --env-file .env .github/workflows/deploy.yml
+```
+
+`--remote` auto-detects the cwd's git origin URL, current SHA, and
+relative-to-toplevel subdirectory, ships them with the request, and the
+Pro VM clones the right repo at the right ref before running. Drop the
+flag and you're back to local execution. Same workflow, no lock-in.
 
 ## Repo
 

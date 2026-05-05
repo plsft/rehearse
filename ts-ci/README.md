@@ -1,8 +1,8 @@
 # @rehearse/ci
 
 > Type-safe GitHub Actions pipelines in TypeScript. Compile to plain
-> YAML on your machine. Zero runtime dependency on us — the YAML is
-> the real artifact.
+> YAML on your machine. **The compiled YAML has zero `@rehearse/ci`
+> dependency** — install us at author time, ship the YAML.
 
 `@rehearse/ci` is the authoring SDK. Write your workflows in TypeScript,
 get IDE autocomplete and refactor support, then compile to standard
@@ -102,7 +102,21 @@ python.test('pytest')   // run: pytest
 docker.buildPush('myimage:${{ github.sha }}', { push: true })
 ```
 
-### Convert existing YAML to TypeScript
+### Compile programmatically
+
+```ts
+import { compile, toYaml } from '@rehearse/ci';
+import { ci } from './my-pipeline.js';
+
+// compile() returns the structured workflow object
+const workflow = compile(ci);
+
+// toYaml() serializes any compatible object to GH Actions YAML
+const yaml = toYaml(workflow);
+console.log(yaml);
+```
+
+### Convert existing YAML to TypeScript (migration starter)
 
 ```ts
 import { convert } from '@rehearse/ci';
@@ -112,15 +126,45 @@ const { source, warnings } = convert(yamlString);
 // warnings: array of unmapped actions or constructs
 ```
 
-The CLI command is `rh ci convert <yaml>`.
+`convert()` is a **migration starter, not a faithful round-trip**. It
+handles common shapes (`run` / `uses` / `with` / `env` / `if` and the
+standard event triggers) but currently drops `matrix`, `services`,
+`concurrency`, `defaults`, `environment`, job-level `permissions`, and
+job outputs. Review the generated TS before relying on it; hand-port
+the dropped blocks; then `rh ci compile` round-trips back to YAML to
+verify.
+
+The CLI wrapper is `rh ci convert <yaml>`.
+
+### Estimate runner cost
+
+```ts
+import { estimate } from '@rehearse/ci';
+import { ci } from './my-pipeline.js';
+
+const report = estimate(ci, {
+  durations: { test: 7, build: 5 },   // minutes per job
+  runsPerMonth: 200,
+});
+console.log(report.totalUsd, report.savingsVsGitHubUsd);
+```
+
+Pricing tables are a **list-price snapshot** baked into the package
+(refresh per release). The math is real (per-job × per-minute × runs
+with Ubicloud↔GitHub tier mapping) — verify against current rate cards
+before quoting numbers to customers.
+
+The CLI wrapper is `rh ci estimate`.
 
 ### Runner support
 
 The same `Runner` constants are honored by
 [`@rehearse/runner`](https://www.npmjs.com/package/@rehearse/runner) — the
-local runner reads the compiled YAML and executes it on your laptop, 6–10×
-faster than `act`. So you author in TS, compile to YAML, run locally
-before pushing.
+local runner reads the compiled YAML and executes it on your laptop,
+**5–9× faster than `act`** on standard workflows, **30× on services**.
+So you author in TS, compile to YAML, run locally before pushing — and
+optionally ship the same workflow to a [Rehearse Pro](https://rehearse.sh/pro)
+VM with `runner run --remote`.
 
 ## Compatibility
 

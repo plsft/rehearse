@@ -34,12 +34,12 @@ rh --version
 
 | Command | What it does |
 | --- | --- |
-| `rh ci init` | Detect your stack (Node / Bun / Rust / Go / Python), scaffold `.rehearse/pipelines/ci.ts` and `rehearse.config.ts`. |
+| `rh ci init` | Detect your stack (Bun / Node / Rust / Go / Python — checked in that order), scaffold `.rehearse/pipelines/ci.ts`, `.rehearse/package.json`, and `rehearse.config.mjs`. |
 | `rh ci compile` | Import `.rehearse/pipelines/**/*.ts`, compile to `.github/workflows/*.yml`. |
-| `rh ci convert <yaml>` | Convert a GitHub Actions YAML file to TypeScript. Reports unmapped actions. |
+| `rh ci convert <yaml>` | **Migration starter** — convert a GitHub Actions YAML to TypeScript. Handles common shapes (`run` / `uses` / `with` / `env` / `if` and the standard event triggers). Currently drops `matrix`, `services`, `concurrency`, `defaults`, `environment`, job-level `permissions`, and outputs — review the generated TS before relying on it. |
 | `rh ci validate` | Dry-run compile — fail on errors without writing output. |
 | `rh ci watch` | Recompile on change — useful while editing pipeline TS. |
-| `rh ci estimate` | Show Ubicloud cost vs GitHub-hosted runners for the compiled pipelines. |
+| `rh ci estimate` | Show Ubicloud cost vs GitHub-hosted runners for the compiled pipelines. **Pricing is a list-price snapshot baked into the package** (refreshes per release); verify against current rate cards before quoting. |
 
 Use the per-command `--help` for full flag lists:
 
@@ -57,7 +57,7 @@ git init && npm init -y
 
 npm install -D @rehearse/ci @rehearse/cli
 
-# Scaffold .rehearse/pipelines/ci.ts and rehearse.config.ts
+# Scaffold .rehearse/pipelines/ci.ts and rehearse.config.mjs
 rh ci init
 
 # Edit .rehearse/pipelines/ci.ts, then:
@@ -70,16 +70,19 @@ rh ci watch
 
 ## Configuration
 
-`rehearse.config.ts` at the repo root (auto-created by `rh ci init`):
+`rehearse.config.mjs` at the repo root (auto-created by `rh ci init` —
+`.mjs` extension is explicit ESM so it loads regardless of your host
+project's `package.json` `type` field):
 
-```ts
-const config = {
+```js
+export default {
   pipelinesDir: '.rehearse/pipelines',
   outputDir: '.github/workflows',
 };
-
-export default config;
 ```
+
+(`.ts` and `.js` config files are also recognized — the loader probes
+in that order — but `rh ci init` scaffolds `.mjs` for compatibility.)
 
 ## Convert existing YAML
 
@@ -93,6 +96,11 @@ The converter maps `actions/checkout@v4` to `step.checkout()`,
 suggestion to use the `node` preset for nicer ergonomics), and so on.
 Unknown actions land as `step.action(uses, { with: {...} })` and the
 warnings list flags anything that needed a fallback.
+
+**Use it as a migration starter, not a faithful round-trip.** It does
+not yet emit `matrix`, `services`, `concurrency`, `defaults`, `environment`
+blocks, or job-level `permissions` — hand-port those after running the
+converter, then `rh ci compile` round-trips back to YAML to verify.
 
 ## Estimate runner cost
 
@@ -114,7 +122,8 @@ runner run .github/workflows/ci.yml
 ```
 
 The runner reads the compiled YAML and executes it on your laptop —
-6–10× faster than `act` on real workflows.
+5–9× faster than `act` on standard workflows, **30× on services**.
+Optional hosted target via `runner run --remote` (Rehearse Pro).
 
 ## Repo
 

@@ -6,8 +6,8 @@
 
 A complete-enough git for in-process work: parse and serialize objects,
 read and write packfiles, speak the smart-HTTP wire protocol, do diffs
-and three-way merges, manage refs. ~2.4k lines of source, **162 tests
-passing**.
+and three-way merges, manage refs. ~2.7k lines of source, ~2.9k lines
+of tests. **162 tests passing across 8 suites.**
 
 [![npm](https://img.shields.io/npm/v/@rehearse/git-core)](https://www.npmjs.com/package/@rehearse/git-core)
 [![License](https://img.shields.io/npm/l/@rehearse/git-core)](./LICENSE)
@@ -33,72 +33,99 @@ node-gyp.
 
 | Module | Purpose |
 | --- | --- |
-| `objects` | Blob / tree / commit / tag parsing + serialization. SHA-1, zlib via `pako`. |
-| `packfile` | Packfile reader and writer. ofs-delta, ref-delta, idx generation. |
-| `protocol` | Smart-HTTP wire protocol — pkt-line framing, capabilities, refs advertisement, upload-pack / receive-pack negotiation. |
-| `client` | High-level smart-HTTP client: `clone`, `fetch`, `push`. |
-| `diff` | Myers line diff + tree diff. |
-| `merge` | Three-way merge with conflict markers. |
-| `refs` | Ref parsing, packed-refs, symbolic refs. |
+| `objects` | Blob / tree / commit / tag parse + serialize. SHA-1 via Web Crypto, zlib via `pako`. |
+| `packfile` | Packfile parser, REF_DELTA + OFS_DELTA decoder, packfile writer with delta-base search. |
+| `protocol` | Smart-HTTP wire — pkt-line / flush / delim framing, capability advertisement, sideband-64k. |
+| `client` | Smart-HTTP primitives: ref discovery, upload-pack request building, packfile fetch + sideband demux. |
+| `diff` | Myers O(ND) diff with V-array offsetting and trace backtracking. Unified-diff formatter. |
+| `merge` | diff3-style three-way merge built on top of `myersDiff`, with conflict-marker emission. |
+| `refs` | Symbolic-ref resolution with cycle detection, packed-refs file parser. |
 
 ## Quickstart — build a commit in memory
 
 ```ts
 import {
-  encodeBlob,
-  encodeTree,
-  encodeCommit,
-  sha1,
-  buildPackfile,
+  hashObject,
+  serializeObject,
+  serializeTreeContent,
+  generatePackfile,
 } from '@rehearse/git-core';
 
-const blob = encodeBlob(new TextEncoder().encode('hello world\n'));
-const blobSha = await sha1(blob);
+// 1. Hash + serialize a blob.
+const blobContent = new TextEncoder().encode('hello world\n');
+const blobSha = await hashObject('blob', blobContent);
+const blobObject = serializeObject({ type: 'blob', content: blobContent });
 
-const tree = encodeTree([
+// 2. Build a tree containing the blob.
+const treeContent = serializeTreeContent([
   { mode: '100644', name: 'README.md', sha: blobSha },
 ]);
-const treeSha = await sha1(tree);
+const treeSha = await hashObject('tree', treeContent);
+const treeObject = serializeObject({ type: 'tree', content: treeContent });
 
-const commit = encodeCommit({
-  treeSha,
-  parents: [],
-  author:    { name: 'Alice', email: 'a@example.com', timestamp: 1714500000, tzOffset: '+0000' },
-  committer: { name: 'Alice', email: 'a@example.com', timestamp: 1714500000, tzOffset: '+0000' },
-  message: 'init',
-});
-const commitSha = await sha1(commit);
+// 3. Build a commit pointing at the tree.
+const commitContent = new TextEncoder().encode(
+  `tree ${treeSha}\n` +
+  `author Alice <a@example.com> 1714500000 +0000\n` +
+  `committer Alice <a@example.com> 1714500000 +0000\n` +
+  `\n` +
+  `init\n`,
+);
+const commitSha = await hashObject('commit', commitContent);
+const commitObject = serializeObject({ type: 'commit', content: commitContent });
 
-// Pack the three objects together for transport
-const pack = await buildPackfile([
-  { sha: blobSha,   type: 'blob',   data: blob },
-  { sha: treeSha,   type: 'tree',   data: tree },
-  { sha: commitSha, type: 'commit', data: commit },
+// 4. Pack the three objects together for transport.
+const pack = await generatePackfile([
+  { sha: blobSha,   type: 'blob',   content: blobContent },
+  { sha: treeSha,   type: 'tree',   content: treeContent },
+  { sha: commitSha, type: 'commit', content: commitContent },
 ]);
+console.log(`packfile is ${pack.length} bytes`);
 ```
 
-## Quickstart — clone a remote in pure TS
+## Quickstart — fetch a remote ref + packfile in pure TS
 
 ```ts
-import { gitClone } from '@rehearse/git-core';
+import {
+  fetchRemoteRefs,
+  buildUploadPackRequest,
+  fetchPackfile,
+  extractPackfileFromSideband,
+  resolvePackfile,
+} from '@rehearse/git-core';
 
-const result = await gitClone({
-  url: 'https://github.com/honojs/hono.git',
-  ref: 'refs/heads/main',
-  // pluggable storage interface — write objects/refs to memory, fs,
-  // R2, KV, whatever you have.
-  storage: myObjectStore,
+const url = 'https://github.com/honojs/hono.git';
+
+// 1. Discover refs (info/refs?service=git-upload-pack).
+const refs = await fetchRemoteRefs(url);
+const mainSha = refs.refs['refs/heads/main'];
+
+// 2. Negotiate a fetch for the main ref + ancestors.
+const body = buildUploadPackRequest({
+  wants: [mainSha],
+  haves: [],
+  depth: 1,
 });
 
-console.log(result.headSha);
+// 3. POST to git-upload-pack and get the sideband response.
+const sideband = await fetchPackfile(url, body);
+const { packfile } = extractPackfileFromSideband(sideband);
+
+// 4. Resolve deltas inside the packfile to standalone objects.
+const { objects } = await resolvePackfile(packfile);
+console.log(`fetched ${objects.size} objects, head=${mainSha}`);
 ```
+
+(The `client` module exposes the lower-level primitives you compose into
+`clone` / `fetch` operations; you bring your own object store — memory,
+filesystem, R2, KV, Durable Object, whatever fits the runtime.)
 
 ## Why pure TypeScript
 
 - **Workers-friendly.** No native deps, no `child_process`, no
   filesystem assumptions. Runs in any V8 isolate, including Cloudflare
   Workers and Durable Objects.
-- **Auditable.** ~2.4k lines of source, ~2.7k lines of tests. You can
+- **Auditable.** ~2.7k lines of source, ~2.9k lines of tests. You can
   read the implementation in an afternoon.
 - **Embeddable.** Use it inside a CI tool, a code review bot, a VCS
   plugin, an MCP server — anywhere the git daemon would be too heavy.
