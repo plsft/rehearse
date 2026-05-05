@@ -44,8 +44,7 @@
     "github-actions",
     "ci",
     "typescript",
-    "pipeline",
-    "ubicloud"
+    "pipeline"
   ],
   "homepage": "https://github.com/plsft/rehearse/tree/main/ts-ci#readme",
   "bugs": "https://github.com/plsft/rehearse/issues",

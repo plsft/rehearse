@@ -45,7 +45,7 @@ dotnet-app/
 
 ```typescript
 job('test', {
-  runner: Runner.ubicloud('standard-4'),
+  runner: Runner.github('ubuntu-latest'),
   matrix: {
     variables: { framework: ['net8.0', 'net9.0'] },
     failFast: false,
@@ -124,6 +124,5 @@ package manager wants.
 ## Push to GitHub
 
 The generated YAML has zero Rehearse runtime dependency. Push the repo
-to GitHub and `runs-on: ubicloud-standard-4` routes the job to Ubicloud
-(if the GitHub App is installed). The matrix cells will run truly in
-parallel on Ubicloud's runner pool, each cell on its own VM.
+to GitHub and the matrix cells run on standard `ubuntu-latest` GitHub-hosted
+runners — each cell on its own VM, truly in parallel.

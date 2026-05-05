@@ -21,7 +21,7 @@ export const ci = pipeline('dotnet app CI', {
   ],
   jobs: [
     job('test', {
-      runner: Runner.ubicloud('standard-4'),
+      runner: Runner.github('ubuntu-latest'),
       matrix: {
         variables: { framework: ['net8.0', 'net9.0', 'net10.0'] },
         failFast: false,

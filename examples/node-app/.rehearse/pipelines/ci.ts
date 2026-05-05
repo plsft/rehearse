@@ -6,9 +6,6 @@
  *     git worktree when executed by @rehearse/runner
  *   - actions/cache for the npm install, keyed on package-lock.json
  *   - upload-artifact for coverage reports
- *   - Targets Ubicloud (Runner.ubicloud('standard-4')) — generated YAML
- *     has `runs-on: ubicloud-standard-4`. Swap to Runner.github() to
- *     target GitHub-hosted instead.
  */
 import { hashFiles, job, pipeline, Runner, step, triggers } from '@rehearse/ci';
 import { node } from '@rehearse/ci/presets';
@@ -20,7 +17,7 @@ export const ci = pipeline('Node app CI', {
   ],
   jobs: [
     job('test', {
-      runner: Runner.ubicloud('standard-4'),
+      runner: Runner.github('ubuntu-latest'),
       matrix: {
         variables: { 'node-version': ['18.x', '20.x', '22.x'] },
         failFast: false,

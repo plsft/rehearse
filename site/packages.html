@@ -200,12 +200,12 @@
 
     <h3 class="mt-8 text-lg font-semibold text-white">What it does</h3>
     <ul class="mt-3 space-y-2 text-[var(--rh-muted)] leading-relaxed">
-      <li><span class="ok">✓</span> Typed builders: <code class="font-mono">pipeline()</code>, <code class="font-mono">job()</code>, <code class="font-mono">step.run() / .checkout() / .action()</code>, <code class="font-mono">triggers.push() / .pullRequest() / .schedule()</code>, <code class="font-mono">Runner.ubicloud() / .github()</code></li>
+      <li><span class="ok">✓</span> Typed builders: <code class="font-mono">pipeline()</code>, <code class="font-mono">job()</code>, <code class="font-mono">step.run() / .checkout() / .action()</code>, <code class="font-mono">triggers.push() / .pullRequest() / .schedule()</code>, <code class="font-mono">Runner.github() / .selfHosted() / .custom()</code></li>
       <li><span class="ok">✓</span> Context helpers: <code class="font-mono">secrets()</code>, <code class="font-mono">vars()</code>, <code class="font-mono">github()</code>, <code class="font-mono">env()</code>, <code class="font-mono">needs()</code>, <code class="font-mono">steps()</code>, <code class="font-mono">expr()</code>, <code class="font-mono">hashFiles()</code> — all validated, throw on empty/whitespace</li>
       <li><span class="ok">✓</span> Language presets: <code class="font-mono">node</code>, <code class="font-mono">bun</code>, <code class="font-mono">python</code>, <code class="font-mono">rust</code>, <code class="font-mono">go</code>, <code class="font-mono">docker</code> — each exporting <code class="font-mono">setup() / install() / test() / build() / lint()</code> with correct action references</li>
       <li><span class="ok">✓</span> Hand-rolled YAML serializer — no external YAML library at runtime</li>
       <li><span class="ok">✓</span> YAML → TypeScript <span class="text-white">migration starter</span> (<code class="font-mono">convert()</code>) — handles common shapes (push/pr/dispatch/schedule, run/uses/with/env/if). Drops <code class="font-mono">matrix</code> / <code class="font-mono">services</code> / <code class="font-mono">concurrency</code> / job-level <code class="font-mono">permissions</code>; emits warnings. Use it to bootstrap, then hand-port the advanced bits.</li>
-      <li><span class="ok">✓</span> Cost estimator (<code class="font-mono">estimate()</code>) — Ubicloud vs GitHub-hosted comparison from a <span class="text-white">list-price snapshot</span> baked into the package. Math is real (per-job × per-min × runs/month with tier mapping); price tables refresh per release.</li>
+      <li><span class="ok">✓</span> Cost estimator (<code class="font-mono">estimate()</code>) — per-run and monthly GitHub-hosted CI cost from a <span class="text-white">list-price snapshot</span> baked into the package. Math is real (per-job × per-min × runs/month against the public price list); price tables refresh per release.</li>
     </ul>
 
     <h3 class="mt-8 text-lg font-semibold text-white">How it's used</h3>
@@ -217,7 +217,7 @@
   triggers: [<span class="fn">triggers</span>.<span class="fn">pullRequest</span>(), <span class="fn">triggers</span>.<span class="fn">push</span>({ branches: [<span class="str">'main'</span>] })],
   jobs: [
     <span class="fn">job</span>(<span class="str">'test'</span>, {
-      runner: <span class="fn">Runner</span>.<span class="fn">ubicloud</span>(<span class="str">'standard-4'</span>),
+      runner: <span class="fn">Runner</span>.<span class="fn">github</span>(<span class="str">'ubuntu-latest'</span>),
       steps: [<span class="fn">step</span>.<span class="fn">checkout</span>(), <span class="fn">node</span>.<span class="fn">setup</span>(<span class="str">'20'</span>), <span class="fn">node</span>.<span class="fn">install</span>(), <span class="fn">node</span>.<span class="fn">test</span>()],
     }),
   ],
@@ -344,7 +344,7 @@
 <span class="prompt"></span>rh ci convert   <span class="comment"># existing .github/workflows/foo.yml → .rehearse/pipelines/foo.ts</span>
 <span class="prompt"></span>rh ci validate  <span class="comment"># type-check pipelines without writing output</span>
 <span class="prompt"></span>rh ci watch     <span class="comment"># recompile on save (inner loop for pipeline authoring)</span>
-<span class="prompt"></span>rh ci estimate  <span class="comment"># Ubicloud vs GitHub-hosted cost per run, given step durations</span></pre>
+<span class="prompt"></span>rh ci estimate  <span class="comment"># GitHub-hosted CI cost per run and per month, given step durations</span></pre>
 
     <h3 class="mt-8 text-lg font-semibold text-white">Stack detection</h3>
     <p class="mt-2 text-[var(--rh-muted)] leading-relaxed">
@@ -419,7 +419,7 @@
                  ┌────────────────────────────────────────┐
                  │  @rehearse/ci  (the SDK)                │
                  │  • pipeline()/job()/step()/triggers()  │
-                 │  • Runner.ubicloud()/github()          │
+                 │  • Runner.github()/selfHosted()/custom() │
                  │  • presets: node, bun, python, rust... │
                  │  • compile() → YAML string             │
                  └─────────────┬──────────────────────────┘

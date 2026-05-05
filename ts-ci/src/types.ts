@@ -93,25 +93,9 @@ export interface WorkflowInput {
 }
 
 export type RunnerSpec =
-  | { kind: 'ubicloud'; size: UbicloudSize }
   | { kind: 'github'; label: string }
   | { kind: 'self-hosted'; labels: string[] }
   | { kind: 'custom'; runsOn: string | string[] };
-
-export type UbicloudSize =
-  | 'standard-2'
-  | 'standard-4'
-  | 'standard-8'
-  | 'standard-16'
-  | 'standard-30'
-  | 'standard-60'
-  | 'premium-2'
-  | 'premium-4'
-  | 'premium-8'
-  | 'gpu-standard-1'
-  | 'arm-2'
-  | 'arm-4'
-  | 'arm-8';
 
 export interface MatrixConfig {
   include?: Array<Record<string, string | number | boolean>>;
@@ -181,23 +165,6 @@ export interface RehearseConfig {
   provenance?: boolean;
 }
 
-/** Per-minute pricing for Ubicloud runner sizes (USD). */
-export const UBICLOUD_PRICING: Record<UbicloudSize, number> = {
-  'standard-2': 0.0008,
-  'standard-4': 0.0016,
-  'standard-8': 0.0032,
-  'standard-16': 0.0064,
-  'standard-30': 0.012,
-  'standard-60': 0.024,
-  'premium-2': 0.0016,
-  'premium-4': 0.0032,
-  'premium-8': 0.0064,
-  'gpu-standard-1': 0.0312,
-  'arm-2': 0.0007,
-  'arm-4': 0.0014,
-  'arm-8': 0.0028,
-};
-
 /** Per-minute pricing for GitHub-hosted runner labels (USD, public price list). */
 export const GITHUB_PRICING: Record<string, number> = {
   'ubuntu-latest': 0.008,
@@ -225,11 +192,6 @@ export interface CostEstimate {
     durationMinutes: number;
     costUsd: number;
   }>;
-  comparison?: {
-    githubCostUsd: number;
-    savingsUsd: number;
-    savingsPercent: number;
-  };
   runsPerMonth: number;
   monthlyCostUsd: number;
 }

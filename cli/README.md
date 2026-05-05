@@ -5,8 +5,8 @@
 
 The CLI front-end for [`@rehearse/ci`](https://www.npmjs.com/package/@rehearse/ci).
 Initialise a project, compile TypeScript pipelines to `.github/workflows/*.yml`,
-convert existing YAML to TypeScript, watch for changes, estimate Ubicloud
-runner cost.
+convert existing YAML to TypeScript, watch for changes, estimate
+GitHub-hosted CI cost.
 
 [![npm](https://img.shields.io/npm/v/@rehearse/cli)](https://www.npmjs.com/package/@rehearse/cli)
 [![License](https://img.shields.io/npm/l/@rehearse/cli)](./LICENSE)
@@ -39,7 +39,7 @@ rh --version
 | `rh ci convert <yaml>` | **Migration starter** — convert a GitHub Actions YAML to TypeScript. Handles common shapes (`run` / `uses` / `with` / `env` / `if` and the standard event triggers). Currently drops `matrix`, `services`, `concurrency`, `defaults`, `environment`, job-level `permissions`, and outputs — review the generated TS before relying on it. |
 | `rh ci validate` | Dry-run compile — fail on errors without writing output. |
 | `rh ci watch` | Recompile on change — useful while editing pipeline TS. |
-| `rh ci estimate` | Show Ubicloud cost vs GitHub-hosted runners for the compiled pipelines. **Pricing is a list-price snapshot baked into the package** (refreshes per release); verify against current rate cards before quoting. |
+| `rh ci estimate` | Estimate GitHub-hosted CI cost per run and per month for the compiled pipelines. **Pricing is a list-price snapshot baked into the package** (refreshes per release); verify against current rate cards before quoting. |
 
 Use the per-command `--help` for full flag lists:
 
@@ -108,8 +108,8 @@ converter, then `rh ci compile` round-trips back to YAML to verify.
 rh ci estimate --durations '{"test":7,"build":5}' --runs-per-month 200
 ```
 
-Outputs a per-job table with the Ubicloud cost vs the GitHub-hosted
-equivalent, plus the savings percentage.
+Outputs a per-job table with cost-per-run on GitHub-hosted runners,
+plus a monthly extrapolation given `--runs-per-month`.
 
 ## Run workflows locally before pushing
 

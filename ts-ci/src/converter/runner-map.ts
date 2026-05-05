@@ -20,10 +20,6 @@ export function mapRunner(runsOn: string | string[]): string {
     return `Runner.custom(${JSON.stringify(runsOn)})`;
   }
   if (runsOn in RUNNER_MAP) return RUNNER_MAP[runsOn]!;
-  if (runsOn.startsWith('ubicloud-')) {
-    const size = runsOn.slice('ubicloud-'.length);
-    return `Runner.ubicloud(${JSON.stringify(size)})`;
-  }
   if (runsOn.startsWith('self-hosted')) {
     return `Runner.selfHosted(${JSON.stringify(runsOn)})`;
   }

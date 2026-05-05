@@ -12,7 +12,7 @@ on:
 jobs:
   test:
     name: test
-    runs-on: ubicloud-standard-4
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         framework:

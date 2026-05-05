@@ -69,7 +69,7 @@ delete this package after compiling and the YAML still works.
 | `step.uploadArtifact(opts)` / `step.downloadArtifact(name, path?)` | `actions/upload-artifact@v4` / `download-artifact@v4`. |
 | `step.cache(opts)` | `actions/cache@v4` with `key`, `path`, `restoreKeys`. |
 | `triggers.push|pullRequest|workflowDispatch|schedule|release|workflowRun` | Trigger constructors. |
-| `Runner.github(label)` / `Runner.ubicloud(size?)` / `Runner.selfHosted(...)` / `Runner.custom(spec)` | Runner specs. |
+| `Runner.github(label)` / `Runner.selfHosted(...)` / `Runner.custom(spec)` | Runner specs. |
 
 ### Context helpers
 
@@ -151,8 +151,8 @@ console.log(report.totalUsd, report.savingsVsGitHubUsd);
 
 Pricing tables are a **list-price snapshot** baked into the package
 (refresh per release). The math is real (per-job × per-minute × runs
-with Ubicloud↔GitHub tier mapping) — verify against current rate cards
-before quoting numbers to customers.
+against GitHub-hosted public list prices) — verify against current rate
+cards before quoting numbers to customers.
 
 The CLI wrapper is `rh ci estimate`.
 
@@ -173,7 +173,9 @@ on:
 
 - GitHub-hosted runners (`ubuntu-latest`, `macos-latest`, `windows-latest`)
 - Self-hosted runners (`Runner.selfHosted(...)`)
-- Ubicloud runners (`Runner.ubicloud('standard-4')` etc.)
+- Third-party hosted runner pools via `Runner.custom('your-label')` —
+  e.g. Ubicloud, BuildJet, Namespace, RunsOn — anywhere the org has
+  configured the corresponding GitHub App or self-hosted listener
 - Locally via `@rehearse/runner` (or `act`, if you prefer)
 
 The TypeScript itself runs anywhere Node 18+ does. Tests run on Node 22.

@@ -57,7 +57,7 @@ ci.command('watch')
   .description('Watch pipelines and recompile on change')
   .action(async () => process.exit(await runWatch()));
 ci.command('estimate')
-  .description('Estimate Ubicloud cost vs GitHub-hosted runners')
+  .description('Estimate GitHub-hosted CI cost per run and per month')
   .option('--durations <json>', 'JSON object: { jobName: minutes }')
   .option('--runs-per-month <n>', 'Pipeline runs per month', (v) => Number(v))
   .action(async (opts: { durations?: string; runsPerMonth?: number }) =>

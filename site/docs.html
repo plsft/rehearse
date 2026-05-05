@@ -263,7 +263,7 @@
   triggers: [<span class="fn">triggers</span>.<span class="fn">pullRequest</span>()],
   jobs: [
     <span class="fn">job</span>(<span class="str">'test'</span>, {
-      runner: <span class="fn">Runner</span>.<span class="fn">ubicloud</span>(<span class="str">'standard-4'</span>),
+      runner: <span class="fn">Runner</span>.<span class="fn">github</span>(<span class="str">'ubuntu-latest'</span>),
       steps: [<span class="fn">step</span>.<span class="fn">checkout</span>(), <span class="fn">node</span>.<span class="fn">setup</span>(<span class="str">'20'</span>), <span class="fn">node</span>.<span class="fn">install</span>(), <span class="fn">node</span>.<span class="fn">test</span>()],
     }),
   ],

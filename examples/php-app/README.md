@@ -39,7 +39,7 @@ php-app/
 
 ```typescript
 job('test', {
-  runner: Runner.ubicloud('standard-4'),
+  runner: Runner.github('ubuntu-latest'),
   matrix: {
     variables: { 'php-version': ['8.2', '8.3', '8.4'] },
     failFast: false,
@@ -102,7 +102,5 @@ PHP version itself. You write the workflow once; it works in CI, in
 ## Push to GitHub
 
 The generated YAML has zero Rehearse runtime dependency. Push the repo
-to GitHub and the workflow runs on Ubicloud (`runs-on:
-ubicloud-standard-4`) if you've installed the Ubicloud GitHub App.
-Switch to `Runner.github('ubuntu-latest')` in `ci.ts` and recompile to
-target GitHub-hosted instead.
+to GitHub and the workflow runs on standard `ubuntu-latest` GitHub-hosted
+runners — three matrix cells in parallel, each on its own runner.

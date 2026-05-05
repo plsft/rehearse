@@ -3,7 +3,7 @@ import { Runner, job, pipeline, step, triggers } from '../../src/index.js';
 
 describe('pipeline()', () => {
   const j = () =>
-    job('a', { runner: Runner.ubicloud('standard-2'), steps: [step.run('echo hi')] });
+    job('a', { runner: Runner.github('ubuntu-latest'), steps: [step.run('echo hi')] });
 
   it('returns a typed Pipeline object', () => {
     const p = pipeline('CI', { triggers: [triggers.push()], jobs: [j()] });

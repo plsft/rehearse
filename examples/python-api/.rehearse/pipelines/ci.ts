@@ -20,7 +20,7 @@ export const ci = pipeline('Python API CI', {
   ],
   jobs: [
     job('test', {
-      runner: Runner.ubicloud('standard-4'),
+      runner: Runner.github('ubuntu-latest'),
       services: {
         postgres: {
           image: 'postgres:16-alpine',

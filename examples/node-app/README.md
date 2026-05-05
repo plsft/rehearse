@@ -12,7 +12,6 @@ that runs the test suite across **Node 18.x / 20.x / 22.x in parallel** via
 | Per-cell git worktree (no shared-workspace races) | how `runner` runs the matrix |
 | `actions/cache` with `restoreKeys` | `~/.npm` cached on `package-lock.json` hash |
 | `actions/upload-artifact` per matrix cell | coverage report uploaded per Node version |
-| Targeting Ubicloud | `Runner.ubicloud('standard-4')` → `runs-on: ubicloud-standard-4` |
 | `hashFiles()` typed expression helper | `@rehearse/ci`'s context API |
 
 ## Files
@@ -46,7 +45,7 @@ export const ci = pipeline('Node app CI', {
   triggers: [triggers.pullRequest(), triggers.push({ branches: ['main'] })],
   jobs: [
     job('test', {
-      runner: Runner.ubicloud('standard-4'),
+      runner: Runner.github('ubuntu-latest'),
       matrix: {
         variables: { 'node-version': ['18.x', '20.x', '22.x'] },
         failFast: false,
@@ -97,16 +96,11 @@ the sum of the three.
 
 ## Push to GitHub
 
-Push the repo to GitHub. If the Ubicloud GitHub App is installed on your
-org/repo, `runs-on: ubicloud-standard-4` routes the job to Ubicloud's pool
-(roughly 10× cheaper than GitHub-hosted at the same vCPU count).
+Push the repo to GitHub. The compiled YAML uses `runs-on: ubuntu-latest`,
+so the job runs on standard GitHub-hosted runners with no additional
+configuration.
 
-To target GitHub-hosted runners instead, change the runner in `ci.ts`:
-
-```typescript
-runner: Runner.github('ubuntu-latest'),
-```
-
-Recompile with `rh ci compile`. The local runner doesn't care about the
-label — both `ubicloud-standard-*` and `ubuntu-latest` run on the host
-backend by default.
+To target a different runner pool — bigger vCPU tiers, self-hosted, or
+a third-party hosted runner provider — swap `Runner.github('ubuntu-latest')`
+for `Runner.github('ubuntu-latest-4-cores')`, `Runner.selfHosted(...)`, or
+`Runner.custom('your-label')` in `ci.ts` and recompile with `rh ci compile`.

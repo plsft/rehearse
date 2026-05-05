@@ -6,7 +6,7 @@ authored in TypeScript with `@rehearse/ci`, runnable locally with
 
 | Example | Stack | What it shows |
 | --- | --- | --- |
-| [`node-app/`](node-app) | Node + Vitest | **matrix `[18.x, 20.x, 22.x]` parallel via per-cell git worktree**, `actions/cache`, `upload-artifact` for coverage. Targets Ubicloud (`Runner.ubicloud('standard-4')`). |
+| [`node-app/`](node-app) | Node + Vitest | **matrix `[18.x, 20.x, 22.x]` parallel via per-cell git worktree**, `actions/cache`, `upload-artifact` for coverage. |
 | [`python-api/`](python-api) | FastAPI + pytest | **Postgres `services:` block** via the container backend with `--network-alias`. The workflow class `act` doesn't complete. |
 | [`php-app/`](php-app) | PHP + PHPUnit + PHPStan | **Remote JS action** (`shivammathur/setup-php@v2`) auto-cloned and executed via the runner's JS-action runtime. Matrix `[8.2, 8.3, 8.4]`. |
 | [`dotnet-app/`](dotnet-app) | .NET (C#) + xUnit | **Multi-target framework matrix** `[net8.0, net9.0]` with shimmed `actions/setup-dotnet` (host no-op locally). NuGet cache, TRX test artifacts. |
@@ -48,13 +48,16 @@ read the TypeScript source and the generated YAML side-by-side. Both are
 checked in so you can push the example directly to GitHub as-is and
 watch CI run there.
 
-## Targeting Ubicloud
+## Targeting a different runner
 
-Every example uses `Runner.ubicloud('standard-4')` by default, so the
-generated YAML has `runs-on: ubicloud-standard-4`. To run on
-GitHub-hosted instead, swap to `Runner.github('ubuntu-latest')` in the
-TS pipeline and recompile. Locally, the runner treats both labels the
-same — both run via the host backend by default.
+Every example uses `Runner.github('ubuntu-latest')` so the generated
+YAML is portable to any GitHub Actions setup. To target a bigger tier,
+self-hosted, or a third-party hosted-runner provider, swap the runner
+in the `.rehearse/pipelines/ci.ts` and recompile:
+
+- Bigger GitHub-hosted: `Runner.github('ubuntu-latest-4-cores')`
+- Self-hosted: `Runner.selfHosted('linux', 'x64')`
+- Custom label: `Runner.custom('your-runner-label')`
 
 See [the package reference](https://rehearse.sh/packages) for the full
 runner / `@rehearse/ci` / `rh` surface.

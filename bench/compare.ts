@@ -151,10 +151,9 @@ async function runAct(target: Target): Promise<Run | null> {
   const args = ['-W', wf, '--no-cache-server'];
   if (target.job) args.push('-j', target.job);
   // Map common runner labels to a host-friendly image. Without this, act
-  // refuses to run unfamiliar labels (e.g. ubicloud-standard-4).
+  // refuses to run unfamiliar labels.
   for (const label of [
     'ubuntu-latest', 'ubuntu-22.04', 'ubuntu-24.04',
-    'ubicloud-standard-2', 'ubicloud-standard-4', 'ubicloud-standard-8',
   ]) {
     args.push('-P', `${label}=${image}`);
   }

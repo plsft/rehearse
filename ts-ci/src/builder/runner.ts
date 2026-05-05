@@ -1,14 +1,6 @@
-import type { RunnerSpec, UbicloudSize } from '../types.js';
+import type { RunnerSpec } from '../types.js';
 
 export const Runner = {
-  /**
-   * @deprecated Emits `runs-on: ubicloud-<size>`, which only works on GitHub
-   * orgs with Ubicloud configured. For portable workflows use
-   * `Runner.github('ubuntu-latest')`. Retained for explicit Ubicloud users.
-   */
-  ubicloud(size: UbicloudSize = 'standard-4'): RunnerSpec {
-    return { kind: 'ubicloud', size };
-  },
   github(label: string = 'ubuntu-latest'): RunnerSpec {
     if (!label.trim()) throw new Error('Runner.github(): label is required');
     return { kind: 'github', label };
@@ -28,8 +20,6 @@ export const Runner = {
  */
 export function resolveRunner(spec: RunnerSpec): string | string[] {
   switch (spec.kind) {
-    case 'ubicloud':
-      return `ubicloud-${spec.size}`;
     case 'github':
       return spec.label;
     case 'self-hosted':

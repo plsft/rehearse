@@ -64,13 +64,6 @@ export async function runEstimate(flags: EstimateFlags = {}): Promise<number> {
       console.log(`Total minutes:    ${result.totalMinutes}`);
       console.log(`Runs per month:   ${result.runsPerMonth}`);
       console.log(`Monthly cost:     $${result.monthlyCostUsd.toFixed(2)}`);
-      if (result.comparison) {
-        console.log('');
-        console.log(`vs GitHub-hosted: $${result.comparison.githubCostUsd.toFixed(4)}/run`);
-        console.log(
-          `Savings:          $${result.comparison.savingsUsd.toFixed(4)} (${result.comparison.savingsPercent}%)`,
-        );
-      }
       console.log('');
     }
   }

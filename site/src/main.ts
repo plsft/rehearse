@@ -58,7 +58,7 @@ window.heroDemo = (): HeroDemoState => ({
 
     // Job 1: typecheck
     push('');
-    push('<span class="ok">▶</span> <span class="text-white">job: typecheck</span>  <span class="comment">(host · ubicloud-standard-4)</span>');
+    push('<span class="ok">▶</span> <span class="text-white">job: typecheck</span>  <span class="comment">(host · ubuntu-latest)</span>');
     await sleep(120);
     push('  <span class="ok">⊘</span> Checkout                                  <span class="comment">host has the repo</span>');
     await sleep(60);
@@ -74,7 +74,7 @@ window.heroDemo = (): HeroDemoState => ({
     // Job 2: test (interleaves)
     await sleep(140);
     push('');
-    push('<span class="ok">▶</span> <span class="text-white">job: test</span>  <span class="comment">(host · ubicloud-standard-4)</span>');
+    push('<span class="ok">▶</span> <span class="text-white">job: test</span>  <span class="comment">(host · ubuntu-latest)</span>');
     await sleep(100);
     push('  <span class="ok">⊘</span> Checkout                                  <span class="comment">host has the repo</span>');
     await sleep(50);

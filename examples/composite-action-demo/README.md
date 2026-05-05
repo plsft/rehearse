@@ -71,7 +71,7 @@ export const ci = pipeline('Composite action demo', {
   triggers: [triggers.pullRequest(), triggers.push({ branches: ['main'] })],
   jobs: [
     job('test', {
-      runner: Runner.ubicloud('standard-4'),
+      runner: Runner.github('ubuntu-latest'),
       steps: [
         step.checkout(),
         step.action('./.github/actions/setup-deps', {

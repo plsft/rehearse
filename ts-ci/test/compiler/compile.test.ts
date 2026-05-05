@@ -38,11 +38,11 @@ describe('compile', () => {
       triggers: [triggers.pullRequest(), triggers.push({ branches: ['main'] })],
       jobs: [
         job('lint', {
-          runner: Runner.ubicloud('standard-2'),
+          runner: Runner.github('ubuntu-latest'),
           steps: [step.checkout(), node.setup('20'), node.install(), node.lint()],
         }),
         job('test', {
-          runner: Runner.ubicloud('standard-4'),
+          runner: Runner.github('ubuntu-latest-4-cores'),
           needs: ['lint'],
           steps: [step.checkout(), node.setup('20'), node.install(), node.test()],
         }),
@@ -57,7 +57,7 @@ describe('compile', () => {
       triggers: [triggers.pullRequest()],
       jobs: [
         job('test', {
-          runner: Runner.ubicloud('standard-2'),
+          runner: Runner.github('ubuntu-latest'),
           matrix: {
             variables: { node: ['18', '20', '22'] },
             failFast: false,
@@ -75,7 +75,7 @@ describe('compile', () => {
       triggers: [triggers.pullRequest()],
       jobs: [
         job('test', {
-          runner: Runner.ubicloud('standard-4'),
+          runner: Runner.github('ubuntu-latest-4-cores'),
           steps: [
             step.checkout(),
             node.setup('20'),
@@ -99,12 +99,12 @@ describe('compile', () => {
       triggers: [triggers.pullRequest({ paths: ['packages/**'] })],
       jobs: [
         job('detect', {
-          runner: Runner.ubicloud('standard-2'),
+          runner: Runner.github('ubuntu-latest'),
           outputs: { affected: '${{ steps.affected.outputs.list }}' },
           steps: [step.checkout(), { ...step.run('echo hello'), id: 'affected', name: 'Detect' }],
         }),
         job('build', {
-          runner: Runner.ubicloud('standard-4'),
+          runner: Runner.github('ubuntu-latest-4-cores'),
           needs: ['detect'],
           condition: "needs.detect.outputs.affected != ''",
           steps: [step.checkout(), node.setup('20'), node.install(), node.build()],
@@ -120,7 +120,7 @@ describe('compile', () => {
       triggers: [triggers.push({ branches: ['main'] })],
       jobs: [
         job('deploy', {
-          runner: Runner.ubicloud('standard-2'),
+          runner: Runner.github('ubuntu-latest'),
           environment: 'production',
           permissions: { contents: 'read', idToken: 'write' },
           steps: [
@@ -148,7 +148,7 @@ describe('compile', () => {
       env: { CI: 'true' },
       jobs: [
         job('test', {
-          runner: Runner.ubicloud('standard-4'),
+          runner: Runner.github('ubuntu-latest-4-cores'),
           timeoutMinutes: 30,
           steps: [step.checkout(), node.setup('20'), node.install(), node.test()],
         }),

@@ -21,7 +21,7 @@ export const ci = pipeline('PHP app CI', {
   ],
   jobs: [
     job('test', {
-      runner: Runner.ubicloud('standard-4'),
+      runner: Runner.github('ubuntu-latest'),
       matrix: {
         variables: { 'php-version': ['8.2', '8.3', '8.4'] },
         failFast: false,
