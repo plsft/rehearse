@@ -51,7 +51,14 @@ export async function run(options: RunOptions): Promise<RunResult> {
     host: new HostBackend({ verbose: options.verbose }),
     container: new ContainerBackend(),
   };
-  const maxParallel = options.maxParallel ?? Math.min(cpus().length, 4);
+  // Local default: use all cpus. Pre-v0.6.9 we capped at 4 — that was a
+  // historical safety belt from the era of the npm cache races (fixed in
+  // v0.5.4+ via per-cell scratch caches). On a developer machine the user
+  // generally WANTS to use all their cores; it's their machine. The Pro
+  // VM still caps at min(cpus, 4) because oversubscribing a 2-vCPU VM
+  // doesn't help, and that cap is enforced by the daemon when it invokes
+  // `rh run` server-side.
+  const maxParallel = options.maxParallel ?? cpus().length;
 
   const verbose = options.verbosity !== 'quiet';
   const isTty = process.stdout.isTTY === true;
