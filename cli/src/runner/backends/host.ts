@@ -15,6 +15,38 @@ import { runShim, hasShim } from '../shims/index.js';
 import { createWorktree, isGitRepo } from '../worktree.js';
 
 /**
+ * Serialise `git worktree add` across all matrix cells in this rh process.
+ *
+ * Why this matters: parallel cells each call `git worktree remove --force`
+ * + `git worktree prune` + `git worktree add`. All three touch the same
+ * `.git/worktrees/` registry. On Windows, the registry lock races when 4+
+ * cells fire `prepare()` simultaneously — some cells' `git worktree add`
+ * fails with "missing but already registered" or similar, the host backend
+ * (pre-v0.6.1) would silently fall back to the shared workspace, and those
+ * fallback cells would then trample each other's `<repo>/node_modules/`
+ * during parallel `npm install`. Symptom: a flood of
+ * `npm warn tar TAR_ENTRY_ERROR ... rename '<repo>/node_modules/...'`.
+ *
+ * Fix: chain worktree creation through a single promise so only one cell
+ * is touching `.git/worktrees/` at a time. Each createWorktree() call is
+ * fast (50-200ms with shallow checkout), so the serialised step adds at
+ * most ~1-2s of total wall time across a 9-cell matrix. Workflow steps
+ * after prep continue running in parallel as normal.
+ */
+let worktreeChain: Promise<void> = Promise.resolve();
+async function createWorktreeSerialized(opts: { repoRoot: string; jobId: string }) {
+  const prev = worktreeChain;
+  let release: () => void = () => {};
+  worktreeChain = new Promise<void>((r) => { release = r; });
+  try {
+    await prev.catch(() => { /* keep chain alive on prior failure */ });
+    return createWorktree(opts);
+  } finally {
+    release();
+  }
+}
+
+/**
  * Per-cell scratch caches for matrix runs. Eliminates package-manager
  * races on the user's global cache. Canonical case: `npm install` on
  * Windows races on `~/.npm/_cacache` tar atomic-rename when 9 cells
@@ -72,29 +104,28 @@ export class HostBackend implements Backend {
       args.job.matrixCell !== undefined &&
       isGitRepo(args.hostCwd)
     ) {
-      try {
-        const wt = createWorktree({ repoRoot: args.hostCwd, jobId: args.jobId });
-        // `git worktree add` checks out the WHOLE repo at the worktree
-        // path, even when hostCwd is a sub-directory of the repo. Map
-        // the cell's workdir to the equivalent sub-directory inside the
-        // worktree so examples in monorepos see their package.json /
-        // lockfile, not the git root's. Falls back to wt.path on error.
-        const top = spawnSync('git', ['rev-parse', '--show-toplevel'], {
-          cwd: args.hostCwd, encoding: 'utf-8',
-        });
-        if (top.status === 0) {
-          const gitRoot = top.stdout.trim();
-          const relCwd = relative(gitRoot, args.hostCwd);
-          workdir = relCwd && !relCwd.startsWith('..') ? resolve(wt.path, relCwd) : wt.path;
-        } else {
-          workdir = wt.path;
-        }
-        worktree = wt;
-      } catch (err) {
-        // Worktree creation can fail (e.g., shallow clone, weird state).
-        // Falling back to shared workspace + sequential execution is safe.
-        console.error(`[runner] worktree setup failed, falling back to shared workspace: ${(err as Error).message}`);
+      // Hard-fail on worktree-create errors instead of silently falling back
+      // to the shared workspace. The fallback caused multiple cells to
+      // race-install into <repo>/node_modules/ — the very failure mode the
+      // worktree was added to prevent. Better to surface the underlying
+      // error so the user can fix it.
+      const wt = await createWorktreeSerialized({ repoRoot: args.hostCwd, jobId: args.jobId });
+      // `git worktree add` checks out the WHOLE repo at the worktree
+      // path, even when hostCwd is a sub-directory of the repo. Map
+      // the cell's workdir to the equivalent sub-directory inside the
+      // worktree so examples in monorepos see their package.json /
+      // lockfile, not the git root's.
+      const top = spawnSync('git', ['rev-parse', '--show-toplevel'], {
+        cwd: args.hostCwd, encoding: 'utf-8',
+      });
+      if (top.status === 0) {
+        const gitRoot = top.stdout.trim();
+        const relCwd = relative(gitRoot, args.hostCwd);
+        workdir = relCwd && !relCwd.startsWith('..') ? resolve(wt.path, relCwd) : wt.path;
+      } else {
+        workdir = wt.path;
       }
+      worktree = wt;
     }
 
     // Per-cell scratch caches for matrix runs (matrix-only — single
