@@ -85,6 +85,22 @@ export async function runJobs(jobs: PlannedJob[], opts: SchedulerOptions): Promi
 
   async function execute(id: string): Promise<JobResult> {
     const job = byId.get(id)!;
+
+    // Structurally unsupported (e.g. remote reusable workflow we can't
+    // expand). Short-circuit before touching backend.prepare() so we
+    // emit a clean skipped result with an actionable reason instead of
+    // a phantom-success on an empty step list.
+    if (job.unsupportedReason) {
+      const r: JobResult = {
+        jobId: job.id, jobName: job.jobName, matrixCell: job.matrixCell,
+        status: 'skipped', durationMs: 0, steps: [], outputs: {}, backend: job.backend,
+        reason: job.unsupportedReason,
+      };
+      opts.onEvent?.({ kind: 'job-start', job });
+      opts.onEvent?.({ kind: 'job-end', job, result: r });
+      return r;
+    }
+
     const needs: Record<string, JobResult> = {};
     for (const n of job.needs) {
       const agg = aggregateNeed(n);

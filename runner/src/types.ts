@@ -58,6 +58,12 @@ export interface PlannedJob {
   steps: PlannedStep[];
   backend: BackendName;
   runsOn: string;
+  /**
+   * Job is structurally unsupported (e.g. remote reusable workflow we
+   * can't expand). Scheduler short-circuits to `status: 'skipped'` with
+   * this reason instead of running the (empty) step list.
+   */
+  unsupportedReason?: string;
 }
 
 export interface PlannedStep {

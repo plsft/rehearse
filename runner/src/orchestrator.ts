@@ -124,7 +124,13 @@ export async function run(options: RunOptions): Promise<RunResult> {
           break;
         }
         case 'job-end':
-          // Per-job rollup is printed in the summary block at the end.
+          // For jobs that finished without emitting any steps (e.g. a
+          // remote reusable we can't expand), show the reason inline so
+          // the user sees WHY there was no work — the summary rollup
+          // only prints in matrix / multi-job runs.
+          if (e.result.status === 'skipped' && e.result.steps.length === 0 && e.result.reason) {
+            console.log(`  ${pc.gray('⊘')} ${pc.gray(e.result.reason)}`);
+          }
           break;
       }
     },

@@ -15,7 +15,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import pc from 'picocolors';
 
-type StepClass = 'run' | 'uses-noop' | 'uses-supported' | 'uses-unsupported' | 'uses-local';
+type StepClass = 'run' | 'uses-noop' | 'uses-supported' | 'uses-unsupported' | 'uses-local' | 'reusable-local' | 'reusable-remote';
 type Backend = 'host' | 'container';
 
 interface StepAnalysis {
@@ -129,15 +129,44 @@ function analyzeJob(key: string, job: ParsedJob): JobAnalysis {
     (isWindowsOnly && process.platform !== 'win32') || (isMacOnly && process.platform !== 'darwin')
       ? 'container'
       : 'host';
+
+  // Job-level `uses:` (reusable workflow caller) — no `steps:` field.
+  // Local refs (`./.github/workflows/x.yml`) are expanded at run-time;
+  // remote refs (`org/repo/.github/workflows/x.yml@ref`) are a known gap.
+  const jobUses = (job as ParsedJob & { uses?: string }).uses;
+  if (jobUses && !job.steps) {
+    const isLocal = jobUses.startsWith('./') || jobUses.startsWith('.\\');
+    const synthetic: StepAnalysis = {
+      index: 0,
+      label: `reusable workflow → ${jobUses}`,
+      class: isLocal ? 'reusable-local' : 'reusable-remote',
+      reason: isLocal
+        ? 'local reusable — expanded at run-time'
+        : 'remote reusable not yet supported (org/repo@ref form)',
+      backend: defaultBackend,
+      features: new Set<string>(['job-level uses:']),
+    };
+    return {
+      key,
+      name: job.name ?? key,
+      runsOn: job['runs-on'] ?? '(reusable)',
+      hasMatrix: !!job.strategy?.matrix,
+      hasIf: !!job.if,
+      needsCount: Array.isArray(job.needs) ? job.needs.length : (job.needs ? 1 : 0),
+      hasServices: false,
+      steps: [synthetic],
+    };
+  }
+
   return {
     key,
     name: job.name ?? key,
-    runsOn: job['runs-on'],
+    runsOn: job['runs-on'] ?? '?',
     hasMatrix: !!job.strategy?.matrix,
     hasIf: !!job.if,
     needsCount: Array.isArray(job.needs) ? job.needs.length : (job.needs ? 1 : 0),
     hasServices: !!job.services && Object.keys(job.services).length > 0,
-    steps: job.steps.map((s, i) => classifyStep(s, i, defaultBackend)),
+    steps: (job.steps ?? []).map((s, i) => classifyStep(s, i, defaultBackend)),
   };
 }
 
@@ -159,9 +188,9 @@ export function compat(workflowPath: string): RunResult {
   const stepsTotal = jobs.flatMap((j) => j.steps).length;
   const byClass = jobs.flatMap((j) => j.steps).reduce(
     (acc, s) => ({ ...acc, [s.class]: (acc[s.class] ?? 0) + 1 }),
-    { run: 0, 'uses-noop': 0, 'uses-supported': 0, 'uses-unsupported': 0, 'uses-local': 0 } as Record<StepClass, number>,
+    { run: 0, 'uses-noop': 0, 'uses-supported': 0, 'uses-unsupported': 0, 'uses-local': 0, 'reusable-local': 0, 'reusable-remote': 0 } as Record<StepClass, number>,
   );
-  const supported = byClass.run + byClass['uses-noop'] + byClass['uses-supported'];
+  const supported = byClass.run + byClass['uses-noop'] + byClass['uses-supported'] + byClass['reusable-local'];
   const coverage = stepsTotal === 0 ? 0 : (supported / stepsTotal) * 100;
   return { workflowName: wf.name ?? workflowPath, workflowPath: path, jobs, stepsTotal, byClass, coverage };
 }
@@ -221,11 +250,13 @@ export function printReport(r: RunResult, opts: { json?: boolean } = {}): void {
   console.log(pc.gray('─'.repeat(70)));
   console.log(`  Jobs:               ${r.jobs.length}`);
   console.log(`  Steps total:        ${r.stepsTotal}`);
-  console.log(`  ${pc.green('✓')} run scripts:       ${r.byClass.run}`);
-  console.log(`  ${pc.green('✓')} uses (host noop):  ${r.byClass['uses-noop']}`);
-  console.log(`  ${pc.cyan('~')} uses (supported):  ${r.byClass['uses-supported']}`);
-  console.log(`  ${pc.red('✗')} uses (unsupported):${r.byClass['uses-unsupported']}`);
-  console.log(`  ${pc.yellow('~')} local actions:     ${r.byClass['uses-local']}`);
+  console.log(`  ${pc.green('✓')} run scripts:           ${r.byClass.run}`);
+  console.log(`  ${pc.green('✓')} uses (host noop):      ${r.byClass['uses-noop']}`);
+  console.log(`  ${pc.cyan('~')} uses (supported):      ${r.byClass['uses-supported']}`);
+  console.log(`  ${pc.red('✗')} uses (unsupported):    ${r.byClass['uses-unsupported']}`);
+  console.log(`  ${pc.yellow('~')} local actions:         ${r.byClass['uses-local']}`);
+  console.log(`  ${pc.green('✓')} reusable (local):      ${r.byClass['reusable-local']}`);
+  console.log(`  ${pc.red('✗')} reusable (remote):     ${r.byClass['reusable-remote']}`);
   console.log('');
   console.log(`  ${pc.bold('Coverage:')}           ${r.coverage.toFixed(1)}% of ${r.stepsTotal} steps would execute`);
 

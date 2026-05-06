@@ -67,12 +67,16 @@ export function substituteWith(w: Record<string, unknown> | undefined, ctx: Expr
   return out;
 }
 
-function pickBackend(job: ParsedJob, opts: RunOptions): BackendName {
+function pickBackend(job: ParsedJob, opts: RunOptions, resolvedRunsOn?: string): BackendName {
   if (opts.backend && opts.backend !== 'auto') return opts.backend;
   const services = job.services;
   if (services && Object.keys(services).length > 0) return 'container';
   if ('container' in job && job.container) return 'container';
-  const runsOn = String(Array.isArray(job['runs-on']) ? job['runs-on'][0] : job['runs-on'] ?? '');
+  // Use the matrix-substituted runs-on if the caller resolved it. The
+  // raw form may be `${{ matrix.os }}` — pre-substitution it never
+  // matches the windows-/macos- prefix and every cell wrongly picks
+  // host. Resolved form is the literal label for THIS cell.
+  const runsOn = resolvedRunsOn ?? String(Array.isArray(job['runs-on']) ? job['runs-on'][0] : job['runs-on'] ?? '');
   if (runsOn.startsWith('windows-') && process.platform !== 'win32') return 'container';
   if (runsOn.startsWith('macos-') && process.platform !== 'darwin') return 'container';
   return 'host';
@@ -140,6 +144,9 @@ export function plan(workflow: ParsedWorkflow, opts: RunOptions): PlannedJob[] {
   // caller's job dictionary. We do this before matrix expansion so the
   // expanded jobs themselves can have matrix strategies.
   const flat: Record<string, ParsedJob> = {};
+  // jobs we can't expand (remote reusables) — emit them as a skipped
+  // PlannedJob with a clear reason rather than a phantom 0-step success.
+  const unsupportedJobs: Record<string, string> = {};
   for (const [jobKey, rawJob] of Object.entries(workflow.jobs)) {
     const j = rawJob as ParsedJob & { uses?: string };
     if (isReusableWorkflowUse(j.uses)) {
@@ -148,14 +155,27 @@ export function plan(workflow: ParsedWorkflow, opts: RunOptions): PlannedJob[] {
         for (const [k, v] of Object.entries(expansion.jobs)) flat[k] = v;
         continue;
       }
-      // Fall through if expansion failed — surfaces as 'no steps' below.
+      // Local refs that fail to load are user errors (file missing).
+      // Remote refs (org/repo/.github/workflows/x.yml@ref) are a known
+      // gap — flag them clearly instead of pretending the job succeeded.
+      const isRemote = j.uses && !(j.uses.startsWith('./') || j.uses.startsWith('.\\'));
+      unsupportedJobs[jobKey] = isRemote
+        ? `remote reusable workflow not supported: ${j.uses}`
+        : `local reusable workflow not found: ${j.uses}`;
+      flat[jobKey] = rawJob;
+      continue;
     }
     flat[jobKey] = rawJob;
   }
 
   const out: PlannedJob[] = [];
   for (const [jobKey, rawJob] of Object.entries(flat)) {
-    if (opts.jobFilter && opts.jobFilter !== jobKey) continue;
+    if (opts.jobFilter) {
+      // Exact match wins. Also allow the caller key as a shorthand for
+      // any expanded inner job (`coverage-nix` matches `coverage-nix__check-coverage`).
+      const matches = opts.jobFilter === jobKey || jobKey.startsWith(`${opts.jobFilter}__`);
+      if (!matches) continue;
+    }
     const matrix = parseMatrix(rawJob.strategy?.matrix);
     const cells = expandMatrix(matrix);
     const needs = Array.isArray(rawJob.needs) ? rawJob.needs : rawJob.needs ? [rawJob.needs] : [];
@@ -179,8 +199,9 @@ export function plan(workflow: ParsedWorkflow, opts: RunOptions): PlannedJob[] {
         ifCondition: rawJob.if,
         env,
         steps,
-        backend: pickBackend(rawJob, opts),
+        backend: pickBackend(rawJob, opts, runsOn),
         runsOn,
+        unsupportedReason: unsupportedJobs[jobKey],
       });
     }
   }
