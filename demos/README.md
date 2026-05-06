@@ -42,10 +42,10 @@ go install github.com/charmbracelet/vhs@latest
 ## Pre-flight
 
 ```bash
-# 1. v0.3.3 of runner + cli (latest at writing)
+# 1. v0.5.0 of runner + cli (latest at writing)
 npm install -g @rehearse/runner@latest @rehearse/cli@latest
-rehearse --version    # 0.3.3
-rh --version        # 0.3.3
+rehearse --version    # 0.5.0
+rh --version          # 0.5.0
 
 # 2. JetBrains Mono (the tapes call for it)
 winget install JetBrains.Mono              # Windows

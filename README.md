@@ -98,7 +98,7 @@ poc/           — fixture workflows used by the bench harness (vite/hono/etc.)
 - Local composite actions (`./.github/actions/*`) AND remote (`org/repo[/sub]@ref` — auto-cloned)
 - Local reusable workflows (`uses: ./.github/workflows/foo.yml`) with `with:` + `secrets: inherit`
 - `${{ matrix… }}`, `${{ env… }}`, `${{ secrets… }}`, `${{ vars… }}`, `${{ runner… }}`, `${{ needs.<job>.outputs.<n> }}`, `${{ steps.<id>.outputs.<n> }}`, `${{ github.* }}`
-- `runner --remote` ships the workflow to a Pro VM (auto-detects git origin + SHA + monorepo subdir; ships `--env-file` secrets to `${{ secrets.* }}`)
+- `rehearse run --remote` ships the workflow to a Pro VM (auto-detects git origin + SHA + monorepo subdir; ships `--env-file` secrets to `${{ secrets.* }}`)
 
 ## Known gaps
 

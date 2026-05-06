@@ -4,7 +4,7 @@ name: render-demos
 #   gh workflow run render-demos.yml -f tape=demos/pro-elevator.tape
 #
 # Requires repo secret REHEARSE_TOKEN_DEMO (a real Pro API key) so the
-# `runner run --remote` lines actually hit a VM.
+# `rehearse run --remote` lines actually hit a VM.
 
 on:
   workflow_dispatch:

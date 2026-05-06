@@ -73,10 +73,10 @@ rehearse run --remote --env-file .env .github/workflows/deploy.yml
 
 ## Bench (Linux GH-hosted, head-to-head with `act`)
 
-Same workflow, fresh `ubuntu-latest` runner, v0.3.11 warm. Reproducible
+Same workflow, fresh `ubuntu-latest` runner, v0.5.0 warm. Reproducible
 via `gh workflow run bench.yml`.
 
-| Target | runner | `act` | Speedup |
+| Target | `rehearse` | `act` | Speedup |
 | --- | ---: | ---: | ---: |
 | `our-ci` (typecheck + tests, 2 parallel jobs) | **12.19s** | 63.78s | **5.23×** |
 | `node-matrix` (3-cell matrix, parallel via worktrees) | **1.12s** | 10.07s | **8.99×** |

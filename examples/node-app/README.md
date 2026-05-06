@@ -9,7 +9,7 @@ that runs the test suite across **Node 18.x / 20.x / 22.x in parallel** via
 | Feature | Where |
 | --- | --- |
 | `strategy.matrix` parallel execution | `node-version: [18.x, 20.x, 22.x]` |
-| Per-cell git worktree (no shared-workspace races) | how `runner` runs the matrix |
+| Per-cell git worktree (no shared-workspace races) | how `rehearse` runs the matrix |
 | `actions/cache` with `restoreKeys` | `~/.npm` cached on `package-lock.json` hash |
 | `actions/upload-artifact` per matrix cell | coverage report uploaded per Node version |
 | `hashFiles()` typed expression helper | `@rehearse/ci`'s context API |
