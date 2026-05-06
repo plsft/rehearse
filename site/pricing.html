@@ -59,8 +59,8 @@
         <p class="text-[12px] font-mono text-[var(--rh-muted)] mb-6">Apache 2.0 · No signup · No telemetry · No phone-home</p>
         <ul class="space-y-2 text-sm mb-8">
           <li><span class="ok">●</span> Local execution on your machine</li>
-          <li><span class="ok">●</span> Sub-second CI on every save (<code class="font-mono">runner watch</code>)</li>
-          <li><span class="ok">●</span> Pre-push hook (<code class="font-mono">runner install-hook</code>)</li>
+          <li><span class="ok">●</span> Sub-second CI on every save (<code class="font-mono">rehearse watch</code>)</li>
+          <li><span class="ok">●</span> Pre-push hook (<code class="font-mono">rehearse install-hook</code>)</li>
           <li><span class="ok">●</span> Host + container backends</li>
           <li><span class="ok">●</span> Matrix, services, composite actions, JS actions</li>
           <li><span class="ok">●</span> 97% of real workflows just work</li>
@@ -161,7 +161,7 @@
       </div>
       <div>
         <p class="font-semibold mb-1">What's the 25,000-minute cap and how does it work?</p>
-        <p class="text-[var(--rh-muted)]">The cap is on <span class="text-white">active CPU minutes</span> — the actual time the VM is executing your workflow. Idle time is free; you only burn minutes when <code class="font-mono">runner run --remote</code> is doing real work on your VM. Email alerts fire at 75% and 90% of your cap. Hit 100% and your runs pause until the cap resets (first of next UTC month) OR you add another $49 / 25k block. To add a block, just reply to the alert email — I'll bump your cap within an hour.</p>
+        <p class="text-[var(--rh-muted)]">The cap is on <span class="text-white">active CPU minutes</span> — the actual time the VM is executing your workflow. Idle time is free; you only burn minutes when <code class="font-mono">rehearse run --remote</code> is doing real work on your VM. Email alerts fire at 75% and 90% of your cap. Hit 100% and your runs pause until the cap resets (first of next UTC month) OR you add another $49 / 25k block. To add a block, just reply to the alert email — I'll bump your cap within an hour.</p>
       </div>
       <div>
         <p class="font-semibold mb-1">What if I outgrow 25,000 minutes?</p>
@@ -169,7 +169,7 @@
       </div>
       <div>
         <p class="font-semibold mb-1">How long does provisioning take?</p>
-        <p class="text-[var(--rh-muted)]">After Stripe checkout the welcome email arrives within ~30 seconds, but your VM is still spinning up — the actual provisioning runs in a GitHub Actions workflow that takes 60–120 seconds. The first <code class="font-mono">runner run --remote</code> waits briefly if the VM isn't ready yet; subsequent runs are warm.</p>
+        <p class="text-[var(--rh-muted)]">After Stripe checkout the welcome email arrives within ~30 seconds, but your VM is still spinning up — the actual provisioning runs in a GitHub Actions workflow that takes 60–120 seconds. The first <code class="font-mono">rehearse run --remote</code> waits briefly if the VM isn't ready yet; subsequent runs are warm.</p>
       </div>
       <div>
         <p class="font-semibold mb-1">Will the OSS runner ever be paywalled?</p>

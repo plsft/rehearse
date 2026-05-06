@@ -59,7 +59,7 @@
         <span class="text-white">Whole-rootfs persistence</span> — every cache, every build artifact,
         every tool install survives between runs forever. Not just
         <code class="font-mono text-white/90">actions/cache</code> paths. Not just declared volumes.
-        <span class="text-white">Everything.</span> One flag: <code class="font-mono text-white/90">runner run --remote</code>.
+        <span class="text-white">Everything.</span> One flag: <code class="font-mono text-white/90">rehearse run --remote</code>.
       </p>
       <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
         <a href="/pricing" class="btn btn-primary">Start Pro — $49/mo</a>
@@ -99,7 +99,7 @@
       <div class="card p-7">
         <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// same cli, three targets</div>
         <h3 class="font-semibold text-lg mb-2">One binary, three execution targets.</h3>
-        <p class="text-[var(--rh-muted)] text-sm"><code class="font-mono">runner run</code> for local. <code class="font-mono">runner run --remote</code> for Pro. <code class="font-mono">git push</code> for GitHub Actions. Same YAML, same output format, same exit codes. Switch with one flag — no config files, no second tool, no lock-in. Drop the flag and you're back to free OSS execution.</p>
+        <p class="text-[var(--rh-muted)] text-sm"><code class="font-mono">rehearse run</code> for local. <code class="font-mono">rehearse run --remote</code> for Pro. <code class="font-mono">git push</code> for GitHub Actions. Same YAML, same output format, same exit codes. Switch with one flag — no config files, no second tool, no lock-in. Drop the flag and you're back to free OSS execution.</p>
       </div>
       <div class="card p-7">
         <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// streaming logs</div>
@@ -286,7 +286,7 @@ AWS_SECRET_ACCESS_KEY=...
 AWS_DEFAULT_REGION=us-east-1
 
 <span class="text-[var(--rh-muted)]"># 2. Same workflow you'd run on GitHub-hosted</span>
-$ runner run --remote --env-file .env .github/workflows/deploy.yml</pre>
+$ rehearse run --remote --env-file .env .github/workflows/deploy.yml</pre>
     <p class="text-[var(--rh-muted)] text-sm mt-5">
       <span class="text-white">Cloud CLIs:</span> the VM ships <code class="font-mono">curl</code>, <code class="font-mono">wget</code>, <code class="font-mono">rsync</code>, <code class="font-mono">ssh</code>. Install <code class="font-mono">aws</code>/<code class="font-mono">az</code>/<code class="font-mono">gcloud</code>/<code class="font-mono">kubectl</code>/<code class="font-mono">terraform</code> in the workflow itself — pip-wheel installs (~5s) cache to your persistent rootfs after the first run.
     </p>
@@ -343,7 +343,7 @@ $ runner run --remote --env-file .env .github/workflows/deploy.yml</pre>
       <span class="text-white">Pro warm vs local Docker cached: 2.55× faster.</span> Cold-to-warm Pro speedup: 2.07× on install, 1.86× on wall. The <em>real</em> savings show up when you run CI dozens of times a day, which is the whole point of CI.
     </p>
     <p class="text-[12px] font-mono text-[var(--rh-muted)] mt-3 max-w-2xl">
-      Reproduce: <code class="font-mono text-white/80">runner run --remote <a href="https://github.com/plsft/rehearse/blob/main/bench/pro-bench.yml" class="link">bench/pro-bench.yml</a></code> against your Pro account, twice. The first run is cold; the second is warm. Exact ms vary by region and upstream-registry latency — the cold/warm ratio is what's load-bearing.
+      Reproduce: <code class="font-mono text-white/80">rehearse run --remote <a href="https://github.com/plsft/rehearse/blob/main/bench/pro-bench.yml" class="link">bench/pro-bench.yml</a></code> against your Pro account, twice. The first run is cold; the second is warm. Exact ms vary by region and upstream-registry latency — the cold/warm ratio is what's load-bearing.
     </p>
   </div>
 </section>
@@ -368,7 +368,7 @@ npm install -g @rehearse/runner@latest
 export REHEARSE_TOKEN=rh_pro_live_…
 
 <span class="comment"># 3. run any workflow that targets a supported language (see below)</span>
-runner run --remote .github/workflows/ci.yml</code></pre>
+rehearse run --remote .github/workflows/ci.yml</code></pre>
     <p class="text-[12px] font-mono text-[var(--rh-muted)] mt-3">Same command without <code class="font-mono">--remote</code> runs locally. Drop the flag any time — there's no lock-in.</p>
   </div>
 </section>

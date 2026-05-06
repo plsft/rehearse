@@ -28,7 +28,7 @@ function readPackageVersion(): string {
 const program = new Command();
 
 program
-  .name('runner')
+  .name('rehearse')
   .description('Local-first runner for GitHub Actions workflows')
   .version(readPackageVersion());
 

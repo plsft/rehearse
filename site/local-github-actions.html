@@ -49,7 +49,7 @@
     <p class="mt-5 text-lg text-[var(--rh-muted)]">
       <span class="text-white">Sub-second on warm cache.</span> Same workflow
       YAML you already have. No edits, no Dockerfile, no special build.
-      <code class="font-mono text-white">runner run .github/workflows/ci.yml</code>
+      <code class="font-mono text-white">rehearse run .github/workflows/ci.yml</code>
       and your CI runs locally — <span class="text-white">5-30× faster than
       <code class="font-mono">nektos/act</code></span>, with services / matrix
       / cache / composite actions / JS actions all working the same as on GitHub.
@@ -72,9 +72,9 @@
       </div>
       <div class="term-body flex items-center justify-between gap-3 border-t border-white/5">
         <div>
-          <span class="prompt"></span><span class="text-white">runner run .github/workflows/ci.yml</span>
+          <span class="prompt"></span><span class="text-white">rehearse run .github/workflows/ci.yml</span>
         </div>
-        <button @click="navigator.clipboard.writeText('runner run .github/workflows/ci.yml'); copied='run'; setTimeout(()=>copied='', 1600)" class="copy-button shrink-0">
+        <button @click="navigator.clipboard.writeText('rehearse run .github/workflows/ci.yml'); copied='run'; setTimeout(()=>copied='', 1600)" class="copy-button shrink-0">
           <span x-show="copied !== 'run'">copy</span><span x-show="copied === 'run'" x-cloak class="text-[var(--rh-accent)]">✓ copied</span>
         </button>
       </div>
@@ -105,14 +105,14 @@
         <span class="step-plate shrink-0">2</span>
         <div>
           <span class="text-white">Iterate at the speed of your tests.</span>
-          <code class="font-mono">runner watch</code> reruns CI on every save. Edit a test, hit save, see it green or red without leaving the editor. Same YAML you commit; no separate dev script.
+          <code class="font-mono">rehearse watch</code> reruns CI on every save. Edit a test, hit save, see it green or red without leaving the editor. Same YAML you commit; no separate dev script.
         </div>
       </li>
       <li class="flex gap-3">
         <span class="step-plate shrink-0">3</span>
         <div>
           <span class="text-white">Burn zero CI minutes.</span>
-          The runner uses your laptop's CPU. No cloud bill. No wasted runner-pool minutes. Pre-push hook (<code class="font-mono">runner install-hook</code>) gates pushes on a green local run, so what hits GitHub is already known to pass.
+          The runner uses your laptop's CPU. No cloud bill. No wasted runner-pool minutes. Pre-push hook (<code class="font-mono">rehearse install-hook</code>) gates pushes on a green local run, so what hits GitHub is already known to pass.
         </div>
       </li>
       <li class="flex gap-3">
@@ -165,7 +165,7 @@ jobs:
     <h3 class="mt-8 text-base font-semibold text-white">2. Run it locally</h3>
     <pre class="mt-3 font-mono text-[12.5px] text-white/90 bg-black/40 p-4 rounded border border-white/10 overflow-x-auto"><span class="prompt"></span>npm install -g @rehearse/runner
 <span class="prompt"></span>cd ~/your-repo
-<span class="prompt"></span>time runner run .github/workflows/ci.yml</pre>
+<span class="prompt"></span>time rehearse run .github/workflows/ci.yml</pre>
 
     <h3 class="mt-8 text-base font-semibold text-white">3. The output</h3>
     <pre class="mt-3 font-mono text-[12.5px] text-white/90 bg-black/40 p-4 rounded border border-white/10 overflow-x-auto"><span class="text-white">runner · CI</span>
@@ -206,9 +206,9 @@ real    0m3.78s</pre>
 
     <div class="mt-6 grid gap-5">
       <div class="card p-6">
-        <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">// runner watch</div>
+        <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">// rehearse watch</div>
         <h3 class="text-lg font-semibold text-white">CI on every save.</h3>
-        <pre class="mt-3 font-mono text-[12.5px] text-white/90"><span class="prompt"></span>runner watch .github/workflows/ci.yml</pre>
+        <pre class="mt-3 font-mono text-[12.5px] text-white/90"><span class="prompt"></span>rehearse watch .github/workflows/ci.yml</pre>
         <p class="mt-3 text-sm text-[var(--rh-muted)]">
           Watches your repo and re-runs the workflow on every file save.
           Debounced and queue-coalesced — rapid edits collapse into a
@@ -219,9 +219,9 @@ real    0m3.78s</pre>
       </div>
 
       <div class="card p-6">
-        <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">// runner install-hook</div>
+        <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">// rehearse install-hook</div>
         <h3 class="text-lg font-semibold text-white">Block bad pushes at the source.</h3>
-        <pre class="mt-3 font-mono text-[12.5px] text-white/90"><span class="prompt"></span>runner install-hook</pre>
+        <pre class="mt-3 font-mono text-[12.5px] text-white/90"><span class="prompt"></span>rehearse install-hook</pre>
         <p class="mt-3 text-sm text-[var(--rh-muted)]">
           Writes a <code class="font-mono">.git/hooks/pre-push</code> that
           runs your CI workflow before letting <code class="font-mono">git

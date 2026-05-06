@@ -86,7 +86,7 @@ npm install -g @rehearse/runner @rehearse/cli
 rh ci compile
 
 # Run the workflow locally — three Node versions in parallel
-runner run .github/workflows/ci.yml
+rehearse run .github/workflows/ci.yml
 ```
 
 Expected: three matrix cells (`node=18.x`, `node=20.x`, `node=22.x`) run

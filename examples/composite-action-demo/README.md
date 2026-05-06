@@ -90,7 +90,7 @@ export const ci = pipeline('Composite action demo', {
 
 ## What the runner does
 
-When `runner run` hits the `uses: ./.github/actions/setup-deps` step, it:
+When `rehearse run` hits the `uses: ./.github/actions/setup-deps` step, it:
 
 1. Reads `.github/actions/setup-deps/action.yml`
 2. Builds an `inputs` context from the parent's `with:` (`node-version: '20.x'`, `cache-key-prefix: 'npm-demo'`), defaulting any unspecified inputs from the action's `inputs:` block
@@ -118,7 +118,7 @@ npm install
 npm install -g @rehearse/runner @rehearse/cli
 
 rh ci compile
-runner run .github/workflows/ci.yml
+rehearse run .github/workflows/ci.yml
 ```
 
 ## Remote composites work the same way

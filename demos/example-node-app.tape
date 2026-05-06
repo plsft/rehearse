@@ -3,8 +3,8 @@
 # Output: demos/example-node-app.mp4 (~75 seconds)
 #
 # Real output captured today:
-#   runner compat → 100.0% of 6 steps would execute
-#   runner run    → Node app CI  PASS  13.72s  (3 ran, 0 skipped)
+#   rehearse compat → 100.0% of 6 steps would execute
+#   rehearse run    → Node app CI  PASS  13.72s  (3 ran, 0 skipped)
 #                   ✓ test  11.81s  [node-version=18.x]
 #                   ✓ test  12.48s  [node-version=20.x]
 #                   ✓ test  12.95s  [node-version=22.x]
@@ -50,7 +50,7 @@ Type "clear" Enter
 Sleep 200ms
 Type "# Compat audit — what would actually execute" Enter
 Sleep 800ms
-Type "runner compat .github/workflows/ci.yml" Enter
+Type "rehearse compat .github/workflows/ci.yml" Enter
 Sleep 5s
 
 # §4 — real run, matrix in parallel
@@ -58,7 +58,7 @@ Type "clear" Enter
 Sleep 200ms
 Type "# Run the workflow locally — 3 cells, parallel via per-cell git worktree" Enter
 Sleep 1s
-Type "runner run .github/workflows/ci.yml" Enter
+Type "rehearse run .github/workflows/ci.yml" Enter
 Sleep 16s
 
 # §5 — close

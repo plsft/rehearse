@@ -10,14 +10,14 @@ This file inlines the canonical descriptions of every Rehearse surface in plain 
 
 Rehearse is four npm packages working together:
 
-1. **@rehearse/runner** (binary: `runner`) — the local GitHub Actions runner. Reads `.github/workflows/*.yml` and executes locally with two backends (host subprocess for speed, Docker container for parity).
+1. **@rehearse/runner** (binary: `rehearse`) — the local GitHub Actions runner. Reads `.github/workflows/*.yml` and executes locally with two backends (host subprocess for speed, Docker container for parity).
 2. **@rehearse/ci** — TypeScript SDK that compiles to standard GitHub Actions YAML. Lossless forward path; one-command migration on-ramp from existing YAML.
 3. **@rehearse/cli** (binary: `rh`) — companion CLI for `@rehearse/ci`. `init`, `compile`, `convert`, `validate`, `watch`, `estimate`.
 4. **@rehearse/git-core** — pure-TypeScript git protocol implementation. Runs in Cloudflare Workers, browsers, Deno, Node, Bun. Standalone.
 
 All four are Apache 2.0, all four versioned in lockstep (currently v0.4.0). The runner alone is enough for most users; the others compose for richer workflows.
 
-Optional commercial layer: **Rehearse Pro** at $49/mo for 25,000 active CPU minutes per month + $49 per additional 25,000-minute block. Single-tenant VM with whole-rootfs cache persistence. Same `runner` binary — pass `--remote` to ship workflow execution to your VM. Drop the flag and you're back to free local execution. No vendor lock-in.
+Optional commercial layer: **Rehearse Pro** at $49/mo for 25,000 active CPU minutes per month + $49 per additional 25,000-minute block. Single-tenant VM with whole-rootfs cache persistence. Same `rehearse` binary — pass `--remote` to ship workflow execution to your VM. Drop the flag and you're back to free local execution. No vendor lock-in.
 
 ---
 
@@ -25,11 +25,11 @@ Optional commercial layer: **Rehearse Pro** at $49/mo for 25,000 active CPU minu
 
 The same `.github/workflows/*.yml` runs in three places, exact same shape, exact same exit codes:
 
-**1. Local** (`runner run .github/workflows/ci.yml`)
+**1. Local** (`rehearse run .github/workflows/ci.yml`)
 
-Free, sub-second on warm cache for trivial workflows; ~1–5s for typical CI workflows on a developer laptop. Use the `host` backend (subprocess against your host's installed toolchains) when you don't need container parity, or the `container` backend (Docker, real services networking) when you do. Pair with `runner watch` for save-triggered reruns or `runner install-hook` for a pre-push gate.
+Free, sub-second on warm cache for trivial workflows; ~1–5s for typical CI workflows on a developer laptop. Use the `host` backend (subprocess against your host's installed toolchains) when you don't need container parity, or the `container` backend (Docker, real services networking) when you do. Pair with `rehearse watch` for save-triggered reruns or `rehearse install-hook` for a pre-push gate.
 
-**2. Pro VM** (`runner run --remote .github/workflows/ci.yml`)
+**2. Pro VM** (`rehearse run --remote .github/workflows/ci.yml`)
 
 $49/mo for 25,000 active CPU minutes; +$49 per additional 25k block. Single-tenant Linux microVM with persistent rootfs. Whole-filesystem cache persistence — every `~/.npm`, `~/.cache/pip`, `~/.cargo/registry`, `node_modules`, build artifact survives between runs forever, no `actions/cache` blocks needed. ~5s warm on the typey 9-cell matrix workflow. Cap-hit triggers a 402 with a Stripe link to buy another block; usage alerts fire at 75% / 90% / 100% of monthly cap.
 
@@ -80,10 +80,10 @@ The headline product. Reads existing `.github/workflows/*.yml`, executes locally
 
 **Four CLI subcommands:**
 
-- `runner run <workflow.yml>` — execute the workflow once.
-- `runner watch <workflow.yml>` — re-run on every file save (debounced, queue-coalesced).
-- `runner install-hook` — write `.git/hooks/pre-push` that runs the workflow first; only let push proceed if green.
-- `runner compat <workflow.yml>` — static audit; how much of this YAML would actually execute? Returns coverage percentage and a per-step report.
+- `rehearse run <workflow.yml>` — execute the workflow once.
+- `rehearse watch <workflow.yml>` — re-run on every file save (debounced, queue-coalesced).
+- `rehearse install-hook` — write `.git/hooks/pre-push` that runs the workflow first; only let push proceed if green.
+- `rehearse compat <workflow.yml>` — static audit; how much of this YAML would actually execute? Returns coverage percentage and a per-step report.
 
 **`--remote` flag** — ships the workflow YAML to a Pro VM via the same binary. Auto-detects git origin URL + HEAD SHA + monorepo subdir from `cwd`. `--env-file` ships secrets to the VM as `${{ secrets.* }}`.
 
@@ -109,8 +109,8 @@ Two comparisons.
 
 **vs GitHub Actions** — same 9-cell matrix workflow on three execution targets, measured against the real `plsft/typey` repo (a Bun CLI, not a fixture):
 
-- Local (`runner run`, warm): **1.5s** wall
-- Pro (`runner run --remote`, warm): **5s** wall
+- Local (`rehearse run`, warm): **1.5s** wall
+- Pro (`rehearse run --remote`, warm): **5s** wall
 - GitHub Actions: **95s** wall
 
 The speedup is the spin-up tax that hosted runners can't avoid — cold container, fresh toolchain install, cold module caches on every push. Local skips all of it; Pro keeps everything warm between runs.
@@ -122,7 +122,7 @@ The speedup is the spin-up tax that hosted runners can't avoid — cold containe
 - service-postgres (postgres:16 + 4 psql steps): **10.97s** vs timed-out (>360s) = **32.82× — act fails**
 - hono-bun (real OSS, honojs/hono bun job): **7.58s** vs n/a (act lacks bun)
 
-Reproducibility: `pnpm tsx bench/compare.ts --skip-cold` from the rehearse repo, plus `time runner run` / `time runner run --remote` against `github.com/plsft/typey`.
+Reproducibility: `pnpm tsx bench/compare.ts --skip-cold` from the rehearse repo, plus `time rehearse run` / `time rehearse run --remote` against `github.com/plsft/typey`.
 
 ---
 
@@ -151,7 +151,7 @@ Reproducibility: `pnpm tsx bench/compare.ts --skip-cold` from the rehearse repo,
 ## Repo layout (for navigation)
 
 ```
-runner/        — @rehearse/runner    — the CLI (binary: `runner`)
+runner/        — @rehearse/runner    — the CLI (binary: `rehearse`)
 ts-ci/         — @rehearse/ci         — author workflows in TypeScript
 git-engine/    — @rehearse/git-core   — pure-TypeScript git protocol
 cli/           — @rehearse/cli        — `rh` CLI (compile / convert TS pipelines)
@@ -165,7 +165,7 @@ site/          — marketing site source (Vite + Tailwind, deploys to Cloudflare
 
 Source: https://github.com/plsft/rehearse (Apache 2.0).
 
-The Pro hosted layer source is in a separate private repo (`plsft/rehearse-pro`): API on Cloudflare Workers + D1, dashboard on Astro/Cloudflare Workers, daemon installed on each customer's microVM. Customers don't interact with these directly — they use the OSS `runner` binary with the `--remote` flag.
+The Pro hosted layer source is in a separate private repo (`plsft/rehearse-pro`): API on Cloudflare Workers + D1, dashboard on Astro/Cloudflare Workers, daemon installed on each customer's microVM. Customers don't interact with these directly — they use the OSS `rehearse` binary with the `--remote` flag.
 
 ---
 

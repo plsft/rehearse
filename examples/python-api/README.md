@@ -76,7 +76,7 @@ npm install                  # gets @rehearse/ci as a devDep
 
 # Compile + run
 rh ci compile
-runner run .github/workflows/ci.yml --backend container
+rehearse run .github/workflows/ci.yml --backend container
 ```
 
 Expected: ~10–15s warm. The runner pulls `postgres:16-alpine`, starts it

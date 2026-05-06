@@ -59,24 +59,24 @@
 <span class="prompt"></span>pnpm add -g @rehearse/runner
 <span class="prompt"></span>bun add -g @rehearse/runner
 
-<span class="comment"># installs a single binary called `runner`</span>
-<span class="prompt"></span>runner --version
+<span class="comment"># installs a single binary called `rehearse`</span>
+<span class="prompt"></span>rehearse --version
 <span class="comment">0.4.0</span></pre>
     </div>
 
     <div class="mt-5 card">
       <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">RUN A WORKFLOW</div>
-      <pre class="font-mono text-[13px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>runner run .github/workflows/ci.yml             <span class="comment"># all jobs</span>
-<span class="prompt"></span>runner run .github/workflows/ci.yml --job test   <span class="comment"># one job</span>
-<span class="prompt"></span>runner run … --backend container                 <span class="comment"># force docker</span>
-<span class="prompt"></span>runner run … --max-parallel 8                    <span class="comment"># concurrency knob</span>
-<span class="prompt"></span>runner run … --quiet                             <span class="comment"># for scripts</span></pre>
+      <pre class="font-mono text-[13px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>rehearse run .github/workflows/ci.yml             <span class="comment"># all jobs</span>
+<span class="prompt"></span>rehearse run .github/workflows/ci.yml --job test   <span class="comment"># one job</span>
+<span class="prompt"></span>rehearse run … --backend container                 <span class="comment"># force docker</span>
+<span class="prompt"></span>rehearse run … --max-parallel 8                    <span class="comment"># concurrency knob</span>
+<span class="prompt"></span>rehearse run … --quiet                             <span class="comment"># for scripts</span></pre>
     </div>
 
     <div class="mt-5 card">
       <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">INTEGRATE</div>
-      <pre class="font-mono text-[13px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>runner watch .github/workflows/ci.yml             <span class="comment"># inner-loop, re-runs on save</span>
-<span class="prompt"></span>runner install-hook                               <span class="comment"># pre-push git hook</span></pre>
+      <pre class="font-mono text-[13px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>rehearse watch .github/workflows/ci.yml             <span class="comment"># inner-loop, re-runs on save</span>
+<span class="prompt"></span>rehearse install-hook                               <span class="comment"># pre-push git hook</span></pre>
     </div>
   </div>
 </section>
@@ -89,7 +89,7 @@
       <a href="#run" class="card hover:border-white/20 transition">
         <div class="font-mono text-xs text-[var(--rh-accent)]">CORE</div>
         <div class="mt-2 text-lg font-semibold text-white">Run a workflow</div>
-        <p class="mt-2 text-sm text-[var(--rh-muted)]"><code class="font-mono">runner run</code>, backend selection, environment.</p>
+        <p class="mt-2 text-sm text-[var(--rh-muted)]"><code class="font-mono">rehearse run</code>, backend selection, environment.</p>
       </a>
       <a href="#watch" class="card hover:border-white/20 transition">
         <div class="font-mono text-xs text-[var(--rh-accent)]">CORE</div>
@@ -142,7 +142,7 @@
       <div class="eyebrow">// Core</div>
       <h2 class="mt-2 text-2xl font-semibold gradient-text">Run a workflow</h2>
       <p class="mt-3 text-[var(--rh-muted)]">
-        <code class="font-mono">runner run &lt;path&gt;</code> reads a GitHub
+        <code class="font-mono">rehearse run &lt;path&gt;</code> reads a GitHub
         Actions YAML, plans the jobs, picks a backend per job, and executes.
         The default backend is <code class="font-mono">auto</code>: <span class="text-white">host
         for plain <code class="font-mono">run:</code> work</span>, <span class="text-white">container
@@ -171,7 +171,7 @@
       <div class="eyebrow">// Core</div>
       <h2 class="mt-2 text-2xl font-semibold gradient-text">Watch mode</h2>
       <p class="mt-3 text-[var(--rh-muted)]">
-        <code class="font-mono">runner watch &lt;path&gt;</code> re-runs the
+        <code class="font-mono">rehearse watch &lt;path&gt;</code> re-runs the
         workflow on every change to <code class="font-mono">.yml</code>,
         <code class="font-mono">.ts</code>, <code class="font-mono">.js</code>,
         or <code class="font-mono">.json</code> files in the repo. Debounced;
@@ -184,16 +184,16 @@
       <div class="eyebrow">// Core</div>
       <h2 class="mt-2 text-2xl font-semibold gradient-text">Pre-push hook</h2>
       <p class="mt-3 text-[var(--rh-muted)]">
-        <code class="font-mono">runner install-hook</code> writes a
+        <code class="font-mono">rehearse install-hook</code> writes a
         <code class="font-mono">.git/hooks/pre-push</code> that runs your
         workflow first. Push only if green. <span class="text-white">CI minutes spent: zero.</span>
       </p>
-      <pre class="mt-5 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>runner install-hook
-<span class="prompt"></span>runner install-hook -w .github/workflows/ci.yml -j test
+      <pre class="mt-5 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>rehearse install-hook
+<span class="prompt"></span>rehearse install-hook -w .github/workflows/ci.yml -j test
 <span class="prompt"></span>cat .git/hooks/pre-push
 <span class="comment"># #!/usr/bin/env bash
-# # Auto-generated by 'runner install-hook'.
-# exec npx @rehearse/runner run ".github/workflows/ci.yml" --fail-fast</span></pre>
+# # Auto-generated by 'rehearse install-hook'.
+# exec npx @rehearse/rehearse run ".github/workflows/ci.yml" --fail-fast</span></pre>
     </div>
 
     <div id="matrix">

@@ -12,8 +12,8 @@ is the OG in this space; we share the category but ship more features
 and the hosted-offload story). It reads your existing
 `.github/workflows/*.yml` and executes it three ways:
 
-1. **Locally** (`runner run`) — host subprocess or container backend, sub-second on the typey demo workflow
-2. **Pro VM** (`runner run --remote`) — single-tenant VM with whole-rootfs persistence, ~5s on the same workflow
+1. **Locally** (`rehearse run`) — host subprocess or container backend, sub-second on the typey demo workflow
+2. **Pro VM** (`rehearse run --remote`) — single-tenant VM with whole-rootfs persistence, ~5s on the same workflow
 3. **GitHub Actions** (`git push`) — same compiled YAML, no Rehearse runtime needed, ~95s for the same workflow
 
 Same source, same output, no lock-in. Free, Apache 2.0,
@@ -33,9 +33,9 @@ disappears, your CI keeps running on a laptop without them.
 npm install -g @rehearse/runner
 
 # inside any repo with a .github/workflows/*.yml
-runner run .github/workflows/ci.yml
-runner watch .github/workflows/ci.yml          # re-run on save
-runner install-hook                            # pre-push git hook
+rehearse run .github/workflows/ci.yml
+rehearse watch .github/workflows/ci.yml          # re-run on save
+rehearse install-hook                            # pre-push git hook
 ```
 
 ## Numbers
@@ -48,8 +48,8 @@ CLI repo (not a fixture we control):
 
 | Target | Wall | vs GH |
 | --- | ---: | ---: |
-| **Local** (`runner run`, warm) | **1.5s** | **63× faster** |
-| **Pro** (`runner run --remote`, warm) | **5s** | **19× faster** |
+| **Local** (`rehearse run`, warm) | **1.5s** | **63× faster** |
+| **Pro** (`rehearse run --remote`, warm) | **5s** | **19× faster** |
 | **GitHub Actions** (3 OS × 3 Bun, 9 cells) | 95s | baseline |
 
 Workflow exercises checkout + setup-bun + install + format + lint + tsc
@@ -76,7 +76,7 @@ Per-OS numbers and full methodology in
 ## Repo layout
 
 ```
-runner/        — @rehearse/runner    — the CLI (binary: `runner`)
+runner/        — @rehearse/runner    — the CLI (binary: `rehearse`)
 ts-ci/         — @rehearse/ci         — author workflows in TypeScript
 git-engine/    — @rehearse/git-core   — pure-TypeScript git protocol
 cli/           — @rehearse/cli        — `rh` CLI (compile / convert TS pipelines)

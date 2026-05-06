@@ -91,7 +91,7 @@
       <span class="text-white">What's true about hosted-runner replacements
       (Blacksmith / Ubicloud / RunsOn / Depot / WarpBuild):</span> none of
       them try to do local execution at all. They bill per minute and
-      "<code class="font-mono">runner watch</code> on every save" would
+      "<code class="font-mono">rehearse watch</code> on every save" would
       bankrupt you. So the inner loop is the OSS-runner game (act and
       Rehearse), not theirs.
     </p>
@@ -116,17 +116,17 @@
         <tbody class="divide-y divide-white/5 text-white/90">
           <tr>
             <td class="py-3 px-5 text-[var(--rh-accent)]">Every keystroke (file save)</td>
-            <td class="py-3 px-5"><code class="font-mono">runner watch</code> reruns CI on each save. Sub-second. Free.</td>
+            <td class="py-3 px-5"><code class="font-mono">rehearse watch</code> reruns CI on each save. Sub-second. Free.</td>
             <td class="py-3 px-5 text-white"><span class="accent-text">Rehearse OSS</span> only</td>
           </tr>
           <tr>
             <td class="py-3 px-5 text-[var(--rh-accent)]"><code class="font-mono">git push</code> hook (pre-push)</td>
-            <td class="py-3 px-5"><code class="font-mono">runner install-hook</code> blocks bad pushes at the source. Free.</td>
+            <td class="py-3 px-5"><code class="font-mono">rehearse install-hook</code> blocks bad pushes at the source. Free.</td>
             <td class="py-3 px-5 text-white"><span class="accent-text">Rehearse OSS</span> only</td>
           </tr>
           <tr>
             <td class="py-3 px-5">Push to a remote VM (offload)</td>
-            <td class="py-3 px-5"><code class="font-mono">runner run --remote</code> ships your YAML to a single-tenant VM. Whole-rootfs cache.</td>
+            <td class="py-3 px-5"><code class="font-mono">rehearse run --remote</code> ships your YAML to a single-tenant VM. Whole-rootfs cache.</td>
             <td class="py-3 px-5"><span class="accent-text">Rehearse Pro</span> ($49 / 25k block)</td>
           </tr>
           <tr>

@@ -3,8 +3,8 @@
 # Output: demos/example-composite-action-demo.mp4 (~60 seconds)
 #
 # Real output captured today:
-#   runner compat → 100.0% of 3 steps would execute
-#   runner run    → Composite action demo  PASS  5.17s  (1 ran, 0 skipped)
+#   rehearse compat → 100.0% of 3 steps would execute
+#   rehearse run    → Composite action demo  PASS  5.17s  (1 ran, 0 skipped)
 #   The runner inlines 3 inner steps from the composite into the calling job.
 
 Output demos/example-composite-action-demo.mp4
@@ -45,7 +45,7 @@ Type "clear" Enter
 Sleep 200ms
 Type "rh ci compile" Enter
 Sleep 1.2s
-Type "runner compat .github/workflows/ci.yml" Enter
+Type "rehearse compat .github/workflows/ci.yml" Enter
 Sleep 5s
 
 # §4 — real run — composite gets expanded inline
@@ -53,7 +53,7 @@ Type "clear" Enter
 Sleep 200ms
 Type "# Watch the runner inline the composite's inner steps" Enter
 Sleep 1s
-Type "runner run .github/workflows/ci.yml" Enter
+Type "rehearse run .github/workflows/ci.yml" Enter
 Sleep 7s
 Sleep 1s
 Type "# Inner steps appear prefixed: ./.github/actions/setup-deps → <step name>" Enter

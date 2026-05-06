@@ -82,7 +82,7 @@ npm install                  # gets @rehearse/ci as a devDep for rh
 
 # Compile + run
 rh ci compile
-runner run .github/workflows/ci.yml
+rehearse run .github/workflows/ci.yml
 ```
 
 Expected first run: the runner clones `shivammathur/setup-php@v2` into
@@ -97,7 +97,7 @@ the PHP versions you want to test against on the host, or to provide a
 Docker image that has them. **The runner does neither** — it executes
 the same JS action GitHub Actions uses, which downloads the requested
 PHP version itself. You write the workflow once; it works in CI, in
-`runner run`, and in `runner watch`.
+`rehearse run`, and in `rehearse watch`.
 
 ## Push to GitHub
 

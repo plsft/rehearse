@@ -85,9 +85,9 @@
         </div>
         <div class="term-body flex items-center justify-between gap-3 border-t border-white/5">
           <div>
-            <span class="prompt"></span><span class="text-white">runner run </span><span class="comment"># your existing workflow.yml</span>
+            <span class="prompt"></span><span class="text-white">rehearse run </span><span class="comment"># your existing workflow.yml</span>
           </div>
-          <button @click="navigator.clipboard.writeText('runner run .github/workflows/ci.yml'); copied='run'; setTimeout(()=>copied='', 1600)" class="copy-button shrink-0">
+          <button @click="navigator.clipboard.writeText('rehearse run .github/workflows/ci.yml'); copied='run'; setTimeout(()=>copied='', 1600)" class="copy-button shrink-0">
             <span x-show="copied !== 'run'">copy</span><span x-show="copied === 'run'" x-cloak class="text-[var(--rh-accent)]">✓ copied</span>
           </button>
         </div>
@@ -112,7 +112,7 @@
         <span class="term-dot dot-r"></span>
         <span class="term-dot dot-y"></span>
         <span class="term-dot dot-g"></span>
-        <span class="term-title">$ runner run .github/workflows/ci.yml</span>
+        <span class="term-title">$ rehearse run .github/workflows/ci.yml</span>
       </div>
       <div class="term-body min-h-[420px]">
         <pre class="whitespace-pre" x-html="lines.join('\n') + '<span class=&quot;cursor&quot;></span>'"></pre>
@@ -142,12 +142,12 @@
     <!-- Three-target comparison (the lead) -->
     <div class="mt-12 grid md:grid-cols-3 gap-5">
       <div class="card p-6">
-        <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">LOCAL · runner run</div>
+        <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">LOCAL · rehearse run</div>
         <div class="text-4xl font-semibold text-white">1.5<span class="text-xl text-[var(--rh-muted)]">s</span></div>
         <p class="mt-2 text-sm text-[var(--rh-muted)]">9-cell matrix workflow on plsft/typey, warm. Sub-second per cell.</p>
       </div>
       <div class="card p-6 border-[var(--rh-accent)]/40">
-        <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">PRO · runner run --remote</div>
+        <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">PRO · rehearse run --remote</div>
         <div class="text-4xl font-semibold text-white">5<span class="text-xl text-[var(--rh-muted)]">s</span></div>
         <p class="mt-2 text-sm text-[var(--rh-muted)]">Same workflow on a private VM. Network roundtrip + actual VM execution.</p>
       </div>
@@ -271,12 +271,12 @@
     <div class="grid md:grid-cols-3 gap-5 mt-10">
       <div class="card p-6">
         <div class="text-[12px] font-mono text-[var(--rh-accent)] mb-2">// 1 — local (free)</div>
-        <pre class="font-mono text-[13px] text-white/90"><span class="prompt"></span>runner run ci.yml</pre>
-        <p class="mt-4 text-sm text-[var(--rh-muted)]"><span class="text-white">Inner loop.</span> Sub-second feedback on every save. Apache 2.0, no signup, no telemetry. Pair with <code class="font-mono">runner watch</code> or the pre-push hook to catch failures before <code class="font-mono">git push</code>.</p>
+        <pre class="font-mono text-[13px] text-white/90"><span class="prompt"></span>rehearse run ci.yml</pre>
+        <p class="mt-4 text-sm text-[var(--rh-muted)]"><span class="text-white">Inner loop.</span> Sub-second feedback on every save. Apache 2.0, no signup, no telemetry. Pair with <code class="font-mono">rehearse watch</code> or the pre-push hook to catch failures before <code class="font-mono">git push</code>.</p>
       </div>
       <div class="card p-6 border-[var(--rh-accent)]/40">
         <div class="text-[12px] font-mono text-[var(--rh-accent)] mb-2">// 2 — Pro VM ($49/mo)</div>
-        <pre class="font-mono text-[13px] text-white/90"><span class="prompt"></span>runner run --remote ci.yml</pre>
+        <pre class="font-mono text-[13px] text-white/90"><span class="prompt"></span>rehearse run --remote ci.yml</pre>
         <p class="mt-4 text-sm text-[var(--rh-muted)]"><span class="text-white">For when the laptop isn't enough.</span> Single-tenant VM. <span class="text-white">Whole-rootfs persistence</span> — every cache, every build artifact, every tool install survives forever. <a href="/pro" class="link">Read more →</a></p>
       </div>
       <div class="card p-6">
@@ -391,7 +391,7 @@
         </div>
         <div class="mt-3 text-lg font-semibold text-white">CI on every save.</div>
         <p class="mt-2 text-sm text-[var(--rh-muted)]">
-          <code class="font-mono">runner watch</code> re-runs your workflow on
+          <code class="font-mono">rehearse watch</code> re-runs your workflow on
           every file change. Debounced, queue-coalesced. <span class="text-white">No hosted runner can do this</span> —
           they bill per minute and you'd go bankrupt.
         </p>
@@ -404,7 +404,7 @@
         </div>
         <div class="mt-3 text-lg font-semibold text-white">Block bad pushes at the source.</div>
         <p class="mt-2 text-sm text-[var(--rh-muted)]">
-          <code class="font-mono">runner install-hook</code> writes a
+          <code class="font-mono">rehearse install-hook</code> writes a
           <code class="font-mono">.git/hooks/pre-push</code> that runs your
           workflow first. Push only if green. <span class="text-white">CI minutes burned: zero.</span>
         </p>
@@ -546,8 +546,8 @@
           <span class="step-plate">02</span>
           <div class="text-lg font-semibold text-white">Run</div>
         </div>
-        <pre class="mt-4 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>runner run .github/workflows/ci.yml
-<span class="prompt"></span>runner run .github/workflows/ci.yml -j test</pre>
+        <pre class="mt-4 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>rehearse run .github/workflows/ci.yml
+<span class="prompt"></span>rehearse run .github/workflows/ci.yml -j test</pre>
         <p class="mt-3 text-sm text-[var(--rh-muted)]">Backend chosen per job: host (fast) or container (parity).</p>
       </div>
       <div class="card">
@@ -555,8 +555,8 @@
           <span class="step-plate">03</span>
           <div class="text-lg font-semibold text-white">Wire it in</div>
         </div>
-        <pre class="mt-4 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>runner watch <span class="comment"># inner-loop</span>
-<span class="prompt"></span>runner install-hook <span class="comment"># pre-push</span></pre>
+        <pre class="mt-4 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>rehearse watch <span class="comment"># inner-loop</span>
+<span class="prompt"></span>rehearse install-hook <span class="comment"># pre-push</span></pre>
         <p class="mt-3 text-sm text-[var(--rh-muted)]">Inner loop or pre-push enforcement. Or both.</p>
       </div>
     </div>

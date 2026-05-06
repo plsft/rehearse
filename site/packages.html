@@ -200,10 +200,10 @@
     </ul>
 
     <h3 class="mt-8 text-lg font-semibold text-white">Four CLI subcommands</h3>
-    <pre class="mt-4 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>runner run &lt;workflow.yml&gt;     <span class="comment"># execute a workflow</span>
-<span class="prompt"></span>runner watch &lt;workflow.yml&gt;   <span class="comment"># re-run on every save (debounced, queue-coalesced)</span>
-<span class="prompt"></span>runner install-hook           <span class="comment"># write .git/hooks/pre-push that runs your workflow</span>
-<span class="prompt"></span>runner compat &lt;workflow.yml&gt;  <span class="comment"># static audit: how much would actually execute</span></pre>
+    <pre class="mt-4 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>rehearse run &lt;workflow.yml&gt;     <span class="comment"># execute a workflow</span>
+<span class="prompt"></span>rehearse watch &lt;workflow.yml&gt;   <span class="comment"># re-run on every save (debounced, queue-coalesced)</span>
+<span class="prompt"></span>rehearse install-hook           <span class="comment"># write .git/hooks/pre-push that runs your workflow</span>
+<span class="prompt"></span>rehearse compat &lt;workflow.yml&gt;  <span class="comment"># static audit: how much would actually execute</span></pre>
 
     <h3 class="mt-8 text-lg font-semibold text-white">Programmatic API</h3>
     <pre class="mt-4 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="kw">import</span> { <span class="fn">run</span>, <span class="fn">compat</span> } <span class="kw">from</span> <span class="str">'@rehearse/runner'</span>;

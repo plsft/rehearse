@@ -16,7 +16,7 @@ Set TypingSpeed  30ms
 Hide
 Type "cd /c/Code/rehearse && clear" Enter
 Sleep 200ms
-Type "runner run poc/playground/hono/.github/workflows/ci.yml --cwd poc/playground/hono --job bun > /dev/null 2>&1" Enter
+Type "rehearse run poc/playground/hono/.github/workflows/ci.yml --cwd poc/playground/hono --job bun > /dev/null 2>&1" Enter
 Sleep 8s
 Type "clear" Enter
 Sleep 200ms
@@ -28,7 +28,7 @@ Show
 # §1 — start watch
 Type "# Watch mode — re-runs the workflow on every save" Enter
 Sleep 800ms
-Type "runner watch poc/playground/hono/.github/workflows/ci.yml -j bun &" Enter
+Type "rehearse watch poc/playground/hono/.github/workflows/ci.yml -j bun &" Enter
 Sleep 9s
 
 # §2 — break a test (echoes appending broken code → triggers watch)

@@ -180,7 +180,7 @@ local runner reads the compiled YAML and executes it on your laptop,
 **5–9× faster than `act`** on standard workflows, **30× on services**.
 So you author in TS, compile to YAML, run locally before pushing — and
 optionally ship the same workflow to a [Rehearse Pro](https://rehearse.sh/pro)
-VM with `runner run --remote`.
+VM with `rehearse run --remote`.
 
 ## Compatibility
 

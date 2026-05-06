@@ -47,7 +47,7 @@ Type "clear" Enter
 Sleep 200ms
 Type "# Run it locally — free, no service required." Enter
 Sleep 700ms
-Type "runner run .github/workflows/ci.yml" Enter
+Type "rehearse run .github/workflows/ci.yml" Enter
 Sleep 7s
 
 # §3 — remote
@@ -55,7 +55,7 @@ Type "" Enter
 Sleep 400ms
 Type "# Same workflow, opt into hosted runner with --remote:" Enter
 Sleep 700ms
-Type "runner run --remote .github/workflows/ci.yml" Enter
+Type "rehearse run --remote .github/workflows/ci.yml" Enter
 Sleep 9s
 
 # §4 — close

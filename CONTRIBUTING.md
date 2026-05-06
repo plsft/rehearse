@@ -3,7 +3,7 @@
 Thanks for taking the time to contribute. This guide covers the
 **four open-source packages** in this repo, all Apache 2.0:
 
-- [`@rehearse/runner`](runner) — local-first GitHub Actions runner (binary: `runner`)
+- [`@rehearse/runner`](runner) — local-first GitHub Actions runner (binary: `rehearse`)
 - [`@rehearse/ci`](ts-ci) — TypeScript pipeline SDK that compiles to GitHub Actions YAML
 - [`@rehearse/git-core`](git-engine) — pure-TypeScript git protocol implementation
 - [`@rehearse/cli`](cli) — `rh`, the companion CLI for `@rehearse/ci`
@@ -108,7 +108,7 @@ for stable, `next`/`rc`/`beta` for prereleases).
 
 - **Bug reports** — minimal repro plus your Node / pnpm / OS versions and
   the workflow YAML you ran.
-- **Compat regressions** — if `runner compat <yourworkflow>` reports a
+- **Compat regressions** — if `rehearse compat <yourworkflow>` reports a
   step as `uses-unsupported` and you think it should be supported, please
   open an issue with the action ref and version.
 - **Bench regressions** — if a bench number drifts noticeably from

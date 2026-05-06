@@ -30,14 +30,14 @@ npm install -g @rehearse/runner @rehearse/cli
 rh ci compile
 
 # run the workflow on your laptop
-runner run .github/workflows/ci.yml
+rehearse run .github/workflows/ci.yml
 ```
 
-That's the loop: edit the TS pipeline → `rh ci compile` → `runner run`.
+That's the loop: edit the TS pipeline → `rh ci compile` → `rehearse run`.
 For watch-mode iteration during dev:
 
 ```bash
-runner watch .github/workflows/ci.yml
+rehearse watch .github/workflows/ci.yml
 ```
 
 ## Pre-generated YAML is committed

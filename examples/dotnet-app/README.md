@@ -97,7 +97,7 @@ npm install                  # gets @rehearse/ci as a devDep for rh
 
 # Compile + run
 rh ci compile
-runner run .github/workflows/ci.yml
+rehearse run .github/workflows/ci.yml
 ```
 
 Expected: two matrix cells (`framework=net8.0` and `framework=net9.0`)

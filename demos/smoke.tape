@@ -13,7 +13,7 @@ Set Theme        "Catppuccin Mocha"
 
 Type "echo hello from vhs" Enter
 Sleep 1s
-Type "runner --version" Enter
+Type "rehearse --version" Enter
 Sleep 1s
 Type "date" Enter
 Sleep 1s

@@ -3,11 +3,11 @@
 # Output: demos/example-dotnet-app.mp4 (~75 seconds)
 #
 # Real output captured today (compat):
-#   runner compat → 100.0% of 7 steps would execute
+#   rehearse compat → 100.0% of 7 steps would execute
 #   Matrix: framework [net8.0, net9.0]
 #
 # To run end-to-end (not in this tape — needs .NET 8 or 9 SDK on host):
-#   runner run .github/workflows/ci.yml
+#   rehearse run .github/workflows/ci.yml
 # actions/setup-dotnet@v4 is shimmed as a host no-op (uses your installed
 # dotnet). 2 cells parallel via per-cell git worktree.
 
@@ -45,7 +45,7 @@ Type "clear" Enter
 Sleep 200ms
 Type "# compat detects matrix=yes, setup-dotnet host-shimmed" Enter
 Sleep 1s
-Type "runner compat .github/workflows/ci.yml" Enter
+Type "rehearse compat .github/workflows/ci.yml" Enter
 Sleep 5s
 
 # §4 — show the project structure and explain run-locally
@@ -56,7 +56,7 @@ Sleep 3s
 Type "" Enter
 Type "# To run end-to-end:" Enter
 Type "#   dotnet --list-sdks      # need .NET 8 or 9 SDK" Enter
-Type "#   runner run .github/workflows/ci.yml" Enter
+Type "#   rehearse run .github/workflows/ci.yml" Enter
 Sleep 3s
 Type "# Two cells (net8.0, net9.0) run in parallel via per-cell git worktree" Enter
 Type "# setup-dotnet shim is a no-op locally — uses your installed dotnet" Enter

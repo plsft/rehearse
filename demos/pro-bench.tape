@@ -58,7 +58,7 @@ Type "clear" Enter
 Sleep 200ms
 Type "# Run 1 — cold cache, fresh VM. We're paying full network freight." Enter
 Sleep 800ms
-Type "runner run --remote .github/workflows/ci.yml" Enter
+Type "rehearse run --remote .github/workflows/ci.yml" Enter
 Sleep 16s
 
 # §3 — Run 2, warm
@@ -66,7 +66,7 @@ Type "" Enter
 Sleep 400ms
 Type "# Run 2 — same workflow. The npm cache from run 1 survived on the VM." Enter
 Sleep 800ms
-Type "runner run --remote .github/workflows/ci.yml" Enter
+Type "rehearse run --remote .github/workflows/ci.yml" Enter
 Sleep 9s
 
 # §4 — Run 3, warm again
@@ -74,7 +74,7 @@ Type "" Enter
 Sleep 400ms
 Type "# Run 3 — confirming run 2 wasn't a fluke." Enter
 Sleep 800ms
-Type "runner run --remote .github/workflows/ci.yml" Enter
+Type "rehearse run --remote .github/workflows/ci.yml" Enter
 Sleep 9s
 
 # §5 — close
