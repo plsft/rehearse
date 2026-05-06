@@ -21,7 +21,7 @@
     <a href="/" class="flex items-center gap-2.5 font-mono group" aria-label="Rehearse home">
       <span class="logo-mark logo-mark-md text-[var(--rh-accent)] transition-transform group-hover:scale-110"></span>
       <span class="font-semibold tracking-tight text-white">rehearse</span>
-      <span class="hidden sm:inline text-[11px] text-[var(--rh-muted)] border border-white/10 rounded px-1.5 py-0.5">v0.5.1 · 4 pkgs · 323 tests</span>
+      <span class="hidden sm:inline text-[11px] text-[var(--rh-muted)] border border-white/10 rounded px-1.5 py-0.5">v0.5.2 · 4 pkgs · 323 tests</span>
     </a>
     <nav class="flex items-center gap-4 md:gap-7 overflow-x-auto whitespace-nowrap nav-scroll min-w-0">
       <a href="/packages" class="nav-link ">Packages</a>
@@ -57,10 +57,31 @@
 <section class="py-16 hairline">
   <div class="max-w-3xl mx-auto px-5 space-y-12">
 
+    <!-- v0.5.2 -->
+    <article>
+      <div class="flex items-baseline gap-3 mb-3">
+        <h2 class="text-2xl font-semibold gradient-text">v0.5.2</h2>
+        <span class="text-[12px] font-mono text-[var(--rh-muted)]">2026-05-06 · CLI UX redesign</span>
+      </div>
+      <div class="card p-6 space-y-4 text-[var(--rh-muted)]">
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1">Runner — terminal output</div>
+          <ul class="space-y-1 text-sm">
+            <li>— <code class="font-mono">rehearse run</code> output now matches the visual style of the hero terminal demo on <a href="/" class="link">rehearse.sh</a> — same banner, marks, layout, and per-step rendering.</li>
+            <li>— Banner: <code class="font-mono"># rehearse · &lt;workflow&gt;</code> (gray comment style) followed by workflow path + parallelism. Dropped the <code class="font-mono">cwd:</code> noise line.</li>
+            <li>— Job header: <code class="font-mono">▶ job: &lt;name&gt;  (host · ubuntu-latest) [matrix.cell]</code>.</li>
+            <li>— Step lines now have three render modes: <code class="font-mono">⊘</code> for skipped + host-shortcut shims (e.g. <em>checkout — host has the repo</em> instead of pretending it ran for 0ms with a green tick), <code class="font-mono">▸</code> for in-flight (with <em>running…</em>), <code class="font-mono">✓ / ✗ / ●</code> for completed real work.</li>
+            <li>— TTY mode does live <code class="font-mono">running… → ✓ X.XXs</code> overwrite via <code class="font-mono">\r\x1B[K</code> against an inflight-job pointer; non-TTY skips the pre-line and emits only the final state.</li>
+            <li>— Summary: <code class="font-mono">CI  PASS  9.09s  ·  2 jobs in parallel</code>. Per-job rollup now only prints when it adds information (matrix runs, &gt;3 jobs).</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
     <!-- v0.5.1 -->
     <article>
       <div class="flex items-baseline gap-3 mb-3">
-        <h2 class="text-2xl font-semibold gradient-text">v0.5.1</h2>
+        <h2 class="text-2xl font-semibold text-white">v0.5.1</h2>
         <span class="text-[12px] font-mono text-[var(--rh-muted)]">2026-05-06 · binary-rename completion</span>
       </div>
       <div class="card p-6 space-y-4 text-[var(--rh-muted)]">
@@ -295,7 +316,7 @@
         <span class="text-white">rehearse</span> · by <a href="https://github.com/plsft" class="link">plsft</a>
       </div>
       <div class="font-mono text-[11px] text-[var(--rh-muted)]">
-        <span class="ok">●</span> v0.5.1 · Apache 2.0
+        <span class="ok">●</span> v0.5.2 · Apache 2.0
       </div>
     </div>
   </div>

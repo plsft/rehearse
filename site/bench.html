@@ -21,7 +21,7 @@
     <a href="/" class="flex items-center gap-2.5 font-mono group" aria-label="Rehearse home">
       <span class="logo-mark logo-mark-md text-[var(--rh-accent)] transition-transform group-hover:scale-110"></span>
       <span class="font-semibold tracking-tight text-white">rehearse</span>
-      <span class="hidden sm:inline text-[11px] text-[var(--rh-muted)] border border-white/10 rounded px-1.5 py-0.5">v0.5.1 · 4 pkgs · 323 tests</span>
+      <span class="hidden sm:inline text-[11px] text-[var(--rh-muted)] border border-white/10 rounded px-1.5 py-0.5">v0.5.2 · 4 pkgs · 323 tests</span>
     </a>
     <nav class="flex items-center gap-4 md:gap-7 overflow-x-auto whitespace-nowrap nav-scroll min-w-0">
       <a href="/packages" class="nav-link ">Packages</a>
@@ -89,7 +89,7 @@
     <p class="mt-6 text-[12.5px] font-mono text-[var(--rh-muted)] max-w-3xl">
       <span class="text-white">63× faster local · 19× faster on Pro vs GitHub
       Actions on the same workflow.</span> Numbers measured 2026-05-05 on
-      <code class="font-mono">v0.5.1</code> against <code class="font-mono">plsft/typey@6595d95</code>.
+      <code class="font-mono">v0.5.2</code> against <code class="font-mono">plsft/typey@6595d95</code>.
     </p>
   </div>
 </section>
@@ -225,7 +225,7 @@ $ git push  <span class="comment"># GH Actions runs in the background, see Actio
         <ul class="space-y-1 list-disc list-outside pl-5">
           <li>Numbers vary by region, upstream-registry latency, and time of day. Treat the <em>ratios</em> as load-bearing, not absolute milliseconds.</li>
           <li>The <code class="font-mono">hono-node-matrix</code> target currently regresses on GH-hosted runners (works locally; under investigation). Excluded from the headline.</li>
-          <li>Bench was last refreshed for <code class="font-mono">v0.5.1</code> against the v0.3.11 baseline. Per-OS macOS/Windows numbers (host backend only — no Docker on those GH runners) in <a href="https://github.com/plsft/rehearse/blob/main/bench/RESULTS.md" class="link">bench/RESULTS.md</a>.</li>
+          <li>Bench was last refreshed for <code class="font-mono">v0.5.2</code> against the v0.3.11 baseline. Per-OS macOS/Windows numbers (host backend only — no Docker on those GH runners) in <a href="https://github.com/plsft/rehearse/blob/main/bench/RESULTS.md" class="link">bench/RESULTS.md</a>.</li>
           <li>Rehearse's local run uses host bun + warm node_modules. If you wipe both, the cold run is closer to act in absolute time (~10-15s on the typey demo) — though still meaningfully faster, and the warm-loop gap is what matters for daily iteration.</li>
         </ul>
       </div>
@@ -302,7 +302,7 @@ $ git push  <span class="comment"># GH Actions runs in the background, see Actio
         <span class="text-white">rehearse</span> · by <a href="https://github.com/plsft" class="link">plsft</a>
       </div>
       <div class="font-mono text-[11px] text-[var(--rh-muted)]">
-        <span class="ok">●</span> v0.5.1 · Apache 2.0
+        <span class="ok">●</span> v0.5.2 · Apache 2.0
       </div>
     </div>
   </div>
