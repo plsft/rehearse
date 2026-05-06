@@ -110,6 +110,32 @@ function ensureCheckedOut(uses: string, hostCwd: string): ResolvedAction | null 
     .map((n) => resolve(actionRoot, n))
     .find(existsSync);
   if (!actionFile) return null;
+
+  // Many ncc-bundled JS actions (browser-actions/setup-chrome,
+  // tj-actions/changed-files, etc.) ship ONLY index.js + action.yml — no
+  // package.json. When the action lives under a parent project whose
+  // package.json declares `"type":"module"` (vitest, modern Node libs,
+  // anything switched to ESM), Node walks up from the action's index.js,
+  // finds the parent's `type:module`, treats the bundled CJS code as
+  // ESM, and crashes with `__dirname is not defined in ES module scope`.
+  //
+  // Plant a tiny CJS-typed package.json in the action's root to shadow
+  // the parent. Only write if the action doesn't already have one — we
+  // respect actions that explicitly set their own type.
+  const actionPkgJson = resolve(actionRoot, 'package.json');
+  if (!existsSync(actionPkgJson)) {
+    try {
+      writeFileSync(
+        actionPkgJson,
+        JSON.stringify({ type: 'commonjs' }, null, 2) + '\n',
+        'utf-8',
+      );
+    } catch {
+      // Non-fatal: if write fails (read-only fs?), the action may still
+      // work for parent projects that aren't `type:module`.
+    }
+  }
+
   try {
     const action = parseYaml(readFileSync(actionFile, 'utf-8')) as ActionYaml;
     return { path: actionRoot, action, ref: parsed.ref };
@@ -236,6 +262,16 @@ export async function runJsAction(
     }
   }
 
+  // RUNNER_TOOL_CACHE: setup-* actions (setup-node, setup-chrome,
+  // setup-go, etc.) install their tools here and reuse on subsequent
+  // runs. GH-hosted runners set this to /opt/hostedtoolcache. We point
+  // at <session.tempDir>'s parent so it persists across sessions but
+  // not across whole-OS reboots — good enough for actions that just
+  // want a writable cache path. Without it, setup-chrome and friends
+  // throw "Expected RUNNER_TOOL_CACHE to be defined".
+  const toolCacheDir = resolve(session.hostCwd, '.runner', 'tool-cache');
+  mkdirSync(toolCacheDir, { recursive: true });
+
   const env: NodeJS.ProcessEnv = {
     ...process.env,
     ...session.env,
@@ -252,6 +288,7 @@ export async function runJsAction(
     GITHUB_STATE: stateFile,
     GITHUB_STEP_SUMMARY: summaryFile,
     RUNNER_TEMP: session.tempDir,
+    RUNNER_TOOL_CACHE: toolCacheDir,
     RUNNER_OS: process.platform === 'win32' ? 'Windows' : process.platform === 'darwin' ? 'macOS' : 'Linux',
   };
 
