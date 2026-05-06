@@ -348,11 +348,17 @@ async function runRemote(args: {
     }
   }
 
-  const wallSeconds = ((Date.now() - start) / 1000).toFixed(1);
-  const status = finalExit === 0 ? 'success' : 'failure';
-  const color = finalExit === 0 ? pc.green : pc.red;
+  const wallMs = Date.now() - start;
+  const wallSec = (wallMs / 1000).toFixed(1);
+  const vmSec = (finalDuration / 1000).toFixed(1);
+  const overheadMs = Math.max(0, wallMs - finalDuration);
+  const overheadSec = (overheadMs / 1000).toFixed(1);
+  // Complementary line — the workflow's own PASS/FAIL summary block
+  // already came through from the VM-side rh just above. We only print
+  // the remote-specific delta (wall vs vm time) plus the run id for
+  // billing/audit lookup. No status duplication.
   process.stderr.write(
-    color(`[remote] ${status} · exit=${finalExit} · vm=${finalDuration}ms · wall=${wallSeconds}s\n`),
+    pc.dim(`[remote] vm=${vmSec}s · wall=${wallSec}s (overhead +${overheadSec}s)\n`),
   );
   if (runId) process.stderr.write(pc.dim(`[remote] run id: ${runId}\n`));
   return finalExit === 0 ? 0 : 1;
