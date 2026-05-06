@@ -29,7 +29,7 @@
 
 <!-- ============== NAV ============== -->
 <header :class="scrolled ? 'border-b border-white/10 backdrop-blur bg-black/55' : 'border-b border-transparent'"
-        class="fixed inset-x-0 top-0 z-50 transition-colors">
+        class="fixed inset-x-0 top-7 z-50 transition-colors">
   <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
     <a href="/" class="flex items-center gap-2.5 font-mono group" aria-label="Rehearse home">
       <span class="logo-mark logo-mark-md text-[var(--rh-accent)] transition-transform group-hover:scale-110"></span>
@@ -40,12 +40,9 @@
       <a href="/packages" class="nav-link ">Packages</a>
       <a href="/docs" class="nav-link ">Docs</a>
       <a href="/bench" class="nav-link ">Bench</a>
-      <a href="/vs" class="nav-link ">vs</a>
-      <a href="/customers" class="nav-link ">Customers</a>
       <a href="/pro" class="nav-link text-white ">Pro
         <span class="ml-1 text-[10px] font-mono text-[var(--rh-accent)] border border-[var(--rh-accent)]/40 rounded px-1 py-0.5 align-middle">$49/mo</span>
       </a>
-      <a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a>
     </nav>
     <a href="/#install" class="btn btn-primary">Install</a>
   </div>
