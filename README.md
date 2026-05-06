@@ -5,8 +5,11 @@
 > your laptop, on every save, in sub-second. Same YAML, three execution
 > targets, no lock-in.
 
-Rehearse is the only OSS GitHub Actions toolchain that gives you a
-fast pre-push loop AND an offload target. It reads your existing
+Rehearse is an OSS GitHub Actions toolchain with a fast pre-push loop
+plus a same-binary hosted offload target — the combination is what
+distinguishes us from sibling local runners ([nektos/act](https://github.com/nektos/act)
+is the OG in this space; we share the category but ship more features
+and the hosted-offload story). It reads your existing
 `.github/workflows/*.yml` and executes it three ways:
 
 1. **Locally** (`runner run`) — host subprocess or container backend, sub-second on the typey demo workflow

@@ -4,21 +4,27 @@
 > `.github/workflows/*.yml` on every save, on your laptop, in
 > sub-second. Same YAML, three execution targets, no lock-in.
 
-`@rehearse/runner` is the local-first GitHub Actions runner — the only
-OSS tool in this category that gives you CI feedback *before* `git push`.
-Read the YAML you already have, choose a backend per job (host or
-container), execute. Pair with `runner watch` for save-triggered reruns
-or `runner install-hook` for a pre-push gate.
+`@rehearse/runner` is a local-first GitHub Actions runner. It reads
+the YAML you already have, picks a backend per job (host or container),
+and executes — giving you CI feedback *before* `git push`. Pair with
+`runner watch` for save-triggered reruns or `runner install-hook` for
+a pre-push gate.
 
-Comparison vs hosted-runner replacements (Blacksmith, Ubicloud, RunsOn):
-they only optimize *post-push*. The runner is the only thing that gives
-you a fast pre-push loop. Honest comparison at
+The category sibling is [`nektos/act`](https://github.com/nektos/act)
+(MIT, ~56k stars) — also OSS, also local. We compete on speed (5–30×
+faster on the bench), feature coverage (host backend, watch mode,
+pre-push hook, real `services:` networking), and an optional same-binary
+hosted offload target via [Rehearse Pro](https://rehearse.sh/pro). Pick
+the one that fits your workflow.
+
+Comparison vs hosted-runner replacements (Blacksmith, Ubicloud, RunsOn,
+Depot, WarpBuild): they don't try to do local execution at all — they
+all start the clock at `git push`. Honest comparison at
 [rehearse.sh/vs](https://rehearse.sh/vs).
 
-Free, Apache 2.0, single binary. Optional hosted offload via
-[Rehearse Pro](https://rehearse.sh/pro) — same binary, add `--remote`.
-$49/mo flat, unlimited minutes, whole-rootfs cache persistence. Skip it
-and the runner is yours forever.
+Free, Apache 2.0, single binary. Pro is $49/mo for 25,000 active
+CPU-min, +$49 per additional 25k block, whole-rootfs cache persistence.
+Skip it and the runner is yours forever.
 
 [![npm](https://img.shields.io/npm/v/@rehearse/runner)](https://www.npmjs.com/package/@rehearse/runner)
 [![License](https://img.shields.io/npm/l/@rehearse/runner)](./LICENSE)

@@ -66,8 +66,9 @@
       Rehearse is in a different category. The <span class="text-white">OSS runner</span>
       gives you sub-second CI feedback on a laptop, on every save,
       <em>before</em> you push. The <a href="/pro" class="link">Pro VM</a> is
-      what you offload to when local isn't enough — flat $49/mo, single-tenant,
-      whole-rootfs persistence.
+      what you offload to when local isn't enough — $49/mo for 25,000 active
+      CPU minutes (+$49 per additional 25k block), single-tenant, whole-rootfs
+      persistence.
     </p>
     <p class="mt-4 text-[var(--rh-muted)] leading-relaxed">
       <span class="text-white">If you're shopping for a "faster GitHub Actions runner,"</span>
@@ -77,10 +78,22 @@
     </p>
     <p class="mt-4 text-[var(--rh-muted)] leading-relaxed">
       <span class="text-white">If you're shopping for "CI feedback that's
-      faster than `git push → wait`,"</span> Rehearse is the only thing in
-      this market that does that. None of the hosted-runner replacements
-      can compete on this — they bill per minute and "<code class="font-mono">runner watch</code>
-      on every save" would bankrupt you.
+      faster than `git push → wait`,"</span> you have two real options:
+      <a href="https://github.com/nektos/act" class="link">nektos/act</a>
+      (the OSS pioneer in this space, MIT, ~56k stars) and
+      <span class="accent-text">Rehearse</span>. Both run your <code class="font-mono">.github/workflows/*.yml</code>
+      locally. We compete with act on speed (5–30× faster — see <a href="/bench" class="link">/bench</a>),
+      feature coverage (host backend / services / watch mode / pre-push hook),
+      and an optional hosted-offload target via the same binary. Pick the
+      one that fits your workflow.
+    </p>
+    <p class="mt-4 text-[var(--rh-muted)] leading-relaxed">
+      <span class="text-white">What's true about hosted-runner replacements
+      (Blacksmith / Ubicloud / RunsOn / Depot / WarpBuild):</span> none of
+      them try to do local execution at all. They bill per minute and
+      "<code class="font-mono">runner watch</code> on every save" would
+      bankrupt you. So the inner loop is the OSS-runner game (act and
+      Rehearse), not theirs.
     </p>
   </div>
 </section>
@@ -114,7 +127,7 @@
           <tr>
             <td class="py-3 px-5">Push to a remote VM (offload)</td>
             <td class="py-3 px-5"><code class="font-mono">runner run --remote</code> ships your YAML to a single-tenant VM. Whole-rootfs cache.</td>
-            <td class="py-3 px-5"><span class="accent-text">Rehearse Pro</span> ($49/mo flat)</td>
+            <td class="py-3 px-5"><span class="accent-text">Rehearse Pro</span> ($49 / 25k block)</td>
           </tr>
           <tr>
             <td class="py-3 px-5"><code class="font-mono">git push</code> to GitHub</td>
@@ -161,7 +174,7 @@
         </thead>
         <tbody class="divide-y divide-white/5 text-white/90">
           <tr>
-            <td class="py-3 px-5 text-[var(--rh-muted)]">Local CI execution (free, sub-second)</td>
+            <td class="py-3 px-5 text-[var(--rh-muted)]">Local CI execution (free, ~1s warm)</td>
             <td class="py-3 px-5 text-center accent-text">✓</td>
             <td class="py-3 px-5 text-center text-[var(--rh-muted)]">—</td>
             <td class="py-3 px-5 text-center text-[var(--rh-muted)]">—</td>
@@ -202,7 +215,7 @@
           </tr>
           <tr>
             <td class="py-3 px-5 text-[var(--rh-muted)]">Pricing model</td>
-            <td class="py-3 px-5 text-center text-white">$49/mo flat</td>
+            <td class="py-3 px-5 text-center text-white">$49 / 25k block</td>
             <td class="py-3 px-5 text-center text-white">$0.008/min Linux</td>
             <td class="py-3 px-5 text-center text-white">$0.004/min</td>
             <td class="py-3 px-5 text-center text-white">$0.001-0.04/min</td>
@@ -501,7 +514,7 @@
     <pre class="mt-5 inline-block font-mono text-sm text-white/90 bg-black/40 px-4 py-2 rounded border border-white/10">npm install -g @rehearse/runner</pre>
     <div class="mt-8 inline-flex flex-wrap justify-center gap-3">
       <a href="/" class="btn btn-primary">Read more →</a>
-      <a href="/pro" class="btn btn-ghost">Or start Pro at $49/mo flat</a>
+      <a href="/pro" class="btn btn-ghost">Or start Pro at $49/mo · 25k min</a>
     </div>
   </div>
 </section>

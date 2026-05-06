@@ -6,11 +6,13 @@
 > the compiled YAML works on stock GitHub Actions even if you uninstall
 > the SDK.
 
-`@rehearse/ci` is the only OSS SDK in this category. The hosted-runner
-SaaS layer (Blacksmith, Ubicloud, RunsOn) doesn't try to do this; YAML
-authoring tools that do exist (Pulumi, hand-written generators, Earthly)
-either lock you into a proprietary execution model or don't compile to
-standard GH Actions YAML.
+`@rehearse/ci` fills a small but real niche: typed TypeScript that
+compiles **lossless** to standard GitHub Actions YAML. The hosted-runner
+SaaS layer (Blacksmith, Ubicloud, RunsOn, Depot, WarpBuild) doesn't try
+to do this. YAML-authoring alternatives that do exist (Pulumi, Earthly,
+Dagger, hand-rolled generators) either lock you into a proprietary
+execution model, use a non-YAML output format, or don't compile to
+canonical GH Actions YAML you can ship to stock GitHub Actions.
 
 The forward path (`compile`: TS → YAML) is **100% lossless** — every
 SDK feature produces canonical GH Actions YAML, verified by a comprehensive
