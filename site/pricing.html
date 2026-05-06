@@ -21,12 +21,13 @@
     <a href="/" class="flex items-center gap-2.5 font-mono group" aria-label="Rehearse home">
       <span class="logo-mark logo-mark-md text-[var(--rh-accent)] transition-transform group-hover:scale-110"></span>
       <span class="font-semibold tracking-tight text-white">rehearse</span>
-      <span class="hidden sm:inline text-[11px] text-[var(--rh-muted)] border border-white/10 rounded px-1.5 py-0.5">v0.4.0 · 4 pkgs · 323 tests</span>
+      <span class="hidden sm:inline text-[11px] text-[var(--rh-muted)] border border-white/10 rounded px-1.5 py-0.5">v0.5.0 · 4 pkgs · 323 tests</span>
     </a>
     <nav class="hidden md:flex items-center gap-7">
       <a href="/packages" class="nav-link ">Packages</a>
       <a href="/docs" class="nav-link ">Docs</a>
       <a href="/bench" class="nav-link ">Bench</a>
+      <a href="/blog" class="nav-link ">Blog</a>
       <a href="/pro" class="nav-link text-white ">Pro
         <span class="ml-1 text-[10px] font-mono text-[var(--rh-accent)] border border-[var(--rh-accent)]/40 rounded px-1 py-0.5 align-middle">$49/mo</span>
       </a>
@@ -39,7 +40,8 @@
   <div class="max-w-6xl mx-auto px-5 text-center">
     <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-3">// pricing</div>
     <h1 class="text-4xl sm:text-5xl font-semibold tracking-tight gradient-text mb-3">Three tiers. No surprises.</h1>
-    <p class="text-[var(--rh-muted)] max-w-2xl mx-auto mb-10">No per-minute meter. No overage charges. No seat surcharges. The OSS runner is free forever — only pay if you want hosted offload.</p>
+    <p class="text-[var(--rh-muted)] max-w-2xl mx-auto mb-3">No per-minute meter. No overage charges. No seat surcharges. The OSS runner is free forever — only pay if you want hosted offload.</p>
+    <p class="text-[12px] font-mono text-[var(--rh-accent)] max-w-2xl mx-auto mb-10">★ Intro pricing — Pro is $49/mo today (regular $69). Lock in the intro rate for the life of your subscription before we move to standard pricing.</p>
     <div class="flex justify-center mb-12">
       <div class="inline-flex border border-white/10 rounded-lg overflow-hidden text-[13px] font-mono">
         <button @click="billing='monthly'" :class="billing==='monthly' ? 'bg-white/10 text-white' : 'text-[var(--rh-muted)]'" class="px-4 py-2">Monthly</button>
@@ -70,14 +72,16 @@
       </div>
 
       <!-- Pro tier (highlighted as the offload product) -->
-      <div class="card p-8 border-[var(--rh-accent)]/40">
+      <div class="card p-8 border-[var(--rh-accent)]/40 relative">
+        <div class="absolute -top-3 right-5 text-[10px] font-mono uppercase tracking-[0.16em] bg-[var(--rh-accent)] text-black px-2 py-0.5 rounded">★ Intro pricing</div>
         <div class="text-[12px] font-mono text-[var(--rh-accent)] mb-2">// pro · the offload target</div>
         <h2 class="text-2xl font-semibold mb-1">Pro</h2>
         <p class="text-[var(--rh-muted)] text-sm mb-6">For when the laptop isn't enough. Single-tenant VM with whole-rootfs persistence — every cache survives forever.</p>
         <div class="text-4xl font-semibold mb-1">
-          <span x-show="billing==='monthly'">$49<span class="text-[var(--rh-muted)] text-base font-normal"> / month</span></span>
-          <span x-show="billing==='yearly'" x-cloak>$490<span class="text-[var(--rh-muted)] text-base font-normal"> / year</span></span>
+          <span x-show="billing==='monthly'">$49<span class="text-base text-[var(--rh-muted)] font-normal line-through ml-2">$69</span><span class="text-[var(--rh-muted)] text-base font-normal block sm:inline"> / month</span></span>
+          <span x-show="billing==='yearly'" x-cloak>$490<span class="text-base text-[var(--rh-muted)] font-normal line-through ml-2">$690</span><span class="text-[var(--rh-muted)] text-base font-normal block sm:inline"> / year</span></span>
         </div>
+        <p class="text-[12px] font-mono text-[var(--rh-accent)] mb-1"><span class="text-white">Intro pricing — locks in for the life of your subscription</span></p>
         <p class="text-[12px] font-mono text-[var(--rh-muted)] mb-1"><span class="text-white">25,000 minutes/month included</span></p>
         <p class="text-[12px] font-mono text-[var(--rh-muted)] mb-6">+$49 per additional 25k block · Cancel anytime · 14-day refund</p>
         <ul class="space-y-2 text-sm mb-8">
@@ -241,7 +245,7 @@
         <span class="text-white">rehearse</span> · by <a href="https://github.com/plsft" class="link">plsft</a>
       </div>
       <div class="font-mono text-[11px] text-[var(--rh-muted)]">
-        <span class="ok">●</span> v0.4.0 · Apache 2.0
+        <span class="ok">●</span> v0.5.0 · Apache 2.0
       </div>
     </div>
   </div>

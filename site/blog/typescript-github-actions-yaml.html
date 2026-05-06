@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#08090c" />
+<title>TypeScript GitHub Actions: from YAML to typed pipelines · Rehearse</title>
+<meta name="description" content="Author GitHub Actions workflows in TypeScript with full type safety, IDE autocomplete, and refactor support. Compile to standard YAML you commit alongside your TS source. 100% lossless. Apache 2.0." />
+<meta name="keywords" content="typescript github actions, github actions typescript, ci in typescript, typed github actions, compile yaml from typescript, github actions sdk, type-safe github actions" />
+<meta property="og:title" content="TypeScript GitHub Actions: from YAML to typed pipelines" />
+<meta property="og:description" content="Type-safe GitHub Actions workflows that compile to standard YAML. 100% lossless. Apache 2.0." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://rehearse.sh/blog/typescript-github-actions-yaml" />
+<meta property="article:published_time" content="2026-05-06" />
+<link rel="canonical" href="https://rehearse.sh/blog/typescript-github-actions-yaml" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script type="module" src="/src/main.ts"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org", "@type": "BlogPosting",
+  "headline": "TypeScript GitHub Actions: from YAML to typed pipelines",
+  "description": "Author GitHub Actions in TypeScript and compile to canonical YAML. Type-safe, refactor-friendly, lossless.",
+  "datePublished": "2026-05-06", "dateModified": "2026-05-06",
+  "author": { "@type": "Person", "name": "George Rios", "url": "https://github.com/plsft" },
+  "publisher": { "@type": "Organization", "name": "Rehearse", "url": "https://rehearse.sh" },
+  "mainEntityOfPage": { "@type": "WebPage", "@id": "https://rehearse.sh/blog/typescript-github-actions-yaml" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org", "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Can I write GitHub Actions in TypeScript?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes — using @rehearse/ci, you write workflows in typed TypeScript and compile them to standard GitHub Actions YAML. The compiled YAML has zero runtime dependency on the SDK; you can ship it to stock GitHub Actions." } },
+    { "@type": "Question", "name": "Will the compiled YAML still work on GitHub if I uninstall @rehearse/ci?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes. The output is canonical GitHub Actions YAML. Uninstall the package, delete the .ts source, keep the .yml — your CI keeps working." } },
+    { "@type": "Question", "name": "How do I migrate an existing YAML workflow to TypeScript?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Run 'rh ci convert .github/workflows/ci.yml --out .rehearse/pipelines/'. Common shapes (triggers, jobs, runner, steps, env, conditions, outputs, permissions) survive the round-trip. Advanced constructs (matrix, services, concurrency, defaults) get hand-ported after the initial generation." } }
+  ]
+}
+</script>
+</head>
+<body class="antialiased" x-data="{ scrolled: false }" x-init="window.addEventListener('scroll', () => scrolled = window.scrollY > 8)">
+
+<header :class="scrolled ? 'border-b border-white/10 backdrop-blur bg-black/55' : 'border-b border-transparent'"
+        class="fixed inset-x-0 top-0 z-50 transition-colors">
+  <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2.5 font-mono group">
+      <span class="logo-mark logo-mark-md text-[var(--rh-accent)] transition-transform group-hover:scale-110"></span>
+      <span class="font-semibold tracking-tight text-white">rehearse</span>
+      <span class="hidden sm:inline text-[11px] text-[var(--rh-muted)] border border-white/10 rounded px-1.5 py-0.5">v0.5.0</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-7">
+      <a href="/packages" class="nav-link">Packages</a><a href="/docs" class="nav-link">Docs</a>
+      <a href="/bench" class="nav-link">Bench</a><a href="/blog" class="nav-link">Blog</a>
+      <a href="/pro" class="nav-link text-white">Pro <span class="ml-1 text-[10px] font-mono text-[var(--rh-accent)] border border-[var(--rh-accent)]/40 rounded px-1 py-0.5 align-middle">$49/mo</span></a>
+    </nav>
+    <a href="/#install" class="btn btn-primary">Install</a>
+  </div>
+</header>
+
+<article class="bg-grid pt-32 pb-12">
+  <div class="max-w-3xl mx-auto px-5">
+    <div class="font-mono text-[12px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">// Blog · 2026-05-06 · 7 min read</div>
+    <h1 class="text-4xl sm:text-5xl font-semibold tracking-tight gradient-text">TypeScript GitHub Actions: from YAML to typed pipelines</h1>
+
+    <div class="card mt-8 p-5 border-[var(--rh-accent)]/40">
+      <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">TL;DR</div>
+      <p class="text-[var(--rh-muted)] text-[15px]">
+        Author your GitHub Actions workflows in <strong class="text-white">typed TypeScript</strong>
+        with full IDE autocomplete and refactor support. Compile to standard
+        GitHub Actions YAML you commit alongside the TS source.
+        <code class="font-mono">@rehearse/ci</code>'s forward path is
+        <strong class="text-white">100% lossless</strong> (snapshot-tested), and
+        the migration on-ramp from existing YAML is one command:
+        <code class="font-mono">rh ci convert</code>. The compiled YAML works on
+        stock GitHub Actions with <strong class="text-white">zero runtime dependency</strong>
+        on the SDK. Apache 2.0.
+      </p>
+    </div>
+  </div>
+</article>
+
+<section class="py-12">
+  <div class="max-w-3xl mx-auto px-5">
+
+    <h2 class="text-2xl font-semibold text-white mt-8 mb-4">YAML for CI breaks down at scale</h2>
+    <p class="text-[var(--rh-muted)] leading-relaxed">
+      A 50-line CI workflow in YAML is fine. A 500-line one is a nightmare. A 1500-line
+      monorepo CI with matrix expansion, conditional jobs, reusable workflows, composite
+      actions, and complex secret-passing is where teams burn weeks of engineering time
+      on what should be config maintenance.
+    </p>
+
+    <p class="text-[var(--rh-muted)] leading-relaxed mt-4">
+      The specific failure modes:
+    </p>
+    <ol class="text-[var(--rh-muted)] space-y-2 mt-4 list-decimal list-outside pl-6">
+      <li><strong class="text-white">No types, no autocomplete.</strong> Misspell <code class="font-mono">runs-on</code> as <code class="font-mono">runs_on</code>? Find out 90 seconds into a run on push. Pass <code class="font-mono">node-version: 20.0.0</code> when <code class="font-mono">setup-node</code> wants <code class="font-mono">'20'</code>? Same.</li>
+      <li><strong class="text-white">No refactor.</strong> Renaming a job key cascades through <code class="font-mono">needs:</code> references, <code class="font-mono">if: needs.X.outputs.Y</code> expressions, <code class="font-mono">${{ matrix.X }}</code> substitutions. Find/replace works until it silently breaks.</li>
+      <li><strong class="text-white">Expression escaping is medieval.</strong> <code class="font-mono">${{ }}</code> inside <code class="font-mono">${{ }}</code>, GitHub-flavored JSON inside YAML strings, double-escaped backslashes inside heredocs.</li>
+      <li><strong class="text-white">No reuse without ceremony.</strong> Composite actions and reusable workflows exist but the YAML cost of extracting them is high.</li>
+      <li><strong class="text-white">Hostile diffs.</strong> Reviewing a YAML refactor PR is brutal — semantic vs cosmetic changes bleed together.</li>
+    </ol>
+
+    <h2 class="text-2xl font-semibold text-white mt-10 mb-4">The TypeScript escape hatch</h2>
+    <p class="text-[var(--rh-muted)] leading-relaxed">
+      <a href="https://www.npmjs.com/package/@rehearse/ci" class="link">@rehearse/ci</a>
+      gives you typed builders for GitHub Actions:
+    </p>
+
+    <pre class="mt-4 font-mono text-[12px] text-white/90 bg-black/40 p-5 rounded border border-white/10 overflow-x-auto"><span class="comment">// .rehearse/pipelines/ci.ts</span>
+<span class="kw">import</span> { <span class="fn">pipeline</span>, <span class="fn">job</span>, <span class="fn">step</span>, <span class="fn">triggers</span>, <span class="fn">Runner</span> } <span class="kw">from</span> <span class="str">'@rehearse/ci'</span>;
+<span class="kw">import</span> { <span class="fn">node</span> } <span class="kw">from</span> <span class="str">'@rehearse/ci/presets'</span>;
+
+<span class="kw">export const</span> <span class="var">ci</span> = <span class="fn">pipeline</span>(<span class="str">'CI'</span>, {
+  triggers: [<span class="fn">triggers</span>.<span class="fn">pullRequest</span>(), <span class="fn">triggers</span>.<span class="fn">push</span>({ branches: [<span class="str">'main'</span>] })],
+  jobs: [
+    <span class="fn">job</span>(<span class="str">'test'</span>, {
+      runner: <span class="fn">Runner</span>.<span class="fn">github</span>(<span class="str">'ubuntu-latest'</span>),
+      matrix: { variables: { node: [<span class="str">'18'</span>, <span class="str">'20'</span>, <span class="str">'22'</span>] } },
+      steps: [
+        <span class="fn">step</span>.<span class="fn">checkout</span>(),
+        <span class="fn">node</span>.<span class="fn">setup</span>(<span class="str">'${{ matrix.node }}'</span>),
+        <span class="fn">node</span>.<span class="fn">install</span>(),
+        <span class="fn">node</span>.<span class="fn">test</span>(),
+      ],
+    }),
+  ],
+});</pre>
+
+    <p class="text-[var(--rh-muted)] leading-relaxed mt-4">
+      Compile with <code class="font-mono">rh ci compile</code> (from
+      <a href="https://www.npmjs.com/package/@rehearse/cli" class="link">@rehearse/cli</a>).
+      Output: standard <code class="font-mono">.github/workflows/ci.yml</code> committed to
+      your repo. The compiled YAML is canonical — same shape GitHub itself emits — and
+      runs on stock GitHub Actions with zero runtime dependency on Rehearse.
+    </p>
+
+    <h2 class="text-2xl font-semibold text-white mt-10 mb-4">100% lossless forward path</h2>
+    <p class="text-[var(--rh-muted)] leading-relaxed">
+      Every public SDK feature compiles to canonical GitHub Actions YAML. We assert this
+      via a snapshot test suite covering 6 reference workflows that exercise every
+      construct GitHub Actions supports — matrix (variables, include, exclude, fail-fast,
+      max-parallel), services (image, env, ports, options), concurrency, defaults,
+      environment blocks, workflow + job + step env, workflow + job permissions, conditions,
+      outputs, schedule triggers, workflow_dispatch with inputs, all standard step
+      constructs, composite actions (local + remote), local reusable workflows, and
+      camel→kebab auto-translation (<code class="font-mono">idToken</code> →
+      <code class="font-mono">id-token</code> etc.).
+    </p>
+    <p class="text-[var(--rh-muted)] leading-relaxed mt-4">
+      <strong class="text-white">Forward path losslessness</strong> means: anything you can
+      do in YAML, you can do in TS, and the compiled YAML is exactly what GitHub expects.
+      No silent translations, no semantic drift.
+    </p>
+
+    <h2 class="text-2xl font-semibold text-white mt-10 mb-4">Migration on-ramp: one command</h2>
+    <p class="text-[var(--rh-muted)] leading-relaxed">
+      Adopting typed CI on a repo that already has <code class="font-mono">.github/workflows/*.yml</code>?
+    </p>
+    <pre class="mt-3 font-mono text-[12.5px] text-white/90 bg-black/40 p-4 rounded border border-white/10 overflow-x-auto"><span class="prompt"></span>npm install -D @rehearse/ci @rehearse/cli
+<span class="prompt"></span>npx rh ci convert .github/workflows/ci.yml --out .rehearse/pipelines/
+<span class="comment"># → .rehearse/pipelines/ci.ts</span></pre>
+
+    <p class="text-[var(--rh-muted)] leading-relaxed mt-4">
+      <code class="font-mono">rh ci convert</code> is a <strong class="text-white">migration starter</strong>,
+      not a faithful round-trip. Common shapes survive — triggers, jobs with name/needs/condition/env/timeoutMinutes/outputs,
+      runner, all standard step constructs, workflow-level permissions and env. Advanced
+      constructs that get hand-ported (matrix, services, concurrency, defaults, job-level
+      permissions when different from workflow-level, environment block in object form,
+      workflow_dispatch inputs) take 5–15 minutes per workflow.
+    </p>
+    <p class="text-[var(--rh-muted)] leading-relaxed mt-4">
+      The SDK supports authoring all of those constructs — only the converter doesn't
+      auto-extract them yet. The common adoption flow: convert once, hand-port the dropped
+      blocks, then live in the TS source-of-truth forever. <code class="font-mono">rh ci
+      compile</code> round-trips back to YAML to verify.
+    </p>
+
+    <h2 class="text-2xl font-semibold text-white mt-10 mb-4">Zero runtime dependency</h2>
+    <p class="text-[var(--rh-muted)] leading-relaxed">
+      The compiled <code class="font-mono">.github/workflows/ci.yml</code> has
+      <strong class="text-white">no runtime dependency</strong> on
+      <code class="font-mono">@rehearse/ci</code>. <code class="font-mono">npm uninstall
+      @rehearse/ci</code> and your CI keeps running on stock GitHub Actions exactly as
+      before. The TS source is authoring-time only.
+    </p>
+    <p class="text-[var(--rh-muted)] leading-relaxed mt-4">
+      That's the key difference from frameworks like Pulumi, Earthly, or Dagger — those
+      either compile to formats GitHub doesn't natively run, or require their own runtime
+      to execute. <code class="font-mono">@rehearse/ci</code> compiles to YAML GitHub
+      already runs.
+    </p>
+
+    <h2 class="text-2xl font-semibold text-white mt-10 mb-4">FAQ</h2>
+    <div class="space-y-6 text-[var(--rh-muted)] mt-4">
+      <div>
+        <p class="text-white font-semibold">Can I use this without committing to Rehearse?</p>
+        <p class="mt-1">Yes. Compile your TS pipelines to YAML, commit both, then never run <code class="font-mono">@rehearse/ci</code> again if you don't want to. The compiled YAML works on stock GitHub Actions forever.</p>
+      </div>
+      <div>
+        <p class="text-white font-semibold">Does it support the language I use?</p>
+        <p class="mt-1">The presets cover Node, Bun, Python, Rust, Go, and Docker out of the box. Anything else uses generic <code class="font-mono">step.run()</code> and <code class="font-mono">step.action()</code> — no language-specific support needed.</p>
+      </div>
+      <div>
+        <p class="text-white font-semibold">How does this compare to writing CI in Pulumi or Earthly?</p>
+        <p class="mt-1">Pulumi compiles to GH Actions YAML but as part of a larger IaC stack with state-backend requirements. Earthly outputs Earthfiles (their own DSL, not standard GH Actions) and runs on Earthly's runtime. Dagger runs pipelines on its own runtime. <code class="font-mono">@rehearse/ci</code>'s niche is typed TS that compiles lossless to standard GitHub Actions YAML with zero runtime dependency on us.</p>
+      </div>
+      <div>
+        <p class="text-white font-semibold">Is the SDK production-ready?</p>
+        <p class="mt-1">Yes. v0.5.0 ships with 40 unit tests + 6 snapshot tests covering every public construct. The forward path is the production code path; we use it for our own CI.</p>
+      </div>
+    </div>
+
+    <hr class="my-12 border-white/10" />
+    <p class="text-[var(--rh-muted)] text-sm">
+      <strong class="text-white">Try it:</strong>
+      <code class="font-mono">npm install -D @rehearse/ci @rehearse/cli && npx rh ci init</code>.
+      Scaffolds a typed pipeline based on your repo's stack.
+    </p>
+    <p class="text-[var(--rh-muted)] text-sm mt-3">
+      More: <a href="/typescript-github-actions" class="link">Full TS deep dive</a> ·
+      <a href="/packages#ci" class="link">@rehearse/ci API reference</a> ·
+      <a href="/blog/act-alternative" class="link">act alternative</a>
+    </p>
+  </div>
+</section>
+
+<footer class="py-14 hairline">
+  <div class="max-w-6xl mx-auto px-5">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-10">
+      <div><div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Product</div>
+        <ul class="space-y-2 font-mono text-[13px]">
+          <li><a href="/packages" class="nav-link">Packages</a></li><li><a href="/docs" class="nav-link">Docs</a></li>
+          <li><a href="/bench" class="nav-link">Bench</a></li><li><a href="/vs" class="nav-link">vs competitors</a></li>
+          <li><a href="/typescript-github-actions" class="nav-link">TS GitHub Actions</a></li>
+          <li><a href="/local-github-actions" class="nav-link">Run GH Actions locally</a></li>
+        </ul></div>
+      <div><div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Pro</div>
+        <ul class="space-y-2 font-mono text-[13px]">
+          <li><a href="/pro" class="nav-link">Overview</a></li><li><a href="/pricing" class="nav-link">Pricing</a></li>
+          <li><a href="https://buy.stripe.com/6oU9AMdTI8VUdZH7ehgjC0r" class="nav-link">Buy 25k block — $49</a></li>
+          <li><a href="https://pro.rehearse.sh/sign-in" class="nav-link">Sign in</a></li>
+          <li><a href="/security" class="nav-link">Security</a></li>
+        </ul></div>
+      <div><div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Open source</div>
+        <ul class="space-y-2 font-mono text-[13px]">
+          <li><a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a></li>
+          <li><a href="https://www.npmjs.com/package/@rehearse/runner" class="nav-link">npm</a></li>
+          <li><a href="https://github.com/plsft/rehearse/issues" class="nav-link">Issues</a></li>
+          <li><a href="/changelog" class="nav-link">Changelog</a></li><li><a href="/llms.txt" class="nav-link">llms.txt</a></li>
+        </ul></div>
+      <div><div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Company</div>
+        <ul class="space-y-2 font-mono text-[13px]">
+          <li><a href="/" class="nav-link">Home</a></li><li><a href="/blog" class="nav-link">Blog</a></li>
+          <li><a href="/customers" class="nav-link">Customers</a></li><li><a href="/about" class="nav-link">About</a></li>
+        </ul></div>
+    </div>
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 pt-6 border-t border-white/5">
+      <div class="flex items-center gap-2 font-mono text-sm text-[var(--rh-muted)]">
+        <span class="logo-mark logo-mark-sm text-[var(--rh-accent)]"></span>
+        <span class="text-white">rehearse</span> · by <a href="https://github.com/plsft" class="link">plsft</a>
+      </div>
+      <div class="font-mono text-[11px] text-[var(--rh-muted)]"><span class="ok">●</span> v0.5.0 · Apache 2.0</div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

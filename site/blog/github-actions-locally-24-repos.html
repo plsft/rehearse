@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#08090c" />
+<title>Running GitHub Actions locally on 24 repos: notes from one week · Rehearse</title>
+<meta name="description" content="Dogfooding notes: running my GitHub Actions workflows locally on 24 repositories with Rehearse. What worked, what broke, what I'd change. Honest writeup." />
+<meta name="keywords" content="run github actions locally, github actions on laptop, local github actions runner, dogfooding github actions, ci before push" />
+<meta property="og:title" content="Running GitHub Actions locally on 24 repos: a week of notes" />
+<meta property="og:description" content="Honest dogfooding writeup. What worked, what broke, what I'd change after running 24 production CI workflows locally." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://rehearse.sh/blog/github-actions-locally-24-repos" />
+<meta property="article:published_time" content="2026-05-06" />
+<link rel="canonical" href="https://rehearse.sh/blog/github-actions-locally-24-repos" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script type="module" src="/src/main.ts"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org", "@type": "BlogPosting",
+  "headline": "Running GitHub Actions locally on 24 repos: notes from one week",
+  "description": "Dogfooding writeup of running 24 production GitHub Actions CI workflows locally with Rehearse.",
+  "datePublished": "2026-05-06", "dateModified": "2026-05-06",
+  "author": { "@type": "Person", "name": "George Rios", "url": "https://github.com/plsft" },
+  "publisher": { "@type": "Organization", "name": "Rehearse", "url": "https://rehearse.sh" },
+  "mainEntityOfPage": { "@type": "WebPage", "@id": "https://rehearse.sh/blog/github-actions-locally-24-repos" }
+}
+</script>
+</head>
+<body class="antialiased" x-data="{ scrolled: false }" x-init="window.addEventListener('scroll', () => scrolled = window.scrollY > 8)">
+
+<header :class="scrolled ? 'border-b border-white/10 backdrop-blur bg-black/55' : 'border-b border-transparent'"
+        class="fixed inset-x-0 top-0 z-50 transition-colors">
+  <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2.5 font-mono group">
+      <span class="logo-mark logo-mark-md text-[var(--rh-accent)] transition-transform group-hover:scale-110"></span>
+      <span class="font-semibold tracking-tight text-white">rehearse</span>
+      <span class="hidden sm:inline text-[11px] text-[var(--rh-muted)] border border-white/10 rounded px-1.5 py-0.5">v0.5.0</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-7">
+      <a href="/packages" class="nav-link">Packages</a><a href="/docs" class="nav-link">Docs</a>
+      <a href="/bench" class="nav-link">Bench</a><a href="/blog" class="nav-link">Blog</a>
+      <a href="/pro" class="nav-link text-white">Pro <span class="ml-1 text-[10px] font-mono text-[var(--rh-accent)] border border-[var(--rh-accent)]/40 rounded px-1 py-0.5 align-middle">$49/mo</span></a>
+    </nav>
+    <a href="/#install" class="btn btn-primary">Install</a>
+  </div>
+</header>
+
+<article class="bg-grid pt-32 pb-12">
+  <div class="max-w-3xl mx-auto px-5">
+    <div class="font-mono text-[12px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">// Blog · 2026-05-06 · 4 min read · dogfood diary</div>
+    <h1 class="text-4xl sm:text-5xl font-semibold tracking-tight gradient-text">Running GitHub Actions locally on 24 repos: notes from one week</h1>
+
+    <div class="card mt-8 p-5 border-[var(--rh-accent)]/40">
+      <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">TL;DR</div>
+      <p class="text-[var(--rh-muted)] text-[15px]">
+        I'm dogfooding Rehearse on 24 of my own production repos this week — internal
+        tools, OSS side projects, and the marketing site itself. This is the public
+        running tally: what worked first try, what broke, what surprised me, what I'd
+        change. Posted in real time so it's honest. <strong class="text-white">Updated as I go.</strong>
+      </p>
+    </div>
+  </div>
+</article>
+
+<section class="py-12">
+  <div class="max-w-3xl mx-auto px-5">
+
+    <h2 class="text-2xl font-semibold text-white mt-8 mb-4">Why dogfood?</h2>
+    <p class="text-[var(--rh-muted)] leading-relaxed">
+      Rehearse v0.5.0 just shipped. I have one user (me). To find the bugs that don't
+      show up in synthetic tests, I need real workflows from real repos doing real work.
+      I picked 24 of my own repos that span: <strong class="text-white">Node + Bun + Python + Go + .NET + Rust</strong>;
+      <strong class="text-white">solo and team projects</strong>; <strong class="text-white">monorepo and single-package</strong>;
+      <strong class="text-white">trivial CI and complex matrix CI</strong>; <strong class="text-white">workflows with services and without</strong>.
+    </p>
+
+    <h2 class="text-2xl font-semibold text-white mt-10 mb-4">The methodology</h2>
+    <p class="text-[var(--rh-muted)] leading-relaxed">
+      For each repo:
+    </p>
+    <ol class="text-[var(--rh-muted)] space-y-2 mt-4 list-decimal list-outside pl-6">
+      <li><code class="font-mono">cd ~/projects/repo-name</code></li>
+      <li><code class="font-mono">rehearse compat .github/workflows/ci.yml</code> — static audit, what % executes</li>
+      <li><code class="font-mono">time rehearse run .github/workflows/ci.yml</code> — local execution, time it</li>
+      <li><code class="font-mono">time rehearse run --remote .github/workflows/ci.yml</code> — Pro VM, time it</li>
+      <li>Compare to the latest GitHub Actions run from the same SHA</li>
+      <li>Note any failures, surprises, broken expectations</li>
+    </ol>
+
+    <h2 class="text-2xl font-semibold text-white mt-10 mb-4">Running tally</h2>
+    <p class="text-[var(--rh-muted)] leading-relaxed">
+      <em>This section updates as I work through the list. Latest writes at top.</em>
+    </p>
+
+    <div class="space-y-6 mt-6">
+      <div class="card p-5">
+        <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">REPO 1: plsft/typey · Bun CLI · 9-cell matrix</div>
+        <p class="text-[var(--rh-muted)] text-sm">
+          ✓ <strong class="text-white">Worked first try.</strong> 9-cell matrix (3 OS × 3 Bun versions),
+          full quality gate (prettier + eslint + tsc + test + build).
+          Local: 1.5s warm. Pro: 5s. GH Actions: 95s. The bench wedge that the homepage cites comes from this repo.
+        </p>
+      </div>
+
+      <div class="card p-5">
+        <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">REPO 2-24: in progress</div>
+        <p class="text-[var(--rh-muted)] text-sm">
+          Posting results as each one completes. Subscribe to the <a href="https://github.com/plsft/rehearse/releases" class="link">repo releases</a>
+          or check back here.
+        </p>
+      </div>
+    </div>
+
+    <h2 class="text-2xl font-semibold text-white mt-10 mb-4">What I'm watching for</h2>
+    <ul class="text-[var(--rh-muted)] space-y-2 mt-4 list-disc list-outside pl-6">
+      <li><strong class="text-white">Workflows that crash</strong> — these are real bugs, not edge cases. Each gets a GitHub issue.</li>
+      <li><strong class="text-white">Workflows that work but slowly</strong> — inefficient code paths in the runner, fixable.</li>
+      <li><strong class="text-white">"Huh, that's annoying"</strong> — UX rough edges. Less critical than bugs but accumulating these is what makes a tool feel polished.</li>
+      <li><strong class="text-white">"I wish it did X"</strong> — feature gaps. Often resolved by reading existing docs more carefully.</li>
+      <li><strong class="text-white">"This actually saved me time"</strong> — the bar I'm trying to clear. If 80% of repos hit this bar, the product is real.</li>
+    </ul>
+
+    <h2 class="text-2xl font-semibold text-white mt-10 mb-4">Why this matters more than the bench</h2>
+    <p class="text-[var(--rh-muted)] leading-relaxed">
+      The <a href="/bench" class="link">bench page</a> is reproducible — anyone can run it.
+      But synthetic benchmarks miss real-world workflow shapes: the workflow that uses an
+      obscure JS action, the workflow with weird secret-passing patterns, the monorepo
+      workflow with 10 jobs and complex <code class="font-mono">needs:</code> dependencies.
+    </p>
+    <p class="text-[var(--rh-muted)] leading-relaxed mt-4">
+      Dogfooding 24 production repos exercises the long tail. Whatever I find here is
+      what a stranger would find in week 1.
+    </p>
+
+    <hr class="my-12 border-white/10" />
+    <p class="text-[var(--rh-muted)] text-sm">
+      Have a workflow that's broken on Rehearse? <a href="https://github.com/plsft/rehearse/issues/new" class="link">File an issue</a>
+      or email <a href="mailto:george@pluralsoftware.com" class="link">george@pluralsoftware.com</a>.
+    </p>
+    <p class="text-[var(--rh-muted)] text-sm mt-3">
+      More: <a href="/blog/act-alternative" class="link">act alternative</a> ·
+      <a href="/blog/github-actions-before-push" class="link">Pre-push CI</a> ·
+      <a href="/bench" class="link">Bench</a>
+    </p>
+  </div>
+</section>
+
+<footer class="py-14 hairline">
+  <div class="max-w-6xl mx-auto px-5">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-10">
+      <div><div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Product</div>
+        <ul class="space-y-2 font-mono text-[13px]">
+          <li><a href="/packages" class="nav-link">Packages</a></li><li><a href="/docs" class="nav-link">Docs</a></li>
+          <li><a href="/bench" class="nav-link">Bench</a></li><li><a href="/vs" class="nav-link">vs competitors</a></li>
+          <li><a href="/typescript-github-actions" class="nav-link">TS GitHub Actions</a></li>
+          <li><a href="/local-github-actions" class="nav-link">Run GH Actions locally</a></li>
+        </ul></div>
+      <div><div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Pro</div>
+        <ul class="space-y-2 font-mono text-[13px]">
+          <li><a href="/pro" class="nav-link">Overview</a></li><li><a href="/pricing" class="nav-link">Pricing</a></li>
+          <li><a href="https://buy.stripe.com/6oU9AMdTI8VUdZH7ehgjC0r" class="nav-link">Buy 25k block — $49</a></li>
+          <li><a href="https://pro.rehearse.sh/sign-in" class="nav-link">Sign in</a></li>
+          <li><a href="/security" class="nav-link">Security</a></li>
+        </ul></div>
+      <div><div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Open source</div>
+        <ul class="space-y-2 font-mono text-[13px]">
+          <li><a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a></li>
+          <li><a href="https://www.npmjs.com/package/@rehearse/runner" class="nav-link">npm</a></li>
+          <li><a href="https://github.com/plsft/rehearse/issues" class="nav-link">Issues</a></li>
+          <li><a href="/changelog" class="nav-link">Changelog</a></li><li><a href="/llms.txt" class="nav-link">llms.txt</a></li>
+        </ul></div>
+      <div><div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Company</div>
+        <ul class="space-y-2 font-mono text-[13px]">
+          <li><a href="/" class="nav-link">Home</a></li><li><a href="/blog" class="nav-link">Blog</a></li>
+          <li><a href="/customers" class="nav-link">Customers</a></li><li><a href="/about" class="nav-link">About</a></li>
+        </ul></div>
+    </div>
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 pt-6 border-t border-white/5">
+      <div class="flex items-center gap-2 font-mono text-sm text-[var(--rh-muted)]">
+        <span class="logo-mark logo-mark-sm text-[var(--rh-accent)]"></span>
+        <span class="text-white">rehearse</span> · by <a href="https://github.com/plsft" class="link">plsft</a>
+      </div>
+      <div class="font-mono text-[11px] text-[var(--rh-muted)]"><span class="ok">●</span> v0.5.0 · Apache 2.0</div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

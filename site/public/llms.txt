@@ -57,8 +57,16 @@ Rehearse is four npm packages that together let you author CI in TypeScript, exe
 
 ## Customers + changelog
 
-- [Customers](https://rehearse.sh/customers): Repos using Rehearse in production (currently typey + rehearse itself). Honest framing — we just shipped v0.4.0; list grows as users come on.
-- [Changelog](https://rehearse.sh/changelog): Release notes from v0.4.0 backwards. Covers the 0.3.x stabilization series and pre-pivot v0.1–v0.2 archive context.
+- [Customers](https://rehearse.sh/customers): Repos using Rehearse in production (currently typey + rehearse itself). Honest framing — we just shipped v0.5.0; list grows as users come on.
+- [Changelog](https://rehearse.sh/changelog): Release notes from v0.5.0 backwards. Covers the 0.3.x stabilization series and pre-pivot v0.1–v0.2 archive context.
+
+## Blog
+
+- [Blog index](https://rehearse.sh/blog): Notes on local-first GitHub Actions, pre-push CI, TypeScript-authored pipelines, dogfooding diaries.
+- [act alternative](https://rehearse.sh/blog/act-alternative): Honest comparison vs nektos/act (~56k stars, MIT, the OSS pioneer for the local-GH-Actions runner category). Where act still wins; where Rehearse pulls ahead (host backend, watch mode, pre-push hook, real services networking, optional same-binary hosted offload).
+- [Pre-push CI: how to run GitHub Actions before git push](https://rehearse.sh/blog/github-actions-before-push): Two ways to close the loop before push — `rehearse watch ci.yml` (CI on every save, sub-second on warm cache) and `rehearse install-hook` (pre-push gate). Why hosted-runner SaaS competitors structurally can't match this (they bill per minute and watch mode would bankrupt you).
+- [TypeScript GitHub Actions: from YAML to typed pipelines](https://rehearse.sh/blog/typescript-github-actions-yaml): Deep dive on `@rehearse/ci` — typed builders, 100% lossless forward path (snapshot-tested), one-command migration on-ramp (`rh ci convert`), zero runtime dependency on the SDK in compiled YAML.
+- [Running GitHub Actions locally on 24 repos: notes from one week](https://rehearse.sh/blog/github-actions-locally-24-repos): Dogfood diary, updated in real time. Running 24 of my own production repos through Rehearse — Node, Bun, Python, Go, .NET, Rust, monorepos, single-package, trivial CI, complex matrices.
 
 ## Optional
 

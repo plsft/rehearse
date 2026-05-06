@@ -15,7 +15,7 @@ Rehearse is four npm packages working together:
 3. **@rehearse/cli** (binary: `rh`) — companion CLI for `@rehearse/ci`. `init`, `compile`, `convert`, `validate`, `watch`, `estimate`.
 4. **@rehearse/git-core** — pure-TypeScript git protocol implementation. Runs in Cloudflare Workers, browsers, Deno, Node, Bun. Standalone.
 
-All four are Apache 2.0, all four versioned in lockstep (currently v0.4.0). The runner alone is enough for most users; the others compose for richer workflows.
+All four are Apache 2.0, all four versioned in lockstep (currently v0.5.0). The runner alone is enough for most users; the others compose for richer workflows.
 
 Optional commercial layer: **Rehearse Pro** at $49/mo for 25,000 active CPU minutes per month + $49 per additional 25,000-minute block. Single-tenant VM with whole-rootfs cache persistence. Same `rehearse` binary — pass `--remote` to ship workflow execution to your VM. Drop the flag and you're back to free local execution. No vendor lock-in.
 
@@ -179,7 +179,7 @@ The Pro hosted layer source is in a separate private repo (`plsft/rehearse-pro`)
 - **PHP on Pro** — verified locally; not yet preinstalled on the Pro VM.
 - **No SOC 2** today. Talk to us if you need it; we'll discuss timeline + cost-share.
 
-All other features documented as supported are tested + working at v0.4.0.
+All other features documented as supported are tested + working at v0.5.0.
 
 ---
 
@@ -239,6 +239,20 @@ const result = await client.clone({
 });
 // → { objects, refs, head }
 ```
+
+---
+
+## Blog
+
+Long-form writeups at https://rehearse.sh/blog. Current posts:
+
+- **act alternative — how Rehearse compares to nektos/act for running GitHub Actions locally** (`/blog/act-alternative`). Honest comparison vs nektos/act. act is the OSS pioneer in the local-GH-Actions-runner category (~56k stars, MIT, pre-dates Rehearse by 5 years) and remains the right pick for use cases that match its design. Rehearse pulls ahead on speed (5–30× on the bench), feature coverage (host subprocess backend in addition to container, watch mode with debounce + queue coalescing, pre-push git hook installer, real `services:` networking with health-check waiting), and an optional same-binary hosted offload target via Pro. Includes head-to-head bench numbers, 30-second migration code, FAQ, and an "act is still the right call when…" section.
+
+- **Pre-push CI: how to run GitHub Actions before `git push`** (`/blog/github-actions-before-push`). The default GH Actions loop costs 60–180s per cycle and burns commits with `wip: try fix`. Two ways to close the loop before push: (1) `rehearse watch ci.yml` reruns on every save (debounced + queue-coalesced; sub-second on warm cache); (2) `rehearse install-hook` writes a `.git/hooks/pre-push` that gates pushes on a green local run. Combining both means most CI failures never hit GitHub Actions. Why hosted-runner SaaS (Blacksmith, Ubicloud, RunsOn, Depot, WarpBuild) structurally can't match this — they bill per minute and watch mode would bankrupt the user.
+
+- **TypeScript GitHub Actions: from YAML to typed pipelines** (`/blog/typescript-github-actions-yaml`). Deep dive on `@rehearse/ci`. The specific YAML failure modes (no autocomplete, no refactor, hostile escaping, no reuse without ceremony, hostile diffs). Typed TS builders that compile to canonical GH Actions YAML. Forward path is 100% lossless (snapshot-tested across 6 reference workflows covering matrix, services, concurrency, defaults, environment, permissions, conditions, outputs, schedule, workflow_dispatch with inputs, all standard step constructs, composite actions local + remote, local reusable workflows, camel→kebab auto-translation). Reverse path (`rh ci convert`) is a one-command migration starter — common shapes survive, advanced constructs hand-port in 5–15 min/workflow. Compiled YAML has zero runtime dependency on the SDK; uninstall and CI keeps running. Comparison vs Pulumi (compiles GH Actions but as part of larger IaC stack), Earthly (Earthfile DSL, own runtime), Dagger (own runtime).
+
+- **Running GitHub Actions locally on 24 repos: notes from one week** (`/blog/github-actions-locally-24-repos`). Dogfood diary updated in real time. Running 24 of my own production repos through Rehearse this week — span: Node, Bun, Python, Go, .NET, Rust; solo and team; monorepo and single-package; trivial CI and complex matrix. Methodology: `rehearse compat` (static audit %) → `rehearse run` (local time) → `rehearse run --remote` (Pro VM time) → compare to GH Actions latest run from same SHA. Watching for: workflows that crash (file issue), workflows that work but slowly (perf bug), UX rough edges, feature gaps, "this saved me time" moments. The bar is: 80% of repos hit the saved-me-time bar.
 
 ---
 

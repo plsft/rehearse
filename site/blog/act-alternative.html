@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#08090c" />
+<title>act alternative: a faster local GitHub Actions runner · Rehearse</title>
+<meta name="description" content="Looking for an alternative to nektos/act? Rehearse runs your .github/workflows/*.yml locally 5–30× faster, with a host backend (no Docker required), real services networking, watch mode, and a pre-push hook. Apache 2.0." />
+<meta name="keywords" content="act alternative, nektos/act alternative, local github actions runner, github actions locally, run github actions on laptop" />
+<meta property="og:title" content="act alternative: faster, more compatible local GitHub Actions runner" />
+<meta property="og:description" content="Run your GitHub Actions workflows locally 5–30× faster than nektos/act. Host backend, services, watch mode, pre-push hook." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://rehearse.sh/blog/act-alternative" />
+<meta property="article:published_time" content="2026-05-06" />
+<meta property="article:author" content="George Rios" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="canonical" href="https://rehearse.sh/blog/act-alternative" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script type="module" src="/src/main.ts"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "act alternative: a faster local GitHub Actions runner",
+  "description": "Rehearse is a local-first GitHub Actions runner that runs 5–30× faster than nektos/act on standard workflows, with a host backend (no Docker required), real services networking, watch mode, and a pre-push hook.",
+  "datePublished": "2026-05-06",
+  "dateModified": "2026-05-06",
+  "author": { "@type": "Person", "name": "George Rios", "url": "https://github.com/plsft" },
+  "publisher": { "@type": "Organization", "name": "Rehearse", "url": "https://rehearse.sh" },
+  "mainEntityOfPage": { "@type": "WebPage", "@id": "https://rehearse.sh/blog/act-alternative" },
+  "keywords": "act alternative, nektos/act alternative, local github actions runner, github actions locally"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "What is the best alternative to nektos/act?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Rehearse is the closest 1:1 alternative — same goal (run .github/workflows/*.yml locally), faster execution (5–30× on the published bench), more compatibility features (host backend, services with networking, watch mode, pre-push hook), and an optional same-binary hosted offload target. Apache 2.0." } },
+    { "@type": "Question", "name": "Is Rehearse compatible with workflows that use act?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes — Rehearse reads the same .github/workflows/*.yml files act does, with no edits required. You can switch between act and Rehearse without changing your YAML." } },
+    { "@type": "Question", "name": "Does Rehearse require Docker like act?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No. Rehearse has a host backend that runs jobs as host subprocesses against your installed toolchains. Docker is only used when a job declares services: or you explicitly opt in. act is Docker-only." } }
+  ]
+}
+</script>
+</head>
+<body class="antialiased" x-data="{ scrolled: false }" x-init="window.addEventListener('scroll', () => scrolled = window.scrollY > 8)">
+
+<header :class="scrolled ? 'border-b border-white/10 backdrop-blur bg-black/55' : 'border-b border-transparent'"
+        class="fixed inset-x-0 top-0 z-50 transition-colors">
+  <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2.5 font-mono group">
+      <span class="logo-mark logo-mark-md text-[var(--rh-accent)] transition-transform group-hover:scale-110"></span>
+      <span class="font-semibold tracking-tight text-white">rehearse</span>
+      <span class="hidden sm:inline text-[11px] text-[var(--rh-muted)] border border-white/10 rounded px-1.5 py-0.5">v0.5.0</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-7">
+      <a href="/packages" class="nav-link">Packages</a>
+      <a href="/docs" class="nav-link">Docs</a>
+      <a href="/bench" class="nav-link">Bench</a>
+      <a href="/blog" class="nav-link">Blog</a>
+      <a href="/pro" class="nav-link text-white">Pro
+        <span class="ml-1 text-[10px] font-mono text-[var(--rh-accent)] border border-[var(--rh-accent)]/40 rounded px-1 py-0.5 align-middle">$49/mo</span>
+      </a>
+    </nav>
+    <a href="/#install" class="btn btn-primary">Install</a>
+  </div>
+</header>
+
+<article class="bg-grid pt-32 pb-12">
+  <div class="max-w-3xl mx-auto px-5">
+    <div class="font-mono text-[12px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">// Blog · 2026-05-06 · 6 min read</div>
+    <h1 class="text-4xl sm:text-5xl font-semibold tracking-tight gradient-text">
+      act alternative: a faster local GitHub Actions runner
+    </h1>
+
+    <div class="card mt-8 p-5 border-[var(--rh-accent)]/40">
+      <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">TL;DR</div>
+      <p class="text-[var(--rh-muted)] text-[15px]">
+        If you've outgrown <a href="https://github.com/nektos/act" class="link">nektos/act</a> —
+        speed, services networking, watch mode, or "I don't want to install Docker just to run my CI" —
+        <span class="text-white">Rehearse</span> is the closest replacement. Same job (run
+        <code class="font-mono">.github/workflows/*.yml</code> locally), <span class="text-white">5–30× faster on the bench</span>,
+        a host backend that doesn't need Docker, real <code class="font-mono">services:</code> networking,
+        a <code class="font-mono">rehearse watch</code> save-loop, and a pre-push git hook.
+        Same YAML, no edits. Apache 2.0. Install: <code class="font-mono text-white">npm i -g @rehearse/runner</code>.
+      </p>
+    </div>
+  </div>
+</article>
+
+<section class="py-12">
+  <div class="max-w-3xl mx-auto px-5 prose-rh">
+
+    <h2 class="text-2xl font-semibold text-white mt-8 mb-4">Why look for an act alternative?</h2>
+    <p class="text-[var(--rh-muted)] leading-relaxed">
+      <a href="https://github.com/nektos/act" class="link">nektos/act</a> is the OSS pioneer for
+      running GitHub Actions workflows locally — ~56k GitHub stars and ~6 years of community use.
+      It works for a lot of people. But there are real reasons teams look for an alternative:
+    </p>
+
+    <ul class="text-[var(--rh-muted)] space-y-2 mt-4 list-disc list-outside pl-6">
+      <li><span class="text-white">It's slow on standard workflows.</span> The published bench shows act at 63s on a 2-job typecheck-and-test pipeline; faster runners finish in 12s.</li>
+      <li><span class="text-white">It's Docker-only.</span> Every job spins a container, even when you'd be fine running on your host shell. That adds 5–15s of overhead per job and forces a Docker install.</li>
+      <li><span class="text-white"><code class="font-mono">services:</code> blocks don't reliably finish.</span> Workflows that declare a Postgres or Redis service routinely hang on health-check waits.</li>
+      <li><span class="text-white">No watch mode.</span> You re-run by hand every time you save.</li>
+      <li><span class="text-white">No pre-push hook.</span> If you want CI to gate <code class="font-mono">git push</code>, you write the script yourself.</li>
+    </ul>
+
+    <h2 class="text-2xl font-semibold text-white mt-10 mb-4">What Rehearse does that act doesn't</h2>
+
+    <h3 class="text-lg font-semibold text-white mt-6 mb-2">Host backend (no Docker required)</h3>
+    <p class="text-[var(--rh-muted)] leading-relaxed">
+      Rehearse picks a backend per job. If your job doesn't declare <code class="font-mono">services:</code>
+      and doesn't pin a container-only image, it runs steps as <strong class="text-white">host subprocesses</strong> —
+      using your already-installed Node, Bun, Python, etc. No image pull, no container spin-up,
+      no second copy of <code class="font-mono">node_modules</code>. This alone is responsible for
+      most of the speedup vs act.
+    </p>
+
+    <h3 class="text-lg font-semibold text-white mt-6 mb-2">Real <code class="font-mono">services:</code> networking</h3>
+    <p class="text-[var(--rh-muted)] leading-relaxed">
+      When your workflow does declare <code class="font-mono">services: { postgres: ... }</code>,
+      Rehearse uses the container backend, starts the service on a private Docker network,
+      wires <code class="font-mono">--network-alias postgres</code> so your job container can
+      reach it as <code class="font-mono">postgres:5432</code>, and waits for the service's
+      health check before running the first step. The published bench has a service-postgres
+      workflow that <strong class="text-white">act times out on at 360s</strong>;
+      Rehearse runs it in ~11s.
+    </p>
+
+    <h3 class="text-lg font-semibold text-white mt-6 mb-2">Watch mode</h3>
+    <p class="text-[var(--rh-muted)] leading-relaxed">
+      <code class="font-mono">rehearse watch .github/workflows/ci.yml</code> reruns the workflow
+      on every file save. Debounced and queue-coalesced — rapid edits collapse into a single
+      rerun. Pair it with a CI workflow that includes lint + typecheck + test and your editor
+      save becomes your CI trigger. <a href="/local-github-actions" class="link">Read more →</a>
+    </p>
+
+    <h3 class="text-lg font-semibold text-white mt-6 mb-2">Pre-push git hook</h3>
+    <p class="text-[var(--rh-muted)] leading-relaxed">
+      <code class="font-mono">rehearse install-hook</code> writes a
+      <code class="font-mono">.git/hooks/pre-push</code> that runs your CI workflow before
+      letting <code class="font-mono">git push</code> complete. Push only if green. The CI
+      minutes you save are real — broken pushes never reach GitHub Actions.
+    </p>
+
+    <h2 class="text-2xl font-semibold text-white mt-10 mb-4">Bench: head-to-head numbers</h2>
+    <p class="text-[var(--rh-muted)] leading-relaxed">
+      Both tools timed warm (second run, deps already on disk) on a fresh GitHub-hosted
+      <code class="font-mono">ubuntu-latest</code> runner. Same YAML, same job, same image.
+      Reproducible: <code class="font-mono">pnpm tsx bench/compare.ts --skip-cold</code>
+      from <a href="https://github.com/plsft/rehearse" class="link">github.com/plsft/rehearse</a>.
+    </p>
+
+    <div class="card mt-6 p-0 overflow-x-auto">
+      <table class="w-full text-sm font-mono">
+        <thead class="bg-white/[0.02] text-[var(--rh-muted)] text-left">
+          <tr>
+            <th class="py-3 px-5">Workflow</th>
+            <th class="py-3 px-5 text-right">Rehearse</th>
+            <th class="py-3 px-5 text-right">act</th>
+            <th class="py-3 px-5 text-right">Speedup</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-white/5 text-white/90">
+          <tr><td class="py-3 px-5">our-ci (typecheck + tests, 2 parallel jobs)</td><td class="text-right ok">12.19s</td><td class="text-right text-[var(--rh-muted)]">63.78s</td><td class="text-right ok">5.23×</td></tr>
+          <tr><td class="py-3 px-5">node-matrix [18.x, 20.x, 22.x]</td><td class="text-right ok">1.12s</td><td class="text-right text-[var(--rh-muted)]">10.07s</td><td class="text-right ok">8.99×</td></tr>
+          <tr><td class="py-3 px-5">service-postgres (postgres:16 + 4 psql steps)</td><td class="text-right ok">10.97s</td><td class="text-right err">timed out (&gt;360s)</td><td class="text-right ok">32.82×</td></tr>
+          <tr><td class="py-3 px-5">hono-bun (real OSS · honojs/hono bun job)</td><td class="text-right ok">7.58s</td><td class="text-right text-[var(--rh-muted)]">n/a (act lacks bun)</td><td class="text-right text-[var(--rh-muted)]">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="text-[var(--rh-muted)] mt-6 leading-relaxed">
+      For the 9-cell matrix workflow on a real third-party repo
+      (<a href="https://github.com/plsft/typey" class="link">plsft/typey</a>, a Bun CLI), Rehearse
+      runs the whole matrix locally in ~1.5s warm vs ~95s on GitHub Actions itself —
+      <strong class="text-white">63× faster</strong>. Detail on the <a href="/bench" class="link">bench page</a>.
+    </p>
+
+    <h2 class="text-2xl font-semibold text-white mt-10 mb-4">Migration: from act to Rehearse in 30 seconds</h2>
+    <p class="text-[var(--rh-muted)] leading-relaxed">
+      You don't need to change your YAML. Drop in:
+    </p>
+    <pre class="mt-3 font-mono text-[12.5px] text-white/90 bg-black/40 p-4 rounded border border-white/10 overflow-x-auto"><span class="comment"># Install</span>
+$ npm install -g @rehearse/runner
+
+<span class="comment"># Run any workflow that act ran</span>
+$ rehearse run .github/workflows/ci.yml
+
+<span class="comment"># Or filter to one job (same flag as act -j)</span>
+$ rehearse run .github/workflows/ci.yml --job test
+
+<span class="comment"># Or wire it into your inner loop</span>
+$ rehearse watch .github/workflows/ci.yml
+$ rehearse install-hook</pre>
+
+    <h2 class="text-2xl font-semibold text-white mt-10 mb-4">Where act is still the right call</h2>
+    <p class="text-[var(--rh-muted)] leading-relaxed">
+      Be honest about the alternative:
+    </p>
+    <ul class="text-[var(--rh-muted)] space-y-2 mt-4 list-disc list-outside pl-6">
+      <li>If you specifically need <strong class="text-white">Docker actions</strong> (<code class="font-mono">runs.using: docker</code>) — act ships them, Rehearse doesn't yet.</li>
+      <li>If you're already invested in act's <code class="font-mono">.actrc</code> + per-image overrides and don't want to relearn anything.</li>
+      <li>If you want a <strong class="text-white">single-binary Go tool</strong> instead of a Node CLI.</li>
+    </ul>
+
+    <h2 class="text-2xl font-semibold text-white mt-10 mb-4">FAQ</h2>
+
+    <div class="space-y-6 text-[var(--rh-muted)] mt-4">
+      <div>
+        <p class="text-white font-semibold">Is Rehearse a fork of act?</p>
+        <p class="mt-1">No. Different architecture, different goals. Rehearse is written in TypeScript with a separate planner / scheduler / two-backend executor; act is a single Go binary that drives Docker. They share the category but no code.</p>
+      </div>
+      <div>
+        <p class="text-white font-semibold">Can I switch between act and Rehearse on the same repo?</p>
+        <p class="mt-1">Yes. They both read the same <code class="font-mono">.github/workflows/*.yml</code> with no edits. You can run the same workflow with both tools and compare.</p>
+      </div>
+      <div>
+        <p class="text-white font-semibold">Does Rehearse support <code class="font-mono">strategy.matrix</code>?</p>
+        <p class="mt-1">Yes — with parallel execution via per-cell <code class="font-mono">git worktree</code>. Each matrix cell gets an isolated checkout so cells never race on shared workspace state. <code class="font-mono">include</code> + <code class="font-mono">exclude</code> are honored.</p>
+      </div>
+      <div>
+        <p class="text-white font-semibold">What about <code class="font-mono">actions/cache</code>?</p>
+        <p class="mt-1">Real semantics on local fs. Exact-key + restore-key longest-prefix matching. <code class="font-mono">cache-hit</code>, <code class="font-mono">cache-primary-key</code>, <code class="font-mono">cache-matched-key</code> outputs. Persistent across runs.</p>
+      </div>
+      <div>
+        <p class="text-white font-semibold">Is there a hosted version?</p>
+        <p class="mt-1">Optional. <a href="/pro" class="link">Rehearse Pro</a> is a single-tenant VM you offload to with <code class="font-mono">rehearse run --remote</code>. $49/mo (intro pricing) for 25,000 active CPU minutes. The OSS runner stays free forever — Pro is strictly additive.</p>
+      </div>
+    </div>
+
+    <hr class="my-12 border-white/10" />
+
+    <p class="text-[var(--rh-muted)] text-sm">
+      <strong class="text-white">Try it now:</strong> <code class="font-mono">npm install -g @rehearse/runner</code>
+      then <code class="font-mono">rehearse run .github/workflows/ci.yml</code> in any repo
+      with a workflow file. Should take 30 seconds.
+    </p>
+
+    <p class="text-[var(--rh-muted)] text-sm mt-3">
+      More: <a href="/local-github-actions" class="link">Run GitHub Actions locally</a> ·
+      <a href="/bench" class="link">Bench methodology</a> ·
+      <a href="/typescript-github-actions" class="link">TypeScript GitHub Actions</a> ·
+      <a href="/vs" class="link">vs other CI tools</a>
+    </p>
+  </div>
+</section>
+
+<footer class="py-14 hairline">
+  <div class="max-w-6xl mx-auto px-5">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-10">
+      <div>
+        <div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Product</div>
+        <ul class="space-y-2 font-mono text-[13px]">
+          <li><a href="/packages" class="nav-link">Packages</a></li>
+          <li><a href="/docs" class="nav-link">Docs</a></li>
+          <li><a href="/bench" class="nav-link">Bench</a></li>
+          <li><a href="/vs" class="nav-link">vs competitors</a></li>
+          <li><a href="/typescript-github-actions" class="nav-link">TS GitHub Actions</a></li>
+          <li><a href="/local-github-actions" class="nav-link">Run GH Actions locally</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Pro</div>
+        <ul class="space-y-2 font-mono text-[13px]">
+          <li><a href="/pro" class="nav-link">Overview</a></li>
+          <li><a href="/pricing" class="nav-link">Pricing</a></li>
+          <li><a href="https://buy.stripe.com/6oU9AMdTI8VUdZH7ehgjC0r" class="nav-link">Buy 25k block — $49</a></li>
+          <li><a href="https://pro.rehearse.sh/sign-in" class="nav-link">Sign in</a></li>
+          <li><a href="/security" class="nav-link">Security</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Open source</div>
+        <ul class="space-y-2 font-mono text-[13px]">
+          <li><a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a></li>
+          <li><a href="https://www.npmjs.com/package/@rehearse/runner" class="nav-link">npm</a></li>
+          <li><a href="https://github.com/plsft/rehearse/issues" class="nav-link">Issues</a></li>
+          <li><a href="/changelog" class="nav-link">Changelog</a></li>
+          <li><a href="/llms.txt" class="nav-link">llms.txt</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Company</div>
+        <ul class="space-y-2 font-mono text-[13px]">
+          <li><a href="/" class="nav-link">Home</a></li>
+          <li><a href="/blog" class="nav-link">Blog</a></li>
+          <li><a href="/customers" class="nav-link">Customers</a></li>
+          <li><a href="/about" class="nav-link">About</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 pt-6 border-t border-white/5">
+      <div class="flex items-center gap-2 font-mono text-sm text-[var(--rh-muted)]">
+        <span class="logo-mark logo-mark-sm text-[var(--rh-accent)]"></span>
+        <span class="text-white">rehearse</span> · by <a href="https://github.com/plsft" class="link">plsft</a>
+      </div>
+      <div class="font-mono text-[11px] text-[var(--rh-muted)]">
+        <span class="ok">●</span> v0.5.0 · Apache 2.0
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
