@@ -242,6 +242,61 @@ async function runRemote(args: {
   let finalExit = -1;
   let finalDuration = 0;
   const phaseStart: Record<string, number> = {};
+  // Phase spinner: animates `[remote] ⠋ <stage>… X.Xs` during phases
+  // where the daemon is otherwise silent (clone fetch, npx install).
+  // Pauses automatically when output streams in (we drop the spinner
+  // line and the next chunk of output replaces it). Resumes if no
+  // new output appears for >1s.
+  const stderrIsTty = process.stderr.isTTY === true;
+  const SPINNER_FRAMES = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+  let phaseSpinnerTimer: NodeJS.Timeout | null = null;
+  let phaseSpinnerFrame = 0;
+  let activePhase: string | null = null;
+  let lastOutputAt = 0;
+  let spinnerLineDrawn = false;
+  const stopPhaseSpinner = () => {
+    if (phaseSpinnerTimer) {
+      clearInterval(phaseSpinnerTimer);
+      phaseSpinnerTimer = null;
+    }
+    if (spinnerLineDrawn) {
+      process.stderr.write('\r\x1B[K');
+      spinnerLineDrawn = false;
+    }
+  };
+  const tickPhaseSpinner = () => {
+    if (!stderrIsTty || !activePhase) return;
+    // If an output line came through recently, skip this frame so we
+    // don't fight the streaming output for cursor position.
+    if (Date.now() - lastOutputAt < 800) {
+      if (spinnerLineDrawn) {
+        process.stderr.write('\r\x1B[K');
+        spinnerLineDrawn = false;
+      }
+      return;
+    }
+    phaseSpinnerFrame = (phaseSpinnerFrame + 1) % SPINNER_FRAMES.length;
+    const elapsed = ((Date.now() - (phaseStart[activePhase] ?? Date.now())) / 1000).toFixed(1);
+    process.stderr.write(
+      `\r\x1B[K${pc.dim(`[remote] ${SPINNER_FRAMES[phaseSpinnerFrame]} ${activePhase}… ${elapsed}s`)}`,
+    );
+    spinnerLineDrawn = true;
+  };
+  const startPhaseSpinner = (stage: string) => {
+    stopPhaseSpinner();
+    activePhase = stage;
+    phaseSpinnerFrame = 0;
+    if (stderrIsTty) {
+      phaseSpinnerTimer = setInterval(tickPhaseSpinner, 100).unref();
+    }
+  };
+  const noteOutput = () => {
+    lastOutputAt = Date.now();
+    if (spinnerLineDrawn) {
+      process.stderr.write('\r\x1B[K');
+      spinnerLineDrawn = false;
+    }
+  };
   while (true) {
     const { value, done } = await reader.read();
     if (done) break;
@@ -259,23 +314,34 @@ async function runRemote(args: {
         status?: string;
       };
       try { obj = JSON.parse(line); } catch { continue; }
-      if (obj.t === 'out' && obj.d !== undefined) process.stdout.write(obj.d + '\n');
-      else if (obj.t === 'err' && obj.d !== undefined) process.stderr.write(obj.d + '\n');
+      if (obj.t === 'out' && obj.d !== undefined) {
+        noteOutput();
+        process.stdout.write(obj.d + '\n');
+      }
+      else if (obj.t === 'err' && obj.d !== undefined) {
+        noteOutput();
+        process.stderr.write(obj.d + '\n');
+      }
       else if (obj.t === 'phase' && obj.stage) {
         // Daemon-emitted progress for the clone / install / run pipeline.
-        // Render `[remote] <stage>: starting` and `[remote] <stage>: done (Xs)`
-        // so the user sees what's happening between long-silent operations
-        // (npx fetching @rehearse/cli, npm install on a 716-package repo).
+        // Animated spinner shows during the silent gaps (npx fetching the
+        // package, daemon waiting on git). The spinner pauses while output
+        // streams (see noteOutput) so it doesn't fight cursor position.
         if (obj.status === 'start') {
           phaseStart[obj.stage] = Date.now();
           process.stderr.write(pc.dim(`[remote] ${obj.stage}…\n`));
+          startPhaseSpinner(obj.stage);
         } else if (obj.status === 'done') {
+          stopPhaseSpinner();
+          activePhase = null;
           const ms = obj.duration_ms ?? (Date.now() - (phaseStart[obj.stage] ?? Date.now()));
           const sec = (ms / 1000).toFixed(1);
           process.stderr.write(pc.dim(`[remote] ${obj.stage} done (${sec}s)\n`));
         }
       }
       else if (obj.t === 'done') {
+        stopPhaseSpinner();
+        activePhase = null;
         finalExit = typeof obj.exit === 'number' ? obj.exit : -1;
         finalDuration = typeof obj.duration_ms === 'number' ? obj.duration_ms : 0;
       }

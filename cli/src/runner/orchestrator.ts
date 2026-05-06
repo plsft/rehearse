@@ -69,8 +69,39 @@ export async function run(options: RunOptions): Promise<RunResult> {
   // breaks the ownership (a different job's event, job-start, summary)
   // calls flushInflight() to push the cursor down to a clean line first.
   let inflightJobId: string | null = null;
+  // Animated spinner for in-flight steps. We repaint the line every ~100ms
+  // with the next frame + elapsed time so the user can see the step is
+  // progressing even while output is captured (v0.6.3+ behavior). TTY only.
+  const SPINNER_FRAMES = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+  let spinnerTimer: NodeJS.Timeout | null = null;
+  let spinnerFrame = 0;
+  let spinnerLabel = '';
+  let spinnerStartedAt = 0;
+  let spinnerStepCounter = '';
+  const stopSpinner = () => {
+    if (spinnerTimer) {
+      clearInterval(spinnerTimer);
+      spinnerTimer = null;
+    }
+  };
+  const startSpinner = (label: string, stepCounter: string) => {
+    stopSpinner();
+    spinnerLabel = label;
+    spinnerStepCounter = stepCounter;
+    spinnerStartedAt = Date.now();
+    spinnerFrame = 0;
+    spinnerTimer = setInterval(() => {
+      spinnerFrame = (spinnerFrame + 1) % SPINNER_FRAMES.length;
+      const elapsed = Date.now() - spinnerStartedAt;
+      const elapsedStr = elapsed < 1000 ? `${elapsed}ms` : `${(elapsed / 1000).toFixed(1)}s`;
+      process.stdout.write(
+        `\r\x1B[K  ${spinnerStepCounter}${pc.yellow(SPINNER_FRAMES[spinnerFrame]!)} ${padLabel(spinnerLabel)} ${pc.gray(elapsedStr)}`,
+      );
+    }, 100).unref();
+  };
   const flushInflight = () => {
     if (inflightJobId === null) return;
+    stopSpinner();
     process.stdout.write('\n');
     inflightJobId = null;
   };
@@ -96,11 +127,21 @@ export async function run(options: RunOptions): Promise<RunResult> {
         case 'step-start': {
           if (!isTty) break;        // non-TTY: skip the pre-line — final line says it all
           flushInflight();           // clear any other job's running… line first
-          process.stdout.write(`  ${pc.yellow('▸')} ${padLabel(e.step.label)} ${pc.gray('running…')}`);
+          // Step counter `[2/4]` so the user sees position within the job.
+          // Total comes from the planned steps; index is per-step.
+          const total = e.job.steps.length;
+          const stepCounter = total > 1
+            ? pc.gray(`[${e.step.index + 1}/${total}] `)
+            : '';
+          process.stdout.write(`  ${stepCounter}${pc.yellow(SPINNER_FRAMES[0]!)} ${padLabel(e.step.label)} ${pc.gray('0ms')}`);
           inflightJobId = e.job.id;
+          startSpinner(e.step.label, stepCounter);
           break;
         }
         case 'step-end': {
+          // Stop the animation BEFORE writing the final line so it can't
+          // re-paint over our terminal output mid-write.
+          stopSpinner();
           // If our own step-start is still on the cursor line, erase it.
           // Otherwise push to a fresh line.
           if (isTty && inflightJobId === e.job.id) {
@@ -109,6 +150,13 @@ export async function run(options: RunOptions): Promise<RunResult> {
           } else {
             flushInflight();
           }
+          // Step counter `[N/M]` for jobs with >1 step. Visible on both
+          // the in-flight spinner line AND the final ✓/✗/⊘ line so the
+          // user sees position regardless of TTY mode.
+          const total = e.job.steps.length;
+          const stepCounter = total > 1
+            ? pc.gray(`[${e.step.index + 1}/${total}] `)
+            : '';
           // Three render modes, matching the simulated demo on rehearse.sh:
           //   - skipped:                       ⊘ <label>  <reason>
           //   - host-shortcut (no-op success): ⊘ <label>  <reason>
@@ -117,9 +165,9 @@ export async function run(options: RunOptions): Promise<RunResult> {
             && e.result.durationMs < 5
             && !!e.result.reason;
           if (e.result.status === 'skipped' || isHostShortcut) {
-            console.log(`  ${pc.gray('⊘')} ${padLabel(e.step.label)} ${pc.gray(e.result.reason ?? 'skipped')}`);
+            console.log(`  ${stepCounter}${pc.gray('⊘')} ${padLabel(e.step.label)} ${pc.gray(e.result.reason ?? 'skipped')}`);
           } else {
-            console.log(`  ${statusMark(e.result.status)} ${padLabel(e.step.label)} ${pc.gray(fmtMs(e.result.durationMs))}`);
+            console.log(`  ${stepCounter}${statusMark(e.result.status)} ${padLabel(e.step.label)} ${pc.gray(fmtMs(e.result.durationMs))}`);
           }
           // Dump captured stdout/stderr ONLY on failure (success runs stay
           // clean). The host backend buffers output by default; --verbose
