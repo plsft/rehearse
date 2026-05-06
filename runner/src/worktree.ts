@@ -6,9 +6,13 @@
  * `coverage/`, `dist/`, etc. With a `git worktree add --detach <path>`
  * each cell gets its own checkout of HEAD, isolated from siblings.
  *
- * To keep cells fast, `node_modules` (and similar dep dirs) is symlinked
- * from the parent repo into each worktree. That gives the cell access to
- * the dev's installed deps without re-running `pnpm install`.
+ * Note on `node_modules`: NOT symlinked back to the parent. Doing so
+ * lets parallel `npm install` / `yarn install` cells race on writes to
+ * the SAME tree (the symlink resolves to one shared location). Each
+ * cell installs into its own worktree's node_modules instead, paired
+ * with the per-cell package-manager scratch caches in host.ts. The
+ * `.runner/` symlink is preserved so artifacts + cache directories ARE
+ * shared (cache layout itself does the per-cell vs shared isolation).
  */
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readdirSync, rmSync, statSync, symlinkSync } from 'node:fs';
@@ -33,11 +37,17 @@ export interface WorktreeHandle {
 }
 
 const DEFAULT_SYMLINK = [
-  'node_modules',
-  '.pnpm-store',
-  '.bun-install',
+  // Build-artifact dirs that are write-rare and read-heavy across cells.
+  // `.turbo` uses content-addressed remote-cache semantics — safe to share.
   '.turbo',
-  '.runner', // share cache + artifacts across cells
+  // Shared artifact + cache root. Per-cell vs shared layout INSIDE this
+  // dir is enforced by host.ts (per-cell npm/yarn/pip, shared pnpm/bun/cargo).
+  '.runner',
+  // Note: `node_modules`, `.pnpm-store`, `.bun-install` were here historically
+  // to skip reinstall, but they raced on parallel `npm install` writes.
+  // Each cell now installs into its own worktree's node_modules; the shared
+  // content-addressed package-manager caches under `.runner/cache/_shared/`
+  // give the same warm-second-run benefit without the race.
 ];
 
 export function isGitRepo(dir: string): boolean {
@@ -48,11 +58,17 @@ export function isGitRepo(dir: string): boolean {
 export function createWorktree(opts: WorktreeOptions): WorktreeHandle {
   const safeId = opts.jobId.replace(/[^A-Za-z0-9_.-]+/g, '_');
   const path = resolve(opts.repoRoot, '.runner', 'worktrees', safeId);
-  // If a previous run left a stale worktree behind, drop it before creating.
+  // Stale-state cleanup. Three failure modes git can leave behind:
+  //  1. Path exists on disk + registered.
+  //  2. Path missing on disk + still registered (e.g. user `rm -rf .runner/`).
+  //  3. Path exists but registration is corrupt.
+  // `git worktree remove --force` is idempotent and handles all three; if it
+  // returns nonzero we fall through to `prune` which sweeps the registry.
   if (existsSync(path)) {
-    spawnSync('git', ['worktree', 'remove', '--force', path], { cwd: opts.repoRoot });
     rmSync(path, { recursive: true, force: true });
   }
+  spawnSync('git', ['worktree', 'remove', '--force', path], { cwd: opts.repoRoot });
+  spawnSync('git', ['worktree', 'prune'], { cwd: opts.repoRoot });
   mkdirSync(dirname(path), { recursive: true });
 
   const r = spawnSync('git', ['worktree', 'add', '--detach', path, 'HEAD'], {

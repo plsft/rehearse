@@ -5,7 +5,7 @@
  * `container:` block, runs-on label matches the host OS family or is generic.
  */
 import { spawn, spawnSync } from 'node:child_process';
-import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { relative, resolve } from 'node:path';
 import { performance } from 'node:perf_hooks';
@@ -13,6 +13,40 @@ import type { Backend, JobSession, PrepareArgs, PlannedStep, StepResult } from '
 import { isJsActionUses, parseGithubOutput, runJsAction } from '../js-action.js';
 import { runShim, hasShim } from '../shims/index.js';
 import { createWorktree, isGitRepo } from '../worktree.js';
+
+/**
+ * Per-cell scratch caches for matrix runs. Eliminates package-manager
+ * races on the user's global cache. Canonical case: `npm install` on
+ * Windows races on `~/.npm/_cacache` tar atomic-rename when 9 cells
+ * fire in parallel — we redirect each cell's npm cache to its own dir.
+ *
+ * Only redirected managers are the ones whose cache CAN race:
+ *   - npm  (cacache uses tar + atomic-rename, races on Windows)
+ *   - yarn classic (similar tar-based cache)
+ *   - pip  (wheels cache races on parallel wheel-build writes)
+ *
+ * pnpm / bun / cargo / Go are content-addressed and parallel-safe — we
+ * leave them on the user's global cache so all cells share the same
+ * warm store with zero extra disk and zero new download.
+ *
+ * Per-cell paths are deterministic from `<repoRoot>/.runner/cache/<cellId>/`
+ * so caches warm across runs of the same matrix configuration. Only
+ * activated when the job has a matrix cell; single-job runs keep the
+ * user's global cache for drop-in compat.
+ */
+function setupCellCaches(repoRoot: string, jobId: string): Record<string, string> {
+  const safeId = jobId.replace(/[^A-Za-z0-9_.-]+/g, '_');
+  const root = resolve(repoRoot, '.runner', 'cache', safeId);
+  const npmDir  = resolve(root, 'npm');
+  const yarnDir = resolve(root, 'yarn');
+  const pipDir  = resolve(root, 'pip');
+  for (const dir of [npmDir, yarnDir, pipDir]) mkdirSync(dir, { recursive: true });
+  return {
+    npm_config_cache:  npmDir,
+    YARN_CACHE_FOLDER: yarnDir,
+    PIP_CACHE_DIR:     pipDir,
+  };
+}
 
 export interface HostBackendOptions {
   /**
@@ -63,11 +97,22 @@ export class HostBackend implements Backend {
       }
     }
 
+    // Per-cell scratch caches for matrix runs (matrix-only — single
+    // jobs keep using the user's global cache for drop-in compat).
+    // Race-prone managers (npm/yarn/pip) get isolated per-cell dirs;
+    // content-addressed managers (pnpm/bun/cargo/Go) share a workflow-
+    // wide dir for warm-cache reuse across cells. Eliminates the
+    // `~/.npm/_cacache` tar-rename race on Windows + matrix.
+    const sessionEnv: Record<string, string> = { ...args.job.env };
+    if (args.job.matrixCell !== undefined) {
+      Object.assign(sessionEnv, setupCellCaches(args.hostCwd, args.jobId));
+    }
+
     return {
       jobId: args.jobId,
       hostCwd: args.hostCwd,
       workdir,
-      env: args.job.env,
+      env: sessionEnv,
       tempDir,
       worktree,
     };
