@@ -1,6 +1,6 @@
 {
   "name": "@rehearse/ci",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "Type-safe GitHub Actions pipelines in TypeScript",
   "license": "Apache-2.0",
   "type": "module",
