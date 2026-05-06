@@ -115,6 +115,8 @@ program
         repoUrlOverride: opts.repoUrl,
         repoRefOverride: opts.repoRef,
         repoSubdirOverride: opts.repoSubdir,
+        jobFilter: opts.job,
+        matrixFilter: opts.matrix && Object.keys(opts.matrix).length > 0 ? opts.matrix : undefined,
         env,
       });
       process.exit(code);
@@ -162,6 +164,10 @@ async function runRemote(args: {
   repoUrlOverride?: string;
   repoRefOverride?: string;
   repoSubdirOverride?: string;
+  /** --job <name> forwarded to the VM-side `rh run`. */
+  jobFilter?: string;
+  /** --matrix <k=v>(,..) forwarded to the VM-side `rh run`. */
+  matrixFilter?: Record<string, string>;
   /**
    * Env vars (typically loaded from --env-file). Shipped to the VM where
    * they become BOTH process env AND `${{ secrets.* }}` for workflow
@@ -219,6 +225,8 @@ async function runRemote(args: {
       repo_ref: repoRef ?? undefined,
       repo_subdir: repoSubdir ?? undefined,
       env: args.env && Object.keys(args.env).length > 0 ? args.env : undefined,
+      job_filter: args.jobFilter,
+      matrix_filter: args.matrixFilter,
     }),
   });
   if (!res.ok || !res.body) {
@@ -233,6 +241,7 @@ async function runRemote(args: {
   let buf = '';
   let finalExit = -1;
   let finalDuration = 0;
+  const phaseStart: Record<string, number> = {};
   while (true) {
     const { value, done } = await reader.read();
     if (done) break;
@@ -241,10 +250,31 @@ async function runRemote(args: {
     buf = lines.pop() ?? '';
     for (const line of lines) {
       if (!line) continue;
-      let obj: { t?: string; d?: string; exit?: number; duration_ms?: number };
+      let obj: {
+        t?: string;
+        d?: string;
+        exit?: number;
+        duration_ms?: number;
+        stage?: string;
+        status?: string;
+      };
       try { obj = JSON.parse(line); } catch { continue; }
       if (obj.t === 'out' && obj.d !== undefined) process.stdout.write(obj.d + '\n');
       else if (obj.t === 'err' && obj.d !== undefined) process.stderr.write(obj.d + '\n');
+      else if (obj.t === 'phase' && obj.stage) {
+        // Daemon-emitted progress for the clone / install / run pipeline.
+        // Render `[remote] <stage>: starting` and `[remote] <stage>: done (Xs)`
+        // so the user sees what's happening between long-silent operations
+        // (npx fetching @rehearse/cli, npm install on a 716-package repo).
+        if (obj.status === 'start') {
+          phaseStart[obj.stage] = Date.now();
+          process.stderr.write(pc.dim(`[remote] ${obj.stage}…\n`));
+        } else if (obj.status === 'done') {
+          const ms = obj.duration_ms ?? (Date.now() - (phaseStart[obj.stage] ?? Date.now()));
+          const sec = (ms / 1000).toFixed(1);
+          process.stderr.write(pc.dim(`[remote] ${obj.stage} done (${sec}s)\n`));
+        }
+      }
       else if (obj.t === 'done') {
         finalExit = typeof obj.exit === 'number' ? obj.exit : -1;
         finalDuration = typeof obj.duration_ms === 'number' ? obj.duration_ms : 0;
