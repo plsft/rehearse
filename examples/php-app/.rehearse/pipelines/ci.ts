@@ -3,7 +3,7 @@
  *
  * Demonstrates:
  *   - shivammathur/setup-php@v2 — a JavaScript action (runs.using: node20).
- *     @rehearse/runner auto-clones the action at the requested ref into
+ *     @rehearse/cli auto-clones the action at the requested ref into
  *     .runner/actions/<slug>/ on first use, then executes its main.js
  *     under the standard INPUT_* / GITHUB_OUTPUT contract. No host PHP
  *     pre-install required — the action provisions PHP itself.

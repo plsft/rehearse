@@ -3,7 +3,7 @@
  *
  * Demonstrates:
  *   - services: { postgres: ... } — Postgres starts as a service container
- *     on a private Docker network. @rehearse/runner wires `--network-alias
+ *     on a private Docker network. @rehearse/cli wires `--network-alias
  *     postgres` so the test job reaches it as `postgres:5432`.
  *   - container backend (auto-selected because services: is present)
  *   - actions/cache for pip

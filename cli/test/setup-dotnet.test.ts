@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { mkdtempSync, mkdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { setupDotnetShim } from '../src/shims/setup-dotnet.js';
-import type { JobSession, PlannedStep } from '../src/types.js';
+import { setupDotnetShim } from '../src/runner/shims/setup-dotnet.js';
+import type { JobSession, PlannedStep } from '../src/runner/types.js';
 
 function mkStep(input: Record<string, unknown> = {}): PlannedStep {
   return {

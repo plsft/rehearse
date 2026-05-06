@@ -45,7 +45,7 @@
     <pre class="terminal">export REHEARSE_TOKEN=rh_pro_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</pre>
 
     <h2 class="text-xl font-semibold mt-10 mb-3">03 — run remote</h2>
-    <pre class="terminal">rehearse run --remote .github/workflows/ci.yml</pre>
+    <pre class="terminal">rh run --remote .github/workflows/ci.yml</pre>
     <p class="text-[var(--rh-muted)] mt-3 text-sm">The runner POSTs your workflow YAML to <code class="font-mono">api.rehearse.sh/v1/runs/stream</code>, which forwards to your VM. The VM executes the same YAML you'd run locally and streams logs back line-by-line as the run progresses.</p>
     <p class="text-[var(--rh-muted)] mt-3 text-sm">Drop the <code class="font-mono">--remote</code> flag and you're back to local execution. Same workflow file, same output format. No lock-in.</p>
 

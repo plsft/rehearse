@@ -12,8 +12,8 @@ is the OG in this space; we share the category but ship more features
 and the hosted-offload story). It reads your existing
 `.github/workflows/*.yml` and executes it three ways:
 
-1. **Locally** (`rehearse run`) — host subprocess or container backend, sub-second on the typey demo workflow
-2. **Pro VM** (`rehearse run --remote`) — single-tenant VM with whole-rootfs persistence, ~5s on the same workflow
+1. **Locally** (`rh run`) — host subprocess or container backend, sub-second on the typey demo workflow
+2. **Pro VM** (`rh run --remote`) — single-tenant VM with whole-rootfs persistence, ~5s on the same workflow
 3. **GitHub Actions** (`git push`) — same compiled YAML, no Rehearse runtime needed, ~95s for the same workflow
 
 Same source, same output, no lock-in. Free, Apache 2.0,
@@ -30,12 +30,12 @@ disappears, your CI keeps running on a laptop without them.
 ## Quick start
 
 ```bash
-npm install -g @rehearse/runner
+npm install -g @rehearse/cli
 
 # inside any repo with a .github/workflows/*.yml
-rehearse run .github/workflows/ci.yml
-rehearse watch .github/workflows/ci.yml          # re-run on save
-rehearse install-hook                            # pre-push git hook
+rh run .github/workflows/ci.yml
+rh watch .github/workflows/ci.yml          # re-run on save
+rh install-hook                            # pre-push git hook
 ```
 
 ## Numbers
@@ -48,8 +48,8 @@ CLI repo (not a fixture we control):
 
 | Target | Wall | vs GH |
 | --- | ---: | ---: |
-| **Local** (`rehearse run`, warm) | **1.5s** | **63× faster** |
-| **Pro** (`rehearse run --remote`, warm) | **5s** | **19× faster** |
+| **Local** (`rh run`, warm) | **1.5s** | **63× faster** |
+| **Pro** (`rh run --remote`, warm) | **5s** | **19× faster** |
 | **GitHub Actions** (3 OS × 3 Bun, 9 cells) | 95s | baseline |
 
 Workflow exercises checkout + setup-bun + install + format + lint + tsc
@@ -76,13 +76,12 @@ Per-OS numbers and full methodology in
 ## Repo layout
 
 ```
-runner/        — @rehearse/runner    — the CLI (binary: `rehearse`)
-ts-ci/         — @rehearse/ci         — author workflows in TypeScript
-git-engine/    — @rehearse/git-core   — pure-TypeScript git protocol
-cli/           — @rehearse/cli        — `rh` CLI (compile / convert TS pipelines)
+cli/           — @rehearse/cli   — single binary `rh` (runner + TS-pipeline ergonomics, all-in-one)
+ts-ci/         — @rehearse/ci    — author workflows in TypeScript (library)
+git-engine/    — internal-only since v0.6.0 — pure-TypeScript git protocol
 bench/         — runner-vs-act bench harness + results
 poc/           — fixture workflows used by the bench harness (vite/hono/etc.)
-.rehearse/      — TypeScript source for this repo's own CI
+.rehearse/     — TypeScript source for this repo's own CI
 .github/       — generated workflow YAML (do not edit by hand)
 ```
 
@@ -98,7 +97,7 @@ poc/           — fixture workflows used by the bench harness (vite/hono/etc.)
 - Local composite actions (`./.github/actions/*`) AND remote (`org/repo[/sub]@ref` — auto-cloned)
 - Local reusable workflows (`uses: ./.github/workflows/foo.yml`) with `with:` + `secrets: inherit`
 - `${{ matrix… }}`, `${{ env… }}`, `${{ secrets… }}`, `${{ vars… }}`, `${{ runner… }}`, `${{ needs.<job>.outputs.<n> }}`, `${{ steps.<id>.outputs.<n> }}`, `${{ github.* }}`
-- `rehearse run --remote` ships the workflow to a Pro VM (auto-detects git origin + SHA + monorepo subdir; ships `--env-file` secrets to `${{ secrets.* }}`)
+- `rh run --remote` ships the workflow to a Pro VM (auto-detects git origin + SHA + monorepo subdir; ships `--env-file` secrets to `${{ secrets.* }}`)
 
 ## Known gaps
 
@@ -116,8 +115,8 @@ Roadmap lives on the GitHub issues for the repo.
 pnpm install
 pnpm turbo typecheck       # passes across all 5 workspace packages
 pnpm turbo test             # 323 tests passing across all packages
-pnpm --filter @rehearse/runner build
-node runner/dist/cli.js run .github/workflows/ci.yml
+pnpm --filter @rehearse/cli build
+node cli/dist/index.js run .github/workflows/ci.yml
 ```
 
 To reproduce the benchmark vs `act`:
@@ -134,10 +133,8 @@ All packages are Apache 2.0, published under the `@rehearse` npm scope.
 
 | Package | Path | What it does |
 | --- | --- | --- |
-| `@rehearse/runner` | [`runner/`](runner) | The local-first runner CLI |
-| `@rehearse/ci` | [`ts-ci/`](ts-ci) | Author workflows in TypeScript |
-| `@rehearse/git-core` | [`git-engine/`](git-engine) | Pure-TypeScript git protocol |
-| `@rehearse/cli` | [`cli/`](cli) | `rh` — compile / convert TS pipelines |
+| `@rehearse/cli` | [`cli/`](cli) | Single binary `rh` — local runner + TS-pipeline CLI |
+| `@rehearse/ci` | [`ts-ci/`](ts-ci) | Author workflows in TypeScript (library) |
 
 ## Releases
 
@@ -165,7 +162,7 @@ pnpm release patch --dry
 
 What the workflow does on every `v*.*.*` push:
 
-| Tag form | npm `dist-tag` | GitHub Release | `npm install @rehearse/runner` resolves to |
+| Tag form | npm `dist-tag` | GitHub Release | `npm install @rehearse/cli` resolves to |
 | --- | --- | --- | --- |
 | `v0.2.0` | `latest` | marked `--latest` | `0.2.0` |
 | `v0.2.0-next.0` | `next` | marked `--prerelease` | (unchanged; `@next` resolves to it) |
@@ -175,7 +172,7 @@ What the workflow does on every `v*.*.*` push:
 Try a prerelease without affecting `latest`:
 
 ```bash
-npm install @rehearse/runner@next
+npm install @rehearse/cli@next
 ```
 
 GitHub Release notes are auto-generated by

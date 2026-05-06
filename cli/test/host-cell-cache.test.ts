@@ -10,8 +10,8 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { existsSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
-import { HostBackend } from '../src/backends/host.js';
-import type { PlannedJob } from '../src/types.js';
+import { HostBackend } from '../src/runner/backends/host.js';
+import type { PlannedJob } from '../src/runner/types.js';
 
 const tempRoots: string[] = [];
 function mkRoot(): string {

@@ -92,12 +92,12 @@ cd examples/dotnet-app
 dotnet --list-sdks
 
 # Install the Rehearse toolchain
-npm install -g @rehearse/runner @rehearse/cli
+npm install -g @rehearse/cli
 npm install                  # gets @rehearse/ci as a devDep for rh
 
 # Compile + run
 rh ci compile
-rehearse run .github/workflows/ci.yml
+rh run .github/workflows/ci.yml
 ```
 
 Expected: two matrix cells (`framework=net8.0` and `framework=net9.0`)
@@ -108,7 +108,7 @@ hits across runs.
 
 ## Why setup-dotnet is shimmed (and what that means)
 
-`@rehearse/runner` ships a no-op shim for `actions/setup-dotnet` because
+`@rehearse/cli` ships a no-op shim for `actions/setup-dotnet` because
 on a developer machine, you almost certainly already have a `dotnet` on
 PATH — re-installing the SDK on every run would be slow and pointless.
 The shim returns success immediately and lets the rest of the workflow

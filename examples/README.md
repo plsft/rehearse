@@ -2,7 +2,7 @@
 
 Five small, self-contained sample projects demonstrating real CI pipelines
 authored in TypeScript with `@rehearse/ci`, runnable locally with
-`@rehearse/runner`.
+`@rehearse/cli`.
 
 | Example | Stack | What it shows |
 | --- | --- | --- |
@@ -24,20 +24,20 @@ pnpm install
 
 # install the rehearse toolchain locally to this example
 npm install -D @rehearse/ci
-npm install -g @rehearse/runner @rehearse/cli
+npm install -g @rehearse/cli
 
 # regenerate the compiled YAML from the TypeScript pipeline
 rh ci compile
 
 # run the workflow on your laptop
-rehearse run .github/workflows/ci.yml
+rh run .github/workflows/ci.yml
 ```
 
-That's the loop: edit the TS pipeline → `rh ci compile` → `rehearse run`.
+That's the loop: edit the TS pipeline → `rh ci compile` → `rh run`.
 For watch-mode iteration during dev:
 
 ```bash
-rehearse watch .github/workflows/ci.yml
+rh watch .github/workflows/ci.yml
 ```
 
 ## Pre-generated YAML is committed

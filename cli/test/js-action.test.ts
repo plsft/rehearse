@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isJsActionUses, parseGithubOutput } from '../src/js-action.js';
+import { isJsActionUses, parseGithubOutput } from '../src/runner/js-action.js';
 
 describe('isJsActionUses', () => {
   it('matches owner/repo@ref', () => {

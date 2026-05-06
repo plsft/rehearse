@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { versionMatches } from '../src/shims/setup-node.js';
+import { versionMatches } from '../src/runner/shims/setup-node.js';
 
 describe('versionMatches', () => {
   it('exact match', () => {

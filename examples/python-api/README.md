@@ -16,7 +16,7 @@ then runs `pytest`.
 | Python preset | `python.setup('3.12')` → `actions/setup-python@v5` |
 
 This is the workflow class **`act` doesn't complete** — it times out at 360s
-on Linux and Windows GH-runners. `@rehearse/runner` finishes it in ~12s.
+on Linux and Windows GH-runners. `@rehearse/cli` finishes it in ~12s.
 
 ## Files
 
@@ -71,12 +71,12 @@ cd examples/python-api
 docker version
 
 # Install the Rehearse toolchain
-npm install -g @rehearse/runner @rehearse/cli
+npm install -g @rehearse/cli
 npm install                  # gets @rehearse/ci as a devDep
 
 # Compile + run
 rh ci compile
-rehearse run .github/workflows/ci.yml --backend container
+rh run .github/workflows/ci.yml --backend container
 ```
 
 Expected: ~10–15s warm. The runner pulls `postgres:16-alpine`, starts it

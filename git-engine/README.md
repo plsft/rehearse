@@ -21,7 +21,7 @@ scratch in TypeScript so it works without one.
 [![Source](https://img.shields.io/badge/source-plsft%2Frehearse-22c55e)](https://github.com/plsft/rehearse)
 
 Standalone library — install it directly when you need git inside a
-sandboxed JS runtime. Ships alongside [`@rehearse/runner`](https://www.npmjs.com/package/@rehearse/runner)
+sandboxed JS runtime. Ships alongside [`@rehearse/cli`](https://www.npmjs.com/package/@rehearse/cli)
 as the foundation for future in-process checkout (the runner currently
 no-ops `actions/checkout` for local execution since `cwd` is already
 the repo, and uses native `git` on the Pro VM).

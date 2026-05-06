@@ -40,10 +40,13 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, '..');
 
+// Public packages bumped + published in lockstep. As of v0.6.0:
+//   - @rehearse/cli — single binary `rh` (was @rehearse/cli + @rehearse/cli)
+//   - @rehearse/ci  — TS→YAML SDK
+// Removed from public release: @rehearse/cli (folded into cli),
+// @rehearse/git-core (kept private; consumers use the cli internals).
 const PACKAGES = [
-  'runner/package.json',
   'ts-ci/package.json',
-  'git-engine/package.json',
   'cli/package.json',
 ];
 

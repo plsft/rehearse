@@ -3,7 +3,7 @@
  *
  * Demonstrates:
  *   - matrix across [18.x, 20.x, 22.x] — runs in parallel via per-cell
- *     git worktree when executed by @rehearse/runner
+ *     git worktree when executed by @rehearse/cli
  *   - actions/cache for the npm install, keyed on package-lock.json
  *   - upload-artifact for coverage reports
  */

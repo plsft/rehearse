@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { evalBody, evalCondition, evalExpr } from '../src/expression.js';
-import type { ExpressionContext } from '../src/types.js';
+import { evalBody, evalCondition, evalExpr } from '../src/runner/expression.js';
+import type { ExpressionContext } from '../src/runner/types.js';
 
 const baseCtx = (): ExpressionContext => ({
   matrix: { node: '20.x', os: 'ubuntu-latest' },

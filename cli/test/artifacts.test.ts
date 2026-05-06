@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { LocalArtifacts, parseArtifactPaths } from '../src/artifacts.js';
+import { LocalArtifacts, parseArtifactPaths } from '../src/runner/artifacts.js';
 
 let cwd: string;
 let store: LocalArtifacts;

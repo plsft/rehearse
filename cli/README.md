@@ -12,11 +12,11 @@ Six commands cover the full workflow:
 - `rh ci convert <yaml>` — **YAML → TypeScript migration in one command** (the killer feature for adopting the SDK on existing repos)
 - `rh ci compile` — TypeScript → standard GitHub Actions YAML
 - `rh ci validate` — type-check pipelines without writing output
-- `rh ci watch` — recompile on save (pair with `rehearse watch` for the inner loop)
+- `rh ci watch` — recompile on save (pair with `rh watch` for the inner loop)
 - `rh ci estimate` — show GitHub-hosted CI cost per run + per month
 
-This pairs with [`@rehearse/runner`](https://www.npmjs.com/package/@rehearse/runner)
-(binary: `rehearse`) for local execution. Together they give you CI in
+This pairs with [`@rehearse/cli`](https://www.npmjs.com/package/@rehearse/cli)
+(binary: `rh`) for local execution. Together they give you CI in
 TypeScript that runs on your laptop, on a Pro VM, and on real GitHub
 Actions — same source, three execution targets, no lock-in. See
 [rehearse.sh/vs](https://rehearse.sh/vs) for the comparison vs
@@ -29,7 +29,7 @@ hosted-runner SaaS (Blacksmith, Ubicloud, RunsOn).
 > **Note:** This package is `@rehearse/cli`, but the binary it installs is
 > `rh` (so you type `rh ci compile`, not `cli ci compile`). For local
 > workflow execution, see the separate
-> [`@rehearse/runner`](https://www.npmjs.com/package/@rehearse/runner)
+> [`@rehearse/cli`](https://www.npmjs.com/package/@rehearse/cli)
 > package, which installs as `rehearse`.
 
 ## Install
@@ -128,16 +128,16 @@ plus a monthly extrapolation given `--runs-per-month`.
 ## Run workflows locally before pushing
 
 For local execution of the YAML you just compiled, install
-[`@rehearse/runner`](https://www.npmjs.com/package/@rehearse/runner) and
+[`@rehearse/cli`](https://www.npmjs.com/package/@rehearse/cli) and
 run:
 
 ```bash
-rehearse run .github/workflows/ci.yml
+rh run .github/workflows/ci.yml
 ```
 
 The runner reads the compiled YAML and executes it on your laptop —
 5–9× faster than `act` on standard workflows, **30× on services**.
-Optional hosted target via `rehearse run --remote` (Rehearse Pro).
+Optional hosted target via `rh run --remote` (Rehearse Pro).
 
 ## Repo
 

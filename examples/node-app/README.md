@@ -2,7 +2,7 @@
 
 A tiny Node library with three exports and matching tests, plus a CI pipeline
 that runs the test suite across **Node 18.x / 20.x / 22.x in parallel** via
-`@rehearse/runner`'s per-cell `git worktree` isolation.
+`@rehearse/cli`'s per-cell `git worktree` isolation.
 
 ## What this example demonstrates
 
@@ -80,13 +80,13 @@ cd examples/node-app
 npm install
 
 # Install the Rehearse toolchain (one-time, global)
-npm install -g @rehearse/runner @rehearse/cli
+npm install -g @rehearse/cli
 
 # Compile the TS pipeline → .github/workflows/ci.yml
 rh ci compile
 
 # Run the workflow locally — three Node versions in parallel
-rehearse run .github/workflows/ci.yml
+rh run .github/workflows/ci.yml
 ```
 
 Expected: three matrix cells (`node=18.x`, `node=20.x`, `node=22.x`) run

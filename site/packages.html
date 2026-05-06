@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#08090c" />
 <title>Rehearse — Packages</title>
-<meta name="description" content="The four @rehearse/* packages on npm: @rehearse/runner, @rehearse/ci, @rehearse/git-core, @rehearse/cli. All Apache 2.0. Independent — install only what you need." />
+<meta name="description" content="The four @rehearse/* packages on npm: @rehearse/cli, @rehearse/ci, @rehearse/git-core, @rehearse/cli. All Apache 2.0. Independent — install only what you need." />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -75,7 +75,7 @@
             <td class="py-3 px-5 text-right ok font-bold">snapshots</td>
           </tr>
           <tr>
-            <td class="py-3 px-5"><a href="#runner" class="link">@rehearse/runner</a></td>
+            <td class="py-3 px-5"><a href="#runner" class="link">@rehearse/cli</a></td>
             <td class="py-3 px-5"><code class="font-mono">rehearse</code></td>
             <td class="py-3 px-5 text-[var(--rh-muted)]">Local-first GitHub Actions runner — sub-second CI on every save</td>
             <td class="py-3 px-5 text-right ok font-bold">121</td>
@@ -165,12 +165,12 @@
   </div>
 </section>
 
-<!-- ================ @rehearse/runner ================ -->
+<!-- ================ @rehearse/cli ================ -->
 <section id="runner" class="py-20 hairline">
   <div class="max-w-3xl mx-auto px-5">
     <div class="font-mono text-xs text-[var(--rh-accent)]">PACKAGE</div>
-    <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">@rehearse/runner</h2>
-    <p class="mt-2 font-mono text-sm text-[var(--rh-muted)]">binary: <code class="text-white">rehearse</code> · <a href="https://www.npmjs.com/package/@rehearse/runner" class="link">npm</a> · <a href="https://github.com/plsft/rehearse/tree/main/runner" class="link">source</a></p>
+    <h2 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight gradient-text">@rehearse/cli</h2>
+    <p class="mt-2 font-mono text-sm text-[var(--rh-muted)]">binary: <code class="text-white">rehearse</code> · <a href="https://www.npmjs.com/package/@rehearse/cli" class="link">npm</a> · <a href="https://github.com/plsft/rehearse/tree/main/runner" class="link">source</a></p>
 
     <p class="mt-5 text-[var(--rh-muted)] leading-relaxed">
       The headline product. Reads your existing
@@ -204,13 +204,13 @@
     </ul>
 
     <h3 class="mt-8 text-lg font-semibold text-white">Four CLI subcommands</h3>
-    <pre class="mt-4 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>rehearse run &lt;workflow.yml&gt;     <span class="comment"># execute a workflow</span>
-<span class="prompt"></span>rehearse watch &lt;workflow.yml&gt;   <span class="comment"># re-run on every save (debounced, queue-coalesced)</span>
-<span class="prompt"></span>rehearse install-hook           <span class="comment"># write .git/hooks/pre-push that runs your workflow</span>
-<span class="prompt"></span>rehearse compat &lt;workflow.yml&gt;  <span class="comment"># static audit: how much would actually execute</span></pre>
+    <pre class="mt-4 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>rh run &lt;workflow.yml&gt;     <span class="comment"># execute a workflow</span>
+<span class="prompt"></span>rh watch &lt;workflow.yml&gt;   <span class="comment"># re-run on every save (debounced, queue-coalesced)</span>
+<span class="prompt"></span>rh install-hook           <span class="comment"># write .git/hooks/pre-push that runs your workflow</span>
+<span class="prompt"></span>rh compat &lt;workflow.yml&gt;  <span class="comment"># static audit: how much would actually execute</span></pre>
 
     <h3 class="mt-8 text-lg font-semibold text-white">Programmatic API</h3>
-    <pre class="mt-4 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="kw">import</span> { <span class="fn">run</span>, <span class="fn">compat</span> } <span class="kw">from</span> <span class="str">'@rehearse/runner'</span>;
+    <pre class="mt-4 font-mono text-[12.5px] text-white/90 whitespace-pre-wrap"><span class="kw">import</span> { <span class="fn">run</span>, <span class="fn">compat</span> } <span class="kw">from</span> <span class="str">'@rehearse/cli'</span>;
 
 <span class="kw">const</span> <span class="var">result</span> = <span class="kw">await</span> <span class="fn">run</span>({
   workflowPath: <span class="str">'.github/workflows/ci.yml'</span>,
@@ -395,7 +395,7 @@
                  │
                  ▼  reads
 ┌──────────────────────────────────────────────────────────┐
-│  @rehearse/runner   (the runner CLI: `rehearse`)          │
+│  @rehearse/cli   (the runner CLI: `rehearse`)          │
 │  • parses YAML                                           │
 │  • plans jobs + matrix cells                             │
 │  • picks backend per job (host vs container)             │
@@ -454,7 +454,7 @@
         <tbody class="divide-y divide-white/5 text-white/90">
           <tr>
             <td class="py-3 px-5">Run your existing GitHub Actions workflow locally</td>
-            <td class="py-3 px-5 font-mono"><code class="font-mono">@rehearse/runner</code></td>
+            <td class="py-3 px-5 font-mono"><code class="font-mono">@rehearse/cli</code></td>
           </tr>
           <tr>
             <td class="py-3 px-5">Write CI in TypeScript instead of YAML</td>
@@ -515,7 +515,7 @@
         <div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Open source</div>
         <ul class="space-y-2 font-mono text-[13px]">
           <li><a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a></li>
-          <li><a href="https://www.npmjs.com/package/@rehearse/runner" class="nav-link">npm</a></li>
+          <li><a href="https://www.npmjs.com/package/@rehearse/cli" class="nav-link">npm</a></li>
           <li><a href="https://github.com/plsft/rehearse/issues" class="nav-link">Issues</a></li>
           <li><a href="/changelog" class="nav-link">Changelog</a></li>
           <li><a href="/llms.txt" class="nav-link">llms.txt</a></li>

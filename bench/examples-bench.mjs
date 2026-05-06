@@ -38,7 +38,7 @@ if (!skipRemote && !process.env.REHEARSE_TOKEN) {
   process.exit(2);
 }
 if (!existsSync(runnerCli)) {
-  console.error(`runner CLI not found at ${runnerCli}; run \`pnpm --filter @rehearse/runner build\``);
+  console.error(`runner CLI not found at ${runnerCli}; run \`pnpm --filter @rehearse/cli build\``);
   process.exit(2);
 }
 

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { runJobs } from '../src/scheduler.js';
+import { runJobs } from '../src/runner/scheduler.js';
 import type {
   Backend,
   ExpressionContext,
@@ -8,7 +8,7 @@ import type {
   PlannedJob,
   PlannedStep,
   StepResult,
-} from '../src/types.js';
+} from '../src/runner/types.js';
 
 function step(label: string, run: string): PlannedStep {
   return {

@@ -3,7 +3,7 @@
 Thanks for taking the time to contribute. This guide covers the
 **four open-source packages** in this repo, all Apache 2.0:
 
-- [`@rehearse/runner`](runner) — local-first GitHub Actions runner (binary: `rehearse`)
+- [`@rehearse/cli`](runner) — local-first GitHub Actions runner (binary: `rh`)
 - [`@rehearse/ci`](ts-ci) — TypeScript pipeline SDK that compiles to GitHub Actions YAML
 - [`@rehearse/git-core`](git-engine) — pure-TypeScript git protocol implementation
 - [`@rehearse/cli`](cli) — `rh`, the companion CLI for `@rehearse/ci`
@@ -25,7 +25,7 @@ pnpm turbo test
 To work on a single package:
 
 ```bash
-pnpm --filter @rehearse/runner test
+pnpm --filter @rehearse/cli test
 pnpm --filter @rehearse/ci test
 pnpm --filter @rehearse/git-core test
 pnpm --filter @rehearse/cli dev -- ci compile   # run the rh CLI from source
@@ -46,7 +46,7 @@ pnpm tsx bench/compare.ts --skip-cold
 ## Project layout
 
 ```
-runner/        @rehearse/runner — the runner CLI + core
+runner/        @rehearse/cli — the runner CLI + core
 cli/           @rehearse/cli — the rh CLI (companion to @rehearse/ci)
 ts-ci/         @rehearse/ci — TypeScript → GitHub Actions YAML SDK
 git-engine/    @rehearse/git-core — pure-TS git engine
@@ -62,7 +62,7 @@ scripts/       release tooling (release.mjs)
 ## What we look for in a PR
 
 1. **Tests.** Every public-API change has a matching test.
-   - `@rehearse/runner` has 121 tests across 13 suites (matrix, expression,
+   - `@rehearse/cli` has 121 tests across 13 suites (matrix, expression,
      scheduler, cache, composite, artifacts, compat, js-action, reusable,
      setup-node, setup-dotnet, image-resolver, git-context).
    - `@rehearse/ci` has compiler snapshot tests under
@@ -108,7 +108,7 @@ for stable, `next`/`rc`/`beta` for prereleases).
 
 - **Bug reports** — minimal repro plus your Node / pnpm / OS versions and
   the workflow YAML you ran.
-- **Compat regressions** — if `rehearse compat <yourworkflow>` reports a
+- **Compat regressions** — if `rh compat <yourworkflow>` reports a
   step as `uses-unsupported` and you think it should be supported, please
   open an issue with the action ref and version.
 - **Bench regressions** — if a bench number drifts noticeably from

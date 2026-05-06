@@ -95,7 +95,7 @@
       <span class="text-white">What's true about hosted-runner replacements
       (Blacksmith / Ubicloud / RunsOn / Depot / WarpBuild):</span> none of
       them try to do local execution at all. They bill per minute and
-      "<code class="font-mono">rehearse watch</code> on every save" would
+      "<code class="font-mono">rh watch</code> on every save" would
       bankrupt you. So the inner loop is the OSS-runner game (act and
       Rehearse), not theirs.
     </p>
@@ -120,17 +120,17 @@
         <tbody class="divide-y divide-white/5 text-white/90">
           <tr>
             <td class="py-3 px-5 text-[var(--rh-accent)]">Every keystroke (file save)</td>
-            <td class="py-3 px-5"><code class="font-mono">rehearse watch</code> reruns CI on each save. Sub-second. Free.</td>
+            <td class="py-3 px-5"><code class="font-mono">rh watch</code> reruns CI on each save. Sub-second. Free.</td>
             <td class="py-3 px-5 text-white"><span class="accent-text">Rehearse OSS</span> only</td>
           </tr>
           <tr>
             <td class="py-3 px-5 text-[var(--rh-accent)]"><code class="font-mono">git push</code> hook (pre-push)</td>
-            <td class="py-3 px-5"><code class="font-mono">rehearse install-hook</code> blocks bad pushes at the source. Free.</td>
+            <td class="py-3 px-5"><code class="font-mono">rh install-hook</code> blocks bad pushes at the source. Free.</td>
             <td class="py-3 px-5 text-white"><span class="accent-text">Rehearse OSS</span> only</td>
           </tr>
           <tr>
             <td class="py-3 px-5">Push to a remote VM (offload)</td>
-            <td class="py-3 px-5"><code class="font-mono">rehearse run --remote</code> ships your YAML to a single-tenant VM. Whole-rootfs cache.</td>
+            <td class="py-3 px-5"><code class="font-mono">rh run --remote</code> ships your YAML to a single-tenant VM. Whole-rootfs cache.</td>
             <td class="py-3 px-5"><span class="accent-text">Rehearse Pro</span> ($49 / 25k block)</td>
           </tr>
           <tr>
@@ -514,7 +514,7 @@
     <p class="mt-4 text-[var(--rh-muted)]">
       No account, no signup, no telemetry. Apache 2.0. Install in 30 seconds:
     </p>
-    <pre class="mt-5 inline-block font-mono text-sm text-white/90 bg-black/40 px-4 py-2 rounded border border-white/10">npm install -g @rehearse/runner</pre>
+    <pre class="mt-5 inline-block font-mono text-sm text-white/90 bg-black/40 px-4 py-2 rounded border border-white/10">npm install -g @rehearse/cli</pre>
     <div class="mt-8 inline-flex flex-wrap justify-center gap-3">
       <a href="/" class="btn btn-primary">Read more →</a>
       <a href="/pro" class="btn btn-ghost">Or start Pro at $49/mo · 25k min</a>
@@ -551,7 +551,7 @@
         <div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Open source</div>
         <ul class="space-y-2 font-mono text-[13px]">
           <li><a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a></li>
-          <li><a href="https://www.npmjs.com/package/@rehearse/runner" class="nav-link">npm</a></li>
+          <li><a href="https://www.npmjs.com/package/@rehearse/cli" class="nav-link">npm</a></li>
           <li><a href="https://github.com/plsft/rehearse/issues" class="nav-link">Issues</a></li>
           <li><a href="/changelog" class="nav-link">Changelog</a></li>
           <li><a href="/llms.txt" class="nav-link">llms.txt</a></li>

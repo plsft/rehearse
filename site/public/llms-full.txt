@@ -10,7 +10,7 @@ This file inlines the canonical descriptions of every Rehearse surface in plain 
 
 Rehearse is four npm packages working together:
 
-1. **@rehearse/runner** (binary: `rehearse`) — the local GitHub Actions runner. Reads `.github/workflows/*.yml` and executes locally with two backends (host subprocess for speed, Docker container for parity).
+1. **@rehearse/cli** (binary: `rh`) — the local GitHub Actions runner. Reads `.github/workflows/*.yml` and executes locally with two backends (host subprocess for speed, Docker container for parity).
 2. **@rehearse/ci** — TypeScript SDK that compiles to standard GitHub Actions YAML. Lossless forward path; one-command migration on-ramp from existing YAML.
 3. **@rehearse/cli** (binary: `rh`) — companion CLI for `@rehearse/ci`. `init`, `compile`, `convert`, `validate`, `watch`, `estimate`.
 4. **@rehearse/git-core** — pure-TypeScript git protocol implementation. Runs in Cloudflare Workers, browsers, Deno, Node, Bun. Standalone.
@@ -25,11 +25,11 @@ Optional commercial layer: **Rehearse Pro** at $49/mo for 25,000 active CPU minu
 
 The same `.github/workflows/*.yml` runs in three places, exact same shape, exact same exit codes:
 
-**1. Local** (`rehearse run .github/workflows/ci.yml`)
+**1. Local** (`rh run .github/workflows/ci.yml`)
 
-Free, sub-second on warm cache for trivial workflows; ~1–5s for typical CI workflows on a developer laptop. Use the `host` backend (subprocess against your host's installed toolchains) when you don't need container parity, or the `container` backend (Docker, real services networking) when you do. Pair with `rehearse watch` for save-triggered reruns or `rehearse install-hook` for a pre-push gate.
+Free, sub-second on warm cache for trivial workflows; ~1–5s for typical CI workflows on a developer laptop. Use the `host` backend (subprocess against your host's installed toolchains) when you don't need container parity, or the `container` backend (Docker, real services networking) when you do. Pair with `rh watch` for save-triggered reruns or `rh install-hook` for a pre-push gate.
 
-**2. Pro VM** (`rehearse run --remote .github/workflows/ci.yml`)
+**2. Pro VM** (`rh run --remote .github/workflows/ci.yml`)
 
 $49/mo for 25,000 active CPU minutes; +$49 per additional 25k block. Single-tenant Linux microVM with persistent rootfs. Whole-filesystem cache persistence — every `~/.npm`, `~/.cache/pip`, `~/.cargo/registry`, `node_modules`, build artifact survives between runs forever, no `actions/cache` blocks needed. ~5s warm on the typey 9-cell matrix workflow. Cap-hit triggers a 402 with a Stripe link to buy another block; usage alerts fire at 75% / 90% / 100% of monthly cap.
 
@@ -53,7 +53,7 @@ Pair with `@rehearse/cli` for ergonomics: `rh ci init` scaffolds a typed pipelin
 
 ---
 
-## The OSS runner (`@rehearse/runner`)
+## The OSS runner (`@rehearse/cli`)
 
 The headline product. Reads existing `.github/workflows/*.yml`, executes locally, no edits to your YAML.
 
@@ -80,10 +80,10 @@ The headline product. Reads existing `.github/workflows/*.yml`, executes locally
 
 **Four CLI subcommands:**
 
-- `rehearse run <workflow.yml>` — execute the workflow once.
-- `rehearse watch <workflow.yml>` — re-run on every file save (debounced, queue-coalesced).
-- `rehearse install-hook` — write `.git/hooks/pre-push` that runs the workflow first; only let push proceed if green.
-- `rehearse compat <workflow.yml>` — static audit; how much of this YAML would actually execute? Returns coverage percentage and a per-step report.
+- `rh run <workflow.yml>` — execute the workflow once.
+- `rh watch <workflow.yml>` — re-run on every file save (debounced, queue-coalesced).
+- `rh install-hook` — write `.git/hooks/pre-push` that runs the workflow first; only let push proceed if green.
+- `rh compat <workflow.yml>` — static audit; how much of this YAML would actually execute? Returns coverage percentage and a per-step report.
 
 **`--remote` flag** — ships the workflow YAML to a Pro VM via the same binary. Auto-detects git origin URL + HEAD SHA + monorepo subdir from `cwd`. `--env-file` ships secrets to the VM as `${{ secrets.* }}`.
 
@@ -109,8 +109,8 @@ Two comparisons.
 
 **vs GitHub Actions** — same 9-cell matrix workflow on three execution targets, measured against the real `plsft/typey` repo (a Bun CLI, not a fixture):
 
-- Local (`rehearse run`, warm): **1.5s** wall
-- Pro (`rehearse run --remote`, warm): **5s** wall
+- Local (`rh run`, warm): **1.5s** wall
+- Pro (`rh run --remote`, warm): **5s** wall
 - GitHub Actions: **95s** wall
 
 The speedup is the spin-up tax that hosted runners can't avoid — cold container, fresh toolchain install, cold module caches on every push. Local skips all of it; Pro keeps everything warm between runs.
@@ -122,7 +122,7 @@ The speedup is the spin-up tax that hosted runners can't avoid — cold containe
 - service-postgres (postgres:16 + 4 psql steps): **10.97s** vs timed-out (>360s) = **32.82× — act fails**
 - hono-bun (real OSS, honojs/hono bun job): **7.58s** vs n/a (act lacks bun)
 
-Reproducibility: `pnpm tsx bench/compare.ts --skip-cold` from the rehearse repo, plus `time rehearse run` / `time rehearse run --remote` against `github.com/plsft/typey`.
+Reproducibility: `pnpm tsx bench/compare.ts --skip-cold` from the rehearse repo, plus `time rh run` / `time rh run --remote` against `github.com/plsft/typey`.
 
 ---
 
@@ -138,7 +138,7 @@ Reproducibility: `pnpm tsx bench/compare.ts --skip-cold` from the rehearse repo,
 
 ## Pricing
 
-**OSS** (`@rehearse/runner` from npm) — free forever. Apache 2.0. No signup, no telemetry, no phone-home. Full feature set: host + container backends, matrix, services, watch, pre-push hook, all the action shims. Pair with `@rehearse/ci` and `@rehearse/cli` for the TypeScript authoring story.
+**OSS** (`@rehearse/cli` from npm) — free forever. Apache 2.0. No signup, no telemetry, no phone-home. Full feature set: host + container backends, matrix, services, watch, pre-push hook, all the action shims. Pair with `@rehearse/ci` and `@rehearse/cli` for the TypeScript authoring story.
 
 **Pro** — $49/mo for 25,000 active CPU minutes per month. +$49 per additional 25,000-minute block (buy via https://buy.stripe.com/6oU9AMdTI8VUdZH7ehgjC0r — webhook auto-bumps your cap within seconds). Email alerts at 75%, 90%, 100% of cap. Cap resets the first of each UTC month. Single-tenant Linux microVM with hardware isolation, 100 GB persistent storage, whole-rootfs cache persistence. Cancel anytime via Stripe Customer Portal; 14-day refund window.
 
@@ -151,7 +151,7 @@ Reproducibility: `pnpm tsx bench/compare.ts --skip-cold` from the rehearse repo,
 ## Repo layout (for navigation)
 
 ```
-runner/        — @rehearse/runner    — the CLI (binary: `rehearse`)
+runner/        — @rehearse/cli    — the CLI (binary: `rh`)
 ts-ci/         — @rehearse/ci         — author workflows in TypeScript
 git-engine/    — @rehearse/git-core   — pure-TypeScript git protocol
 cli/           — @rehearse/cli        — `rh` CLI (compile / convert TS pipelines)
@@ -185,10 +185,10 @@ All other features documented as supported are tested + working at v0.5.4.
 
 ## Programmatic APIs
 
-**`@rehearse/runner`:**
+**`@rehearse/cli`:**
 
 ```ts
-import { run, compat } from '@rehearse/runner';
+import { run, compat } from '@rehearse/cli';
 
 const result = await run({
   workflowPath: '.github/workflows/ci.yml',
@@ -248,7 +248,7 @@ Long-form writeups at https://rehearse.sh/blog. Current posts:
 
 - **act alternative — how Rehearse compares to nektos/act for running GitHub Actions locally** (`/blog/act-alternative`). Honest comparison vs nektos/act. act is the OSS pioneer in the local-GH-Actions-runner category (~56k stars, MIT, pre-dates Rehearse by 5 years) and remains the right pick for use cases that match its design. Rehearse pulls ahead on speed (5–30× on the bench), feature coverage (host subprocess backend in addition to container, watch mode with debounce + queue coalescing, pre-push git hook installer, real `services:` networking with health-check waiting), and an optional same-binary hosted offload target via Pro. Includes head-to-head bench numbers, 30-second migration code, FAQ, and an "act is still the right call when…" section.
 
-- **Pre-push CI: how to run GitHub Actions before `git push`** (`/blog/github-actions-before-push`). The default GH Actions loop costs 60–180s per cycle and burns commits with `wip: try fix`. Two ways to close the loop before push: (1) `rehearse watch ci.yml` reruns on every save (debounced + queue-coalesced; sub-second on warm cache); (2) `rehearse install-hook` writes a `.git/hooks/pre-push` that gates pushes on a green local run. Combining both means most CI failures never hit GitHub Actions. Why hosted-runner SaaS (Blacksmith, Ubicloud, RunsOn, Depot, WarpBuild) structurally can't match this — they bill per minute and watch mode would bankrupt the user.
+- **Pre-push CI: how to run GitHub Actions before `git push`** (`/blog/github-actions-before-push`). The default GH Actions loop costs 60–180s per cycle and burns commits with `wip: try fix`. Two ways to close the loop before push: (1) `rh watch ci.yml` reruns on every save (debounced + queue-coalesced; sub-second on warm cache); (2) `rh install-hook` writes a `.git/hooks/pre-push` that gates pushes on a green local run. Combining both means most CI failures never hit GitHub Actions. Why hosted-runner SaaS (Blacksmith, Ubicloud, RunsOn, Depot, WarpBuild) structurally can't match this — they bill per minute and watch mode would bankrupt the user.
 
 - **TypeScript GitHub Actions: from YAML to typed pipelines** (`/blog/typescript-github-actions-yaml`). Deep dive on `@rehearse/ci`. The specific YAML failure modes (no autocomplete, no refactor, hostile escaping, no reuse without ceremony, hostile diffs). Typed TS builders that compile to canonical GH Actions YAML. Forward path is 100% lossless (snapshot-tested across 6 reference workflows covering matrix, services, concurrency, defaults, environment, permissions, conditions, outputs, schedule, workflow_dispatch with inputs, all standard step constructs, composite actions local + remote, local reusable workflows, camel→kebab auto-translation). Reverse path (`rh ci convert`) is a one-command migration starter — common shapes survive, advanced constructs hand-port in 5–15 min/workflow. Compiled YAML has zero runtime dependency on the SDK; uninstall and CI keeps running. Comparison vs Pulumi (compiles GH Actions but as part of larger IaC stack), Earthly (Earthfile DSL, own runtime), Dagger (own runtime).
 
@@ -258,7 +258,7 @@ Long-form writeups at https://rehearse.sh/blog. Current posts:
 
 - Marketing site: https://rehearse.sh
 - GitHub: https://github.com/plsft/rehearse
-- npm packages: https://www.npmjs.com/package/@rehearse/runner, /@rehearse/ci, /@rehearse/cli, /@rehearse/git-core
+- npm packages: https://www.npmjs.com/package/@rehearse/cli, /@rehearse/ci, /@rehearse/cli, /@rehearse/git-core
 - Pro signup: https://rehearse.sh/pricing → /checkout
 - Pro dashboard: https://pro.rehearse.sh
 - Issues + roadmap: https://github.com/plsft/rehearse/issues

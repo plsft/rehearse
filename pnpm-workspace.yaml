@@ -1,6 +1,5 @@
 packages:
   - 'ts-ci'
-  - 'git-engine'
   - 'cli'
-  - 'runner'
   - 'site'
+  # - 'git-engine'  # private/internal — removed from public release in v0.6.0

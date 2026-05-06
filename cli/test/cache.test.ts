@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync, existsSync
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { LocalCache, parsePaths } from '../src/cache.js';
+import { LocalCache, parsePaths } from '../src/runner/cache.js';
 
 let cwd: string;
 let cache: LocalCache;

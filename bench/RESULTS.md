@@ -145,7 +145,7 @@ gh run watch --workflow=bench.yml
 
 # Locally
 pnpm install
-pnpm turbo build --filter=@rehearse/runner...
+pnpm turbo build --filter=@rehearse/cli...
 git clone --depth 1 https://github.com/honojs/hono.git poc/playground/hono
 docker pull node:22-bookworm-slim postgres:16-alpine catthehacker/ubuntu:act-latest
 pnpm tsx bench/compare.ts --skip-cold

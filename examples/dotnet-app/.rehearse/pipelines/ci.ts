@@ -2,7 +2,7 @@
  * CI pipeline for the dotnet-app example.
  *
  * Demonstrates:
- *   - actions/setup-dotnet@v4 — real shim in @rehearse/runner. Uses host
+ *   - actions/setup-dotnet@v4 — real shim in @rehearse/cli. Uses host
  *     `dotnet` if present at the right version; otherwise runs Microsoft's
  *     dotnet-install.sh and caches the SDK to ~/.dotnet/. On Pro VMs the
  *     SDK persists across runs (~7ms cached vs ~16s first install).

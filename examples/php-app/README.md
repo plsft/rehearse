@@ -3,7 +3,7 @@
 A small PHP library with PHPUnit tests and PHPStan static analysis. The CI
 pipeline runs against **PHP 8.2, 8.3, and 8.4 in parallel** using
 `shivammathur/setup-php@v2` — a JavaScript action that
-`@rehearse/runner` auto-clones and executes locally without pre-installing
+`@rehearse/cli` auto-clones and executes locally without pre-installing
 any PHP toolchain on the host.
 
 ## What this example demonstrates
@@ -77,12 +77,12 @@ job('test', {
 cd examples/php-app
 
 # Install the Rehearse toolchain
-npm install -g @rehearse/runner @rehearse/cli
+npm install -g @rehearse/cli
 npm install                  # gets @rehearse/ci as a devDep for rh
 
 # Compile + run
 rh ci compile
-rehearse run .github/workflows/ci.yml
+rh run .github/workflows/ci.yml
 ```
 
 Expected first run: the runner clones `shivammathur/setup-php@v2` into
@@ -97,7 +97,7 @@ the PHP versions you want to test against on the host, or to provide a
 Docker image that has them. **The runner does neither** — it executes
 the same JS action GitHub Actions uses, which downloads the requested
 PHP version itself. You write the workflow once; it works in CI, in
-`rehearse run`, and in `rehearse watch`.
+`rh run`, and in `rh watch`.
 
 ## Push to GitHub
 

@@ -45,12 +45,12 @@
 
       <div class="card p-7 mb-5">
         <div class="text-[12px] font-mono text-[var(--rh-muted)] mb-2">// quickstart</div>
-        <pre class="terminal">npm install -g @rehearse/runner@latest
+        <pre class="terminal">npm install -g @rehearse/cli@latest
 export REHEARSE_TOKEN=<span x-text="apiKey"></span>
-rehearse run --remote .github/workflows/ci.yml</pre>
+rh run --remote .github/workflows/ci.yml</pre>
       </div>
       <p class="text-[12px] font-mono text-[var(--rh-muted)] mb-5">
-        Your dedicated VM is provisioning now (60–120s after this page loaded). The first <code class="font-mono">rehearse run --remote</code> may wait briefly while it comes up; subsequent runs are instant-warm.
+        Your dedicated VM is provisioning now (60–120s after this page loaded). The first <code class="font-mono">rh run --remote</code> may wait briefly while it comes up; subsequent runs are instant-warm.
       </p>
 
       <a href="https://pro.rehearse.sh/dashboard" class="btn btn-primary">go to dashboard →</a>

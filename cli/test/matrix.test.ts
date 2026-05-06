@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cellId, expandMatrix, parseMatrix } from '../src/matrix.js';
+import { cellId, expandMatrix, parseMatrix } from '../src/runner/matrix.js';
 
 describe('parseMatrix', () => {
   it('returns null for undefined', () => {

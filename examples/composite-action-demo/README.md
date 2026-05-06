@@ -1,7 +1,7 @@
 # composite-action-demo — local composite action authoring + use
 
 A repo with a reusable composite action and a workflow that uses it. Shows
-how `@rehearse/runner` inlines composite actions at execution time, with
+how `@rehearse/cli` inlines composite actions at execution time, with
 `${{ inputs.* }}` substituted from the parent's `with:`.
 
 ## What this example demonstrates
@@ -90,7 +90,7 @@ export const ci = pipeline('Composite action demo', {
 
 ## What the runner does
 
-When `rehearse run` hits the `uses: ./.github/actions/setup-deps` step, it:
+When `rh run` hits the `uses: ./.github/actions/setup-deps` step, it:
 
 1. Reads `.github/actions/setup-deps/action.yml`
 2. Builds an `inputs` context from the parent's `with:` (`node-version: '20.x'`, `cache-key-prefix: 'npm-demo'`), defaulting any unspecified inputs from the action's `inputs:` block
@@ -115,10 +115,10 @@ You'll see this in the runner's output as labelled steps prefixed with the actio
 cd examples/composite-action-demo
 
 npm install
-npm install -g @rehearse/runner @rehearse/cli
+npm install -g @rehearse/cli
 
 rh ci compile
-rehearse run .github/workflows/ci.yml
+rh run .github/workflows/ci.yml
 ```
 
 ## Remote composites work the same way

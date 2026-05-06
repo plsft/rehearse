@@ -206,7 +206,7 @@ async function main(): Promise<void> {
 
   // Sanity: runner CLI built?
   if (!existsSync(resolve(REPO_ROOT, 'runner/dist/cli.js'))) {
-    console.error('runner/dist/cli.js missing — run `pnpm --filter @rehearse/runner build` first');
+    console.error('runner/dist/cli.js missing — run `pnpm --filter @rehearse/cli build` first');
     process.exit(2);
   }
   // Clean up any stragglers from prior runs so port bindings / volume mounts

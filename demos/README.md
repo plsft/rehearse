@@ -19,7 +19,7 @@ pixel-identical every time you run it.
 
 | File | Output | Length | What it shows |
 | --- | --- | --- | --- |
-| `example-node-app.tape` | `example-node-app.mp4` | ~75 s | Node + Vitest, matrix `[18.x, 20.x, 22.x]` parallel via per-cell git worktree. Real `rehearse run` end-to-end. |
+| `example-node-app.tape` | `example-node-app.mp4` | ~75 s | Node + Vitest, matrix `[18.x, 20.x, 22.x]` parallel via per-cell git worktree. Real `rh run` end-to-end. |
 | `example-composite-action-demo.tape` | ~60 s | Local composite action expansion: see the runner inline `./.github/actions/setup-deps`'s inner steps. Real run end-to-end. |
 | `example-python-api.tape` | ~75 s | FastAPI + Postgres service: pipeline source, compiled YAML, compat audit. Run-locally instructions for Docker + Python. |
 | `example-php-app.tape` | ~75 s | PHP matrix via `shivammathur/setup-php@v2` (remote JS action): pipeline source, compat audit, JS-action runtime explanation. |
@@ -42,10 +42,9 @@ go install github.com/charmbracelet/vhs@latest
 ## Pre-flight
 
 ```bash
-# 1. v0.5.0 of runner + cli (latest at writing)
-npm install -g @rehearse/runner@latest @rehearse/cli@latest
-rehearse --version    # 0.5.0
-rh --version          # 0.5.0
+# 1. v0.6.0+ — single binary `rh`
+npm install -g @rehearse/cli@latest
+rh --version          # 0.6.0
 
 # 2. JetBrains Mono (the tapes call for it)
 winget install JetBrains.Mono              # Windows
@@ -59,7 +58,7 @@ ls poc/playground/hono/.github/workflows/ci.yml
 cd examples/node-app && npm install              # for example-node-app.tape
 cd examples/composite-action-demo && npm install # for example-composite-action-demo.tape
 # python-api, php-app, dotnet-app tapes don't need their host toolchain
-# installed (they only run rh ci compile + rehearse compat, not full rehearse run)
+# installed (they only run rh ci compile + rh compat, not full rh run)
 ```
 
 ## Record
@@ -91,14 +90,14 @@ the matching example:
 
 1. **`cat .rehearse/pipelines/ci.ts`** — the TypeScript source
 2. **`rh ci compile`** + **`cat .github/workflows/ci.yml`** — the compiled YAML
-3. **`rehearse compat .github/workflows/ci.yml`** — what would execute,
+3. **`rh compat .github/workflows/ci.yml`** — what would execute,
    per-job
 
 For the two examples whose host requirements are minimal (Node-only:
 `node-app`, `composite-action-demo`), the tape **also runs the workflow
-end-to-end** with real `rehearse run`. For the others (Postgres + Docker
+end-to-end** with real `rh run`. For the others (Postgres + Docker
 for `python-api`; PHP + composer for `php-app`; .NET SDK for `dotnet-app`),
-the tape stops at compat and prints the `rehearse run …` invocation as
+the tape stops at compat and prints the `rh run …` invocation as
 text + a comment about the expected output.
 
 This keeps every tape **reproducible from a clean machine** — the heavy

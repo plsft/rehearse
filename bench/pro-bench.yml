@@ -5,10 +5,10 @@
 # cost; ~2x speedup on warm runs is the headline.
 #
 # Reproduce against your Pro account:
-#   1. npm install -g @rehearse/runner
+#   1. npm install -g @rehearse/cli
 #   2. export REHEARSE_TOKEN=rh_pro_live_...
-#   3. rehearse run --remote bench/pro-bench.yml       # cold (run 1)
-#   4. rehearse run --remote bench/pro-bench.yml       # warm (run 2)
+#   3. rh run --remote bench/pro-bench.yml       # cold (run 1)
+#   4. rh run --remote bench/pro-bench.yml       # warm (run 2)
 #
 # Numbers from the most recent measurement (Pro page table at rehearse.sh/pro)
 # were cold install 10.5s / wall 12.5s, warm install 5.1s / wall 6.7s on a

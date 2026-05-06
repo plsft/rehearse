@@ -23,7 +23,7 @@ const PACKAGES = [
   '@rehearse/git-core', // no internal deps — publish first
   '@rehearse/ci',
   '@rehearse/cli', // depends on @rehearse/ci
-  '@rehearse/runner', // depends on @rehearse/ci + @rehearse/git-core
+  '@rehearse/cli', // depends on @rehearse/ci + @rehearse/git-core
 ] as const;
 
 // Detect prerelease vs stable from the tag and emit NPM_TAG + PRERELEASE

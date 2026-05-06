@@ -1,9 +1,10 @@
 {
   "name": "@rehearse/cli",
   "version": "0.5.4",
-  "description": "Rehearse CLI — compile and convert TypeScript GitHub Actions pipelines (rh)",
+  "description": "Rehearse — local-first GitHub Actions runner + TypeScript-pipeline CLI. Single binary `rh`.",
   "license": "Apache-2.0",
   "type": "module",
+  "main": "./dist/index.js",
   "bin": {
     "rh": "./dist/index.js"
   },
@@ -14,6 +15,7 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
     "dev": "tsx src/index.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
@@ -21,11 +23,13 @@
     "@rehearse/ci": "workspace:*",
     "commander": "^12.1.0",
     "picocolors": "^1.1.1",
-    "tsx": "^4.19.2"
+    "tsx": "^4.19.2",
+    "yaml": "^2.6.1"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
-    "typescript": "^5.8.0"
+    "typescript": "^5.8.0",
+    "vitest": "^3.0.0"
   },
   "publishConfig": {
     "access": "public"
@@ -33,9 +37,11 @@
   "keywords": [
     "github-actions",
     "ci",
+    "runner",
+    "local-ci",
+    "act-alternative",
     "typescript",
-    "pipeline",
-    "cli"
+    "pipeline"
   ],
   "homepage": "https://github.com/plsft/rehearse/tree/main/cli#readme",
   "bugs": "https://github.com/plsft/rehearse/issues",

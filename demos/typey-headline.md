@@ -21,10 +21,9 @@ project. Hits every load-bearing claim on rehearse.sh:
 ## Pre-flight
 
 ```bash
-# v0.5.2+ of runner + cli on PATH
-npm install -g @rehearse/runner@latest @rehearse/cli@latest
-rehearse --version       # 0.5.2
-rh --version             # 0.5.2
+# v0.6.0+ — single binary `rh` (was: rehearse + rh, two binaries pre-v0.6)
+npm install -g @rehearse/cli@latest
+rh --version       # 0.6.0
 
 # Clone typey somewhere outside the rehearse repo
 cd ~/work
@@ -39,8 +38,8 @@ export REHEARSE_TOKEN=rh_pro_live_...
 # Terminal 2 = browser/editor view of the YAML and TS files
 
 # Pre-warm caches (so demo timing is "warm" not "cold install")
-rehearse run .github/workflows/ci.yml > /dev/null
-rehearse run --remote .github/workflows/ci.yml > /dev/null
+rh run .github/workflows/ci.yml > /dev/null
+rh run --remote .github/workflows/ci.yml > /dev/null
 clear
 ```
 
@@ -207,7 +206,7 @@ three back-to-back so the wall clock is on screen continuously.
 
 **Type:**
 ```bash
-time rehearse run .github/workflows/ci.yml
+time rh run .github/workflows/ci.yml
 ```
 
 **Expected (warm cache, v0.5.2 output):**
@@ -242,7 +241,7 @@ real    0m1.524s
 
 **Type:**
 ```bash
-time rehearse run --remote .github/workflows/ci.yml
+time rh run --remote .github/workflows/ci.yml
 ```
 
 **Expected:**
@@ -305,7 +304,7 @@ GH     → 95s
 
 **Type:**
 ```bash
-rehearse install-hook
+rh install-hook
 ```
 
 **Expected:**
@@ -318,18 +317,18 @@ rehearse install-hook
 > — no failed run on github.com, no Slack ping at 11pm, no `wip: try
 > fix` commit on my branch."
 
-**(Optional)** demonstrate `rehearse watch`:
+**(Optional)** demonstrate `rh watch`:
 
 **Type:**
 ```bash
-rehearse watch .github/workflows/ci.yml
+rh watch .github/workflows/ci.yml
 ```
 
 > *Edit a source file, hit save. Watch the workflow re-run in
 > sub-second.*
 
 **Narration:**
-> "Or `rehearse watch` for save-triggered reruns. Sub-second on warm
+> "Or `rh watch` for save-triggered reruns. Sub-second on warm
 > cache. **The CI feedback loop closes inside your editor.**"
 
 > *Ctrl-C the watch.*
@@ -351,9 +350,9 @@ rehearse watch .github/workflows/ci.yml
 
 **Show on screen (lower third or as final terminal):**
 ```bash
-npm install -g @rehearse/runner @rehearse/cli
+npm install -g @rehearse/cli
 npx rh ci convert .github/workflows/ci.yml --out .rehearse/pipelines/
-rehearse run .github/workflows/ci.yml
+rh run .github/workflows/ci.yml
 ```
 
 **Narration:**

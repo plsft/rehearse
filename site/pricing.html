@@ -64,14 +64,14 @@
         <p class="text-[12px] font-mono text-[var(--rh-muted)] mb-6">Apache 2.0 · No signup · No telemetry · No phone-home</p>
         <ul class="space-y-2 text-sm mb-8">
           <li><span class="ok">●</span> Local execution on your machine</li>
-          <li><span class="ok">●</span> Sub-second CI on every save (<code class="font-mono">rehearse watch</code>)</li>
-          <li><span class="ok">●</span> Pre-push hook (<code class="font-mono">rehearse install-hook</code>)</li>
+          <li><span class="ok">●</span> Sub-second CI on every save (<code class="font-mono">rh watch</code>)</li>
+          <li><span class="ok">●</span> Pre-push hook (<code class="font-mono">rh install-hook</code>)</li>
           <li><span class="ok">●</span> Host + container backends</li>
           <li><span class="ok">●</span> Matrix, services, composite actions, JS actions</li>
           <li><span class="ok">●</span> 97% of real workflows just work</li>
           <li><span class="ok">●</span> No vendor lock-in — ever</li>
         </ul>
-        <a href="https://www.npmjs.com/package/@rehearse/runner" class="btn btn-ghost w-full justify-center">Install from npm →</a>
+        <a href="https://www.npmjs.com/package/@rehearse/cli" class="btn btn-ghost w-full justify-center">Install from npm →</a>
       </div>
 
       <!-- Pro tier (highlighted as the offload product) -->
@@ -168,7 +168,7 @@
       </div>
       <div>
         <p class="font-semibold mb-1">What's the 25,000-minute cap and how does it work?</p>
-        <p class="text-[var(--rh-muted)]">The cap is on <span class="text-white">active CPU minutes</span> — the actual time the VM is executing your workflow. Idle time is free; you only burn minutes when <code class="font-mono">rehearse run --remote</code> is doing real work on your VM. Email alerts fire at 75% and 90% of your cap. Hit 100% and your runs pause until the cap resets (first of next UTC month) OR you add another $49 / 25k block. To add a block, just reply to the alert email — I'll bump your cap within an hour.</p>
+        <p class="text-[var(--rh-muted)]">The cap is on <span class="text-white">active CPU minutes</span> — the actual time the VM is executing your workflow. Idle time is free; you only burn minutes when <code class="font-mono">rh run --remote</code> is doing real work on your VM. Email alerts fire at 75% and 90% of your cap. Hit 100% and your runs pause until the cap resets (first of next UTC month) OR you add another $49 / 25k block. To add a block, just reply to the alert email — I'll bump your cap within an hour.</p>
       </div>
       <div>
         <p class="font-semibold mb-1">What if I outgrow 25,000 minutes?</p>
@@ -176,7 +176,7 @@
       </div>
       <div>
         <p class="font-semibold mb-1">How long does provisioning take?</p>
-        <p class="text-[var(--rh-muted)]">After Stripe checkout the welcome email arrives within ~30 seconds, but your VM is still spinning up — the actual provisioning runs in a GitHub Actions workflow that takes 60–120 seconds. The first <code class="font-mono">rehearse run --remote</code> waits briefly if the VM isn't ready yet; subsequent runs are warm.</p>
+        <p class="text-[var(--rh-muted)]">After Stripe checkout the welcome email arrives within ~30 seconds, but your VM is still spinning up — the actual provisioning runs in a GitHub Actions workflow that takes 60–120 seconds. The first <code class="font-mono">rh run --remote</code> waits briefly if the VM isn't ready yet; subsequent runs are warm.</p>
       </div>
       <div>
         <p class="font-semibold mb-1">Will the OSS runner ever be paywalled?</p>
@@ -188,7 +188,7 @@
       </div>
       <div>
         <p class="font-semibold mb-1">Is the OSS runner the same binary as Pro?</p>
-        <p class="text-[var(--rh-muted)]">Yes. <code class="font-mono">@rehearse/runner</code> on npm is one Apache 2.0 binary. Run it locally for free; pass <code class="font-mono">--remote</code> with a Pro token and the same binary ships your workflow to your VM. Nothing about Pro changes the OSS runner — Pro is a hosted execution target, not a fork.</p>
+        <p class="text-[var(--rh-muted)]">Yes. <code class="font-mono">@rehearse/cli</code> on npm is one Apache 2.0 binary. Run it locally for free; pass <code class="font-mono">--remote</code> with a Pro token and the same binary ships your workflow to your VM. Nothing about Pro changes the OSS runner — Pro is a hosted execution target, not a fork.</p>
       </div>
       <div>
         <p class="font-semibold mb-1">What languages does the Pro VM support?</p>
@@ -227,7 +227,7 @@
         <div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Open source</div>
         <ul class="space-y-2 font-mono text-[13px]">
           <li><a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a></li>
-          <li><a href="https://www.npmjs.com/package/@rehearse/runner" class="nav-link">npm</a></li>
+          <li><a href="https://www.npmjs.com/package/@rehearse/cli" class="nav-link">npm</a></li>
           <li><a href="https://github.com/plsft/rehearse/issues" class="nav-link">Issues</a></li>
           <li><a href="/changelog" class="nav-link">Changelog</a></li>
           <li><a href="/llms.txt" class="nav-link">llms.txt</a></li>

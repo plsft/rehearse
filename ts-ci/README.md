@@ -175,12 +175,12 @@ The CLI wrapper is `rh ci estimate`.
 ### Runner support
 
 The same `Runner` constants are honored by
-[`@rehearse/runner`](https://www.npmjs.com/package/@rehearse/runner) — the
+[`@rehearse/cli`](https://www.npmjs.com/package/@rehearse/cli) — the
 local runner reads the compiled YAML and executes it on your laptop,
 **5–9× faster than `act`** on standard workflows, **30× on services**.
 So you author in TS, compile to YAML, run locally before pushing — and
 optionally ship the same workflow to a [Rehearse Pro](https://rehearse.sh/pro)
-VM with `rehearse run --remote`.
+VM with `rh run --remote`.
 
 ## Compatibility
 
@@ -192,7 +192,7 @@ on:
 - Third-party hosted runner pools via `Runner.custom('your-label')` —
   e.g. Ubicloud, BuildJet, Namespace, RunsOn — anywhere the org has
   configured the corresponding GitHub App or self-hosted listener
-- Locally via `@rehearse/runner` (or `act`, if you prefer)
+- Locally via `@rehearse/cli` (or `act`, if you prefer)
 
 The TypeScript itself runs anywhere Node 18+ does. Tests run on Node 22.
 

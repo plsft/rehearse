@@ -29,11 +29,11 @@ const setup = [
     name: 'Setup Bun (for hono-bun target)',
   }),
   step.run('pnpm install --frozen-lockfile', { name: 'Install', shell: 'bash' }),
-  // Build via turbo so workspace deps (@rehearse/ci → @rehearse/runner) build
-  // in dependency order. A bare `pnpm --filter @rehearse/runner build` would
+  // Build via turbo so workspace deps (@rehearse/ci → @rehearse/cli) build
+  // in dependency order. A bare `pnpm --filter @rehearse/cli build` would
   // try to typecheck against a `@rehearse/ci` whose `dist/` doesn't exist yet
   // on a fresh checkout, and fail with TS2307 'Cannot find module @rehearse/ci'.
-  step.run('pnpm turbo build --filter=@rehearse/runner...', {
+  step.run('pnpm turbo build --filter=@rehearse/cli...', {
     name: 'Build runner (and workspace deps)',
     shell: 'bash',
   }),

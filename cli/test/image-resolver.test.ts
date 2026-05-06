@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { createImageResolver } from '../src/backends/image-resolver.js';
+import { createImageResolver } from '../src/runner/backends/image-resolver.js';
 
 describe('image-resolver', () => {
   test('with no token returns public passthrough', () => {

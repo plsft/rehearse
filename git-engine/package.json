@@ -1,7 +1,8 @@
 {
   "name": "@rehearse/git-core",
   "version": "0.5.4",
-  "description": "Pure-TypeScript git protocol: objects, packfiles, smart-HTTP, diff, merge, refs",
+  "private": true,
+  "description": "Pure-TypeScript git protocol: objects, packfiles, smart-HTTP, diff, merge, refs (internal — not published since v0.6.0)",
   "license": "Apache-2.0",
   "type": "module",
   "main": "./dist/index.js",

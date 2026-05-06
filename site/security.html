@@ -52,7 +52,7 @@
       <ul class="space-y-2 text-sm">
         <li>— <span class="text-white">Inside your VM.</span> Each team gets a dedicated microVM with hardware-level isolation. 100 GB persistent ext4 filesystem.</li>
         <li>— <span class="text-white">No cross-tenant access.</span> VMs have no shared kernel, no shared filesystem, no shared network namespace with other customers' VMs.</li>
-        <li>— <span class="text-white">Code transfers at run time.</span> When you run <code class="font-mono">rehearse run --remote</code>, your workflow YAML is shipped to your VM over HTTPS. It executes there. Logs come back over HTTPS as they happen. Persistent files (your caches, repo clone) stay on the VM.</li>
+        <li>— <span class="text-white">Code transfers at run time.</span> When you run <code class="font-mono">rh run --remote</code>, your workflow YAML is shipped to your VM over HTTPS. It executes there. Logs come back over HTTPS as they happen. Persistent files (your caches, repo clone) stay on the VM.</li>
         <li>— <span class="text-white">Cancel = wiped.</span> Cancel your subscription and we destroy your VM. The 100 GB volume is reclaimed.</li>
       </ul>
     </div>
@@ -129,7 +129,7 @@
         <div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Open source</div>
         <ul class="space-y-2 font-mono text-[13px]">
           <li><a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a></li>
-          <li><a href="https://www.npmjs.com/package/@rehearse/runner" class="nav-link">npm</a></li>
+          <li><a href="https://www.npmjs.com/package/@rehearse/cli" class="nav-link">npm</a></li>
           <li><a href="https://github.com/plsft/rehearse/issues" class="nav-link">Issues</a></li>
           <li><a href="/changelog" class="nav-link">Changelog</a></li>
           <li><a href="/llms.txt" class="nav-link">llms.txt</a></li>

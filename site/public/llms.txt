@@ -8,7 +8,7 @@ Rehearse is four npm packages that together let you author CI in TypeScript, exe
 
 - [Homepage](https://rehearse.sh/): Hero, three-target wedge (1.5s local · 5s Pro · 95s GH Actions on a real 9-cell matrix), feature overview, install command.
 - [Quickstart](https://rehearse.sh/docs): 30-second install + run instructions, CLI subcommands, watch mode, pre-push hook.
-- [Packages](https://rehearse.sh/packages): Full reference for all four npm packages (`@rehearse/runner`, `@rehearse/ci`, `@rehearse/cli`, `@rehearse/git-core`) — what each does, public API, programmatic usage examples, cross-references.
+- [Packages](https://rehearse.sh/packages): Full reference for all four npm packages (`@rehearse/cli`, `@rehearse/ci`, `@rehearse/cli`, `@rehearse/git-core`) — what each does, public API, programmatic usage examples, cross-references.
 - [TypeScript GitHub Actions](https://rehearse.sh/typescript-github-actions): Deep dive on `@rehearse/ci` — author CI in typed TS, compile to standard GH Actions YAML. Forward path is 100% lossless (snapshot-tested); reverse path (YAML → TS) is a one-command migration starter.
 - [Run GitHub Actions locally](https://rehearse.sh/local-github-actions): SEO landing for the act-alternative use case. Sample workflow + sample CLI + sample output + vs-act feature table.
 - [About](https://rehearse.sh/about): Project orientation, what it is, what it isn't.
@@ -16,18 +16,18 @@ Rehearse is four npm packages that together let you author CI in TypeScript, exe
 
 ## Packages
 
-- [@rehearse/runner](https://www.npmjs.com/package/@rehearse/runner) (binary: `rehearse`): Local-first GitHub Actions runner. Reads `.github/workflows/*.yml`, executes with two backends (host subprocess + container via Docker), supports matrix / services / cache / composite actions / JS actions / per-cell git worktrees. CLI subcommands: `run`, `watch`, `install-hook`, `compat`, `--remote` for Pro offload.
+- [@rehearse/cli](https://www.npmjs.com/package/@rehearse/cli) (binary: `rh`): Local-first GitHub Actions runner. Reads `.github/workflows/*.yml`, executes with two backends (host subprocess + container via Docker), supports matrix / services / cache / composite actions / JS actions / per-cell git worktrees. CLI subcommands: `run`, `watch`, `install-hook`, `compat`, `--remote` for Pro offload.
 - [@rehearse/ci](https://www.npmjs.com/package/@rehearse/ci): TypeScript-authored CI SDK. Typed builders compile to standard GitHub Actions YAML. Forward path (`compile`) is 100% lossless — every public SDK feature produces canonical YAML, snapshot-tested against 6 reference workflows. Reverse path (`convert`) is a migration starter: handles common YAML shapes for adopting the SDK on existing repos. Zero runtime dependency on the compiled YAML.
 - [@rehearse/cli](https://www.npmjs.com/package/@rehearse/cli) (binary: `rh`): Companion CLI for `@rehearse/ci`. Six subcommands: `init` (scaffold), `compile` (TS → YAML), `convert` (YAML → TS migration), `validate` (type-check), `watch` (recompile on save), `estimate` (per-run + monthly cost on GH-hosted).
 - [@rehearse/git-core](https://www.npmjs.com/package/@rehearse/git-core): Pure-TypeScript implementation of the git protocol — objects, packfiles, smart-HTTP wire, Myers diff, three-way merge, refs. Zero native dependencies. Runs in Cloudflare Workers, browsers, Deno, Node, Bun. The unique-fit use case is anywhere the system `git` binary isn't an option.
 
 ## Key concepts
 
-- [Three execution targets](https://rehearse.sh/#bench): Same YAML, three places it can run. Local (`rehearse run`, sub-second on warm cache, free), Pro VM (`rehearse run --remote`, ~5s on warm cache, $49/mo for 25,000 minutes), GitHub Actions (`git push`, ~95s on the typey 9-cell matrix). Switch with one flag.
+- [Three execution targets](https://rehearse.sh/#bench): Same YAML, three places it can run. Local (`rh run`, sub-second on warm cache, free), Pro VM (`rh run --remote`, ~5s on warm cache, $49/mo for 25,000 minutes), GitHub Actions (`git push`, ~95s on the typey 9-cell matrix). Switch with one flag.
 - [TypeScript-first CI authoring](https://rehearse.sh/typescript-github-actions): Author workflows in typed TS instead of YAML. Compiles to canonical GH Actions YAML you commit. Snapshot-tested for losslessness. Includes a one-command migration on-ramp for adopting on existing repos (`rh ci convert`).
 - [Same-binary OSS + Pro](https://rehearse.sh/pro): The `rehearse` binary is the same code path locally and on Pro — Pro is just an execution target, not a fork. Drop the `--remote` flag and you're back to free local execution. No vendor lock-in: the OSS runner is Apache 2.0 and runs on a laptop forever.
 - [Whole-rootfs cache persistence](https://rehearse.sh/pro): Pro VM is single-tenant Linux with persistent rootfs. Every cache, every build artifact, every tool install survives between runs forever — no `actions/cache` declarations needed, no sticky-disk path lists. This is the differentiator vs Blacksmith Sticky Disks / RunsOn / Ubicloud, which require declared paths.
-- [Pre-push CI loop](https://rehearse.sh/local-github-actions): `rehearse watch` reruns CI on every save (debounced, queue-coalesced); `rehearse install-hook` writes a pre-push git hook that gates pushes on a green local run. Hosted-runner SaaS competitors can't match this — they bill per minute and watch mode would bankrupt you.
+- [Pre-push CI loop](https://rehearse.sh/local-github-actions): `rh watch` reruns CI on every save (debounced, queue-coalesced); `rh install-hook` writes a pre-push git hook that gates pushes on a green local run. Hosted-runner SaaS competitors can't match this — they bill per minute and watch mode would bankrupt you.
 
 ## Examples
 
@@ -64,7 +64,7 @@ Rehearse is four npm packages that together let you author CI in TypeScript, exe
 
 - [Blog index](https://rehearse.sh/blog): Notes on local-first GitHub Actions, pre-push CI, TypeScript-authored pipelines, dogfooding diaries.
 - [act alternative](https://rehearse.sh/blog/act-alternative): Honest comparison vs nektos/act (~56k stars, MIT, the OSS pioneer for the local-GH-Actions runner category). Where act still wins; where Rehearse pulls ahead (host backend, watch mode, pre-push hook, real services networking, optional same-binary hosted offload).
-- [Pre-push CI: how to run GitHub Actions before git push](https://rehearse.sh/blog/github-actions-before-push): Two ways to close the loop before push — `rehearse watch ci.yml` (CI on every save, sub-second on warm cache) and `rehearse install-hook` (pre-push gate). Why hosted-runner SaaS competitors structurally can't match this (they bill per minute and watch mode would bankrupt you).
+- [Pre-push CI: how to run GitHub Actions before git push](https://rehearse.sh/blog/github-actions-before-push): Two ways to close the loop before push — `rh watch ci.yml` (CI on every save, sub-second on warm cache) and `rh install-hook` (pre-push gate). Why hosted-runner SaaS competitors structurally can't match this (they bill per minute and watch mode would bankrupt you).
 - [TypeScript GitHub Actions: from YAML to typed pipelines](https://rehearse.sh/blog/typescript-github-actions-yaml): Deep dive on `@rehearse/ci` — typed builders, 100% lossless forward path (snapshot-tested), one-command migration on-ramp (`rh ci convert`), zero runtime dependency on the SDK in compiled YAML.
 
 ## Optional

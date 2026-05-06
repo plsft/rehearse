@@ -70,12 +70,12 @@
 
     <div class="mt-10 grid md:grid-cols-3 gap-5">
       <div class="card p-6">
-        <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">LOCAL · rehearse run</div>
+        <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">LOCAL · rh run</div>
         <div class="text-5xl font-semibold text-white">1.5<span class="text-2xl text-[var(--rh-muted)]">s</span></div>
         <p class="mt-3 text-sm text-[var(--rh-muted)]">Sub-second per cell, warm. Worker concurrency capped at 4.</p>
       </div>
       <div class="card p-6 border-[var(--rh-accent)]/40">
-        <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">PRO · rehearse run --remote</div>
+        <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">PRO · rh run --remote</div>
         <div class="text-5xl font-semibold text-white">5<span class="text-2xl text-[var(--rh-muted)]">s</span></div>
         <p class="mt-3 text-sm text-[var(--rh-muted)]">Single-tenant VM. Network roundtrip + actual VM execution. Cells serialize on Pro to avoid bun-cache install race.</p>
       </div>
@@ -192,7 +192,7 @@
           <li>GitHub-hosted <code class="font-mono">ubuntu-latest</code> runner (2-core, 7 GB RAM, free tier).</li>
           <li>For the typey 9-cell matrix: 3 OSs (ubuntu-latest, macos-latest, windows-latest) × 3 Bun versions (1.2.x, 1.3.x, latest).</li>
           <li>Local Rehearse run on a Windows 11 laptop, host backend, default <code class="font-mono">--max-parallel 4</code>.</li>
-          <li>Pro Rehearse run via <code class="font-mono">rehearse run --remote</code> against a default-tier microVM.</li>
+          <li>Pro Rehearse run via <code class="font-mono">rh run --remote</code> against a default-tier microVM.</li>
         </ul>
       </div>
 
@@ -215,8 +215,8 @@ $ pnpm tsx bench/compare.ts --skip-cold
 
 <span class="comment"># Rehearse vs GitHub Actions on plsft/typey (9-cell matrix)</span>
 $ git clone https://github.com/plsft/typey && cd typey
-$ time rehearse run .github/workflows/ci.yml
-$ time rehearse run --remote .github/workflows/ci.yml
+$ time rh run .github/workflows/ci.yml
+$ time rh run --remote .github/workflows/ci.yml
 $ git push  <span class="comment"># GH Actions runs in the background, see Actions tab</span></pre>
       </div>
 
@@ -281,7 +281,7 @@ $ git push  <span class="comment"># GH Actions runs in the background, see Actio
         <div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Open source</div>
         <ul class="space-y-2 font-mono text-[13px]">
           <li><a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a></li>
-          <li><a href="https://www.npmjs.com/package/@rehearse/runner" class="nav-link">npm</a></li>
+          <li><a href="https://www.npmjs.com/package/@rehearse/cli" class="nav-link">npm</a></li>
           <li><a href="https://github.com/plsft/rehearse/issues" class="nav-link">Issues</a></li>
           <li><a href="/changelog" class="nav-link">Changelog</a></li>
           <li><a href="/llms.txt" class="nav-link">llms.txt</a></li>

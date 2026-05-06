@@ -2,8 +2,8 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { expandComposite, isComposite, resolveAction } from '../src/composite.js';
-import type { ExpressionContext, PlannedStep } from '../src/types.js';
+import { expandComposite, isComposite, resolveAction } from '../src/runner/composite.js';
+import type { ExpressionContext, PlannedStep } from '../src/runner/types.js';
 
 let repo: string;
 
