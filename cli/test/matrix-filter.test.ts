@@ -54,7 +54,7 @@ describe('plan() — matrix filter', () => {
     expect(jobs[0]!.matrixCell).toMatchObject({ os: 'ubuntu-latest', 'node-version': 20 });
   });
 
-  it('filter that matches no cells → 0 cells (caller surfaces "no jobs match")', () => {
+  it('filter that mismatches every cell value → 0 cells (caller surfaces "no jobs match")', () => {
     const jobs = plan(wf(), {
       workflowPath: '.',
       cwd: '.',
@@ -63,13 +63,38 @@ describe('plan() — matrix filter', () => {
     expect(jobs).toHaveLength(0);
   });
 
-  it('filter on a key that does not exist on matrix → 0 cells', () => {
+  it('filter on a key the matrix DOES NOT have → all cells pass (non-strict)', () => {
+    // Pre-v0.6.12 was strict: missing key → 0 cells. Now we treat the
+    // constraint as N/A and let the cells through. Without this, a job
+    // without `architecture` in its matrix gets filtered out by an
+    // `--matrix architecture=x86_64` flag that wasn't meant to apply
+    // to it. Reported by user testing honojs/hono.
     const jobs = plan(wf(), {
       workflowPath: '.',
       cwd: '.',
       matrixFilter: { architecture: 'x86_64' },
     });
-    expect(jobs).toHaveLength(0);
+    expect(jobs).toHaveLength(9);
+  });
+
+  it('non-matrix job + matrix filter → job runs (non-strict)', () => {
+    // Mirrors the hono/main case: job with NO strategy.matrix block,
+    // user passes --matrix os=ubuntu-latest. Pre-fix, this returned 0
+    // cells. Now the job runs unaffected.
+    const wf2: ParsedWorkflow = {
+      name: 'ci',
+      on: 'push',
+      jobs: {
+        main: { 'runs-on': 'ubuntu-latest', steps: [{ run: 'echo hi' }] },
+      },
+    } as unknown as ParsedWorkflow;
+    const jobs = plan(wf2, {
+      workflowPath: '.',
+      cwd: '.',
+      matrixFilter: { os: 'ubuntu-latest' },
+    });
+    expect(jobs).toHaveLength(1);
+    expect(jobs[0]!.jobKey).toBe('main');
   });
 
   it('matrix-os runs-on substituted per cell', () => {

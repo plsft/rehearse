@@ -178,11 +178,24 @@ export function plan(workflow: ParsedWorkflow, opts: RunOptions): PlannedJob[] {
     }
     const matrix = parseMatrix(rawJob.strategy?.matrix);
     const allCells = expandMatrix(matrix);
-    // Apply --matrix filter if any. Each filter entry must match a value
-    // on the cell. Cells with NO matrix variable for a given filter key
-    // are dropped (the user asked for X=Y; this cell has no X — exclude).
+    // Apply --matrix filter if any.
+    //
+    // Semantics: a cell passes the filter iff every constraint either
+    //   (a) names a key the cell DOES have AND the cell's value matches, OR
+    //   (b) names a key the cell DOESN'T have (i.e. the constraint is
+    //       N/A for this job — don't penalise non-matrix or differently-
+    //       shaped-matrix jobs for not having the variable).
+    //
+    // Pre-v0.6.12 we used strict matching (`cell[k] ?? '' === v`) which
+    // meant `--matrix os=ubuntu-latest` against a job WITH NO matrix
+    // returned 0 cells → "no jobs match". Reported by user testing
+    // honojs/hono whose `main` job has no matrix block. The non-strict
+    // semantics match what users expect: "filter cells where applicable,
+    // pass through everything else".
     const cells = opts.matrixFilter && Object.keys(opts.matrixFilter).length > 0
-      ? allCells.filter((cell) => Object.entries(opts.matrixFilter!).every(([k, v]) => String(cell[k] ?? '') === v))
+      ? allCells.filter((cell) => Object.entries(opts.matrixFilter!).every(
+          ([k, v]) => !(k in cell) || String(cell[k]) === v,
+        ))
       : allCells;
     const needs = Array.isArray(rawJob.needs) ? rawJob.needs : rawJob.needs ? [rawJob.needs] : [];
 
