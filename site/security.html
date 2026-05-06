@@ -98,32 +98,54 @@
 
 <!-- ============== FOOTER ============== -->
 <footer class="py-14 hairline">
-  <div class="max-w-6xl mx-auto px-5 flex flex-col gap-5">
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+  <div class="max-w-6xl mx-auto px-5">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-10">
+      <div>
+        <div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Product</div>
+        <ul class="space-y-2 font-mono text-[13px]">
+          <li><a href="/packages" class="nav-link">Packages</a></li>
+          <li><a href="/docs" class="nav-link">Docs</a></li>
+          <li><a href="/bench" class="nav-link">Bench</a></li>
+          <li><a href="/vs" class="nav-link">vs competitors</a></li>
+          <li><a href="/local-github-actions" class="nav-link">Run GH Actions locally</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Pro</div>
+        <ul class="space-y-2 font-mono text-[13px]">
+          <li><a href="/pro" class="nav-link">Overview</a></li>
+          <li><a href="/pricing" class="nav-link">Pricing</a></li>
+          <li><a href="https://buy.stripe.com/6oU9AMdTI8VUdZH7ehgjC0r" class="nav-link">Buy 25k block — $49</a></li>
+          <li><a href="https://pro.rehearse.sh/sign-in" class="nav-link">Sign in</a></li>
+          <li><a href="/security" class="nav-link">Security</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Open source</div>
+        <ul class="space-y-2 font-mono text-[13px]">
+          <li><a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a></li>
+          <li><a href="https://www.npmjs.com/package/@rehearse/runner" class="nav-link">npm</a></li>
+          <li><a href="https://github.com/plsft/rehearse/issues" class="nav-link">Issues</a></li>
+          <li><a href="/changelog" class="nav-link">Changelog</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Company</div>
+        <ul class="space-y-2 font-mono text-[13px]">
+          <li><a href="/" class="nav-link">Home</a></li>
+          <li><a href="/customers" class="nav-link">Customers</a></li>
+          <li><a href="/about" class="nav-link">About</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 pt-6 border-t border-white/5">
       <div class="flex items-center gap-2 font-mono text-sm text-[var(--rh-muted)]">
         <span class="logo-mark logo-mark-sm text-[var(--rh-accent)]"></span>
         <span class="text-white">rehearse</span> · by <a href="https://github.com/plsft" class="link">plsft</a>
       </div>
-      <div class="flex flex-wrap gap-x-5 gap-y-2 font-mono text-[13px]">
-        <a href="/" class="nav-link">Home</a>
-        <a href="/packages" class="nav-link">Packages</a>
-        <a href="/docs" class="nav-link">Docs</a>
-        <a href="/pro" class="nav-link">Pro</a>
-        <a href="/pricing" class="nav-link">Pricing</a>
-        <a href="/vs" class="nav-link">vs</a>
-        <a href="/bench" class="nav-link">Bench</a>
-        <a href="/customers" class="nav-link">Customers</a>
-        <a href="/changelog" class="nav-link">Changelog</a>
-        <a href="/about" class="nav-link">About</a>
-        <a href="/security" class="nav-link">Security</a>
-        <a href="https://pro.rehearse.sh/sign-in" class="nav-link">Sign in</a>
-        <a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a>
-        <a href="https://www.npmjs.com/package/@rehearse/runner" class="nav-link">npm</a>
-        <a href="https://github.com/plsft/rehearse/issues" class="nav-link">Issues</a>
+      <div class="font-mono text-[11px] text-[var(--rh-muted)]">
+        <span class="ok">●</span> v0.4.0 · Apache 2.0
       </div>
-    </div>
-    <div class="font-mono text-[11px] text-[var(--rh-muted)]">
-      <span class="ok">●</span> v0.4.0 · Apache 2.0 · No telemetry · No phone-home
     </div>
   </div>
 </footer>

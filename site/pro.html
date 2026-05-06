@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#08090c" />
 <title>Rehearse Pro — for when the laptop isn't enough</title>
-<meta name="description" content="Rehearse Pro: single-tenant VM you offload to when local CI isn't enough. Whole-rootfs persistence — every cache, every artifact, every tool install survives between runs forever. $49/mo flat, unlimited minutes." />
+<meta name="description" content="Rehearse Pro: single-tenant VM you offload to when local CI isn't enough. Whole-rootfs persistence — every cache, every artifact, every tool install survives between runs forever. $49/mo for 25,000 minutes, $49 per additional 25k block." />
 <meta property="og:title" content="Rehearse Pro — for when the laptop isn't enough" />
-<meta property="og:description" content="Single-tenant VM with whole-rootfs persistence. Every cache survives between runs. $49/mo flat, unlimited minutes." />
+<meta property="og:description" content="Single-tenant VM with whole-rootfs persistence. Every cache survives between runs. $49/mo for 25,000 minutes, $49 per additional 25k block." />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -40,7 +40,7 @@
 <section class="bg-grid pt-36 pb-20 relative">
   <div class="max-w-6xl mx-auto px-5">
     <div class="max-w-3xl mx-auto text-center">
-      <div class="tag mb-5"><span class="w-1.5 h-1.5 rounded-full bg-[var(--rh-accent)] inline-block"></span> rehearse pro · the offload target · $49 / month flat</div>
+      <div class="tag mb-5"><span class="w-1.5 h-1.5 rounded-full bg-[var(--rh-accent)] inline-block"></span> rehearse pro · the offload target · $49 / month · 25,000 min</div>
       <h1 class="text-4xl sm:text-5xl lg:text-[3.7rem] leading-[1.04] font-semibold tracking-tight gradient-text">
         For when the laptop<br/><span class="text-white">isn't enough.</span>
       </h1>
@@ -62,12 +62,12 @@
         <span class="text-white">Everything.</span> One flag: <code class="font-mono text-white/90">runner run --remote</code>.
       </p>
       <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
-        <a href="/pricing" class="btn btn-primary">Start Pro — $49/mo flat</a>
+        <a href="/pricing" class="btn btn-primary">Start Pro — $49/mo</a>
         <a href="/vs" class="btn btn-ghost">vs Blacksmith / Ubicloud →</a>
       </div>
       <div class="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2 text-[12.5px] font-mono text-[var(--rh-muted)]">
         <span><span class="ok">●</span> Single-tenant VM, hardware-isolated</span>
-        <span><span class="ok">●</span> Unlimited minutes</span>
+        <span><span class="ok">●</span> 25,000 min/mo · +$49 per 25k block</span>
         <span><span class="ok">●</span> Whole-rootfs persistence (not just declared paths)</span>
         <span><span class="ok">●</span> Cancel anytime, OSS runner stays free</span>
       </div>
@@ -390,32 +390,54 @@ runner run --remote .github/workflows/ci.yml</code></pre>
 
 <!-- ============== FOOTER ============== -->
 <footer class="py-14 hairline">
-  <div class="max-w-6xl mx-auto px-5 flex flex-col gap-5">
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+  <div class="max-w-6xl mx-auto px-5">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-10">
+      <div>
+        <div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Product</div>
+        <ul class="space-y-2 font-mono text-[13px]">
+          <li><a href="/packages" class="nav-link">Packages</a></li>
+          <li><a href="/docs" class="nav-link">Docs</a></li>
+          <li><a href="/bench" class="nav-link">Bench</a></li>
+          <li><a href="/vs" class="nav-link">vs competitors</a></li>
+          <li><a href="/local-github-actions" class="nav-link">Run GH Actions locally</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Pro</div>
+        <ul class="space-y-2 font-mono text-[13px]">
+          <li><a href="/pro" class="nav-link">Overview</a></li>
+          <li><a href="/pricing" class="nav-link">Pricing</a></li>
+          <li><a href="https://buy.stripe.com/6oU9AMdTI8VUdZH7ehgjC0r" class="nav-link">Buy 25k block — $49</a></li>
+          <li><a href="https://pro.rehearse.sh/sign-in" class="nav-link">Sign in</a></li>
+          <li><a href="/security" class="nav-link">Security</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Open source</div>
+        <ul class="space-y-2 font-mono text-[13px]">
+          <li><a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a></li>
+          <li><a href="https://www.npmjs.com/package/@rehearse/runner" class="nav-link">npm</a></li>
+          <li><a href="https://github.com/plsft/rehearse/issues" class="nav-link">Issues</a></li>
+          <li><a href="/changelog" class="nav-link">Changelog</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Company</div>
+        <ul class="space-y-2 font-mono text-[13px]">
+          <li><a href="/" class="nav-link">Home</a></li>
+          <li><a href="/customers" class="nav-link">Customers</a></li>
+          <li><a href="/about" class="nav-link">About</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 pt-6 border-t border-white/5">
       <div class="flex items-center gap-2 font-mono text-sm text-[var(--rh-muted)]">
         <span class="logo-mark logo-mark-sm text-[var(--rh-accent)]"></span>
         <span class="text-white">rehearse</span> · by <a href="https://github.com/plsft" class="link">plsft</a>
       </div>
-      <div class="flex flex-wrap gap-x-5 gap-y-2 font-mono text-[13px]">
-        <a href="/" class="nav-link">Home</a>
-        <a href="/packages" class="nav-link">Packages</a>
-        <a href="/docs" class="nav-link">Docs</a>
-        <a href="/pro" class="nav-link">Pro</a>
-        <a href="/pricing" class="nav-link">Pricing</a>
-        <a href="/vs" class="nav-link">vs</a>
-        <a href="/bench" class="nav-link">Bench</a>
-        <a href="/customers" class="nav-link">Customers</a>
-        <a href="/changelog" class="nav-link">Changelog</a>
-        <a href="/about" class="nav-link">About</a>
-        <a href="/security" class="nav-link">Security</a>
-        <a href="https://pro.rehearse.sh/sign-in" class="nav-link">Sign in</a>
-        <a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a>
-        <a href="https://www.npmjs.com/package/@rehearse/runner" class="nav-link">npm</a>
-        <a href="https://github.com/plsft/rehearse/issues" class="nav-link">Issues</a>
+      <div class="font-mono text-[11px] text-[var(--rh-muted)]">
+        <span class="ok">●</span> v0.4.0 · Apache 2.0
       </div>
-    </div>
-    <div class="font-mono text-[11px] text-[var(--rh-muted)]">
-      <span class="ok">●</span> v0.4.0 · Apache 2.0 · No telemetry · No phone-home
     </div>
   </div>
 </footer>
