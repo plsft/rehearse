@@ -259,18 +259,18 @@
   <div class="max-w-6xl mx-auto px-5"
        x-data="{
          minutes: 25000,
-         price(perMin, flat) {
-           if (flat !== undefined) return flat;
-           return Math.round(this.minutes * perMin);
-         }
+         proBlocks() { return Math.max(1, Math.ceil(this.minutes / 25000)); },
+         proPrice() { return this.proBlocks() * 49; },
+         price(perMin) { return Math.round(this.minutes * perMin); }
        }">
     <div class="eyebrow">// Interactive cost calculator</div>
     <h2 class="mt-2 text-3xl font-semibold gradient-text">Paste your monthly minutes. See the bill.</h2>
     <p class="mt-4 text-[var(--rh-muted)] max-w-3xl">
-      All Linux/Ubuntu minutes. Add per-OS multipliers for macOS/Windows yourself —
-      both inflate per-minute pricing on the SaaS competitors and have no
-      bearing on Rehearse Pro's flat rate. Numbers are list prices as of
-      2026-05-05; verify against current rate cards before quoting.
+      All Linux/Ubuntu minutes. Pro pricing is in 25,000-minute blocks
+      ($49 each); per-minute competitors are listed at their cheapest
+      Ubuntu rate. macOS/Windows inflate per-minute pricing on the
+      competitors and have no bearing on Pro's block pricing. Numbers
+      are list prices as of 2026-05-05.
     </p>
 
     <div class="mt-8 card p-7">
@@ -287,11 +287,11 @@
       </label>
 
       <div class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <!-- Rehearse Pro: $49 flat -->
+        <!-- Rehearse Pro: $49 per 25k block -->
         <div class="border border-[var(--rh-accent)]/40 rounded-lg p-5 bg-[var(--rh-accent-glow)]/30">
           <div class="font-mono text-xs text-[var(--rh-accent)]">★ REHEARSE PRO</div>
-          <div class="mt-2 text-3xl font-semibold text-white">$49<span class="text-sm text-[var(--rh-muted)]">/mo</span></div>
-          <div class="text-[12px] text-[var(--rh-muted)] mt-1">Flat. Unlimited minutes. <span x-show="minutes > 0">$<span x-text="(49/Math.max(minutes,1)*1000).toFixed(2)"></span> / 1k min effective.</span></div>
+          <div class="mt-2 text-3xl font-semibold text-white">$<span x-text="proPrice()"></span><span class="text-sm text-[var(--rh-muted)]">/mo</span></div>
+          <div class="text-[12px] text-[var(--rh-muted)] mt-1"><span x-text="proBlocks()"></span> × $49 / 25k block · <span x-text="(proBlocks()*25).toLocaleString()"></span>k min cap</div>
         </div>
 
         <!-- GitHub Actions Linux -->
@@ -330,19 +330,21 @@
         </div>
       </div>
 
-      <p class="mt-6 text-[12.5px] font-mono text-[var(--rh-muted)] max-w-3xl" x-show="minutes >= 12250">
-        <span class="accent-text">★ Pro saves money</span> at this volume.
-        At <span x-text="minutes.toLocaleString()"></span> min/mo, Pro's $49 flat is
-        <span class="text-white" x-text="(price(0.008)/49).toFixed(1)"></span>× cheaper than GitHub Actions and
-        <span class="text-white" x-text="(price(0.004)/49).toFixed(1)"></span>× cheaper than Blacksmith.
+      <p class="mt-6 text-[12.5px] font-mono text-[var(--rh-muted)] max-w-3xl" x-show="proPrice() < price(0.008)">
+        <span class="accent-text">★ Pro is cheaper than GitHub Actions</span> at this volume —
+        $<span x-text="proPrice()"></span>/mo (Pro) vs $<span x-text="price(0.008).toLocaleString()"></span>/mo (GH).
       </p>
-      <p class="mt-6 text-[12.5px] font-mono text-[var(--rh-muted)] max-w-3xl" x-show="minutes < 12250 && minutes > 3000">
-        <span class="text-[var(--rh-muted)]">At this volume, Blacksmith's free tier or per-minute pricing beats Pro's flat $49.</span>
-        Crossover happens at 12,250 min/mo on Linux.
+      <p class="mt-3 text-[12.5px] font-mono text-[var(--rh-muted)] max-w-3xl" x-show="proPrice() < price(0.004)">
+        <span class="accent-text">★ Pro is also cheaper than Blacksmith</span> —
+        $<span x-text="proPrice()"></span>/mo (Pro) vs $<span x-text="price(0.004).toLocaleString()"></span>/mo (Blacksmith).
       </p>
-      <p class="mt-6 text-[12.5px] font-mono text-[var(--rh-muted)] max-w-3xl" x-show="minutes <= 3000">
+      <p class="mt-3 text-[12.5px] font-mono text-[var(--rh-muted)] max-w-3xl" x-show="proPrice() >= price(0.004) && minutes > 3000">
+        <span class="text-[var(--rh-muted)]">At this volume, Blacksmith's per-minute beats Pro's block pricing.</span>
+        Pro $<span x-text="proPrice()"></span> vs Blacksmith $<span x-text="price(0.004).toLocaleString()"></span>.
+      </p>
+      <p class="mt-3 text-[12.5px] font-mono text-[var(--rh-muted)] max-w-3xl" x-show="minutes <= 3000">
         <span class="text-[var(--rh-muted)]">At this volume, you fit inside Blacksmith's 3,000-min free tier and GitHub Actions' 2,000-min free tier.</span>
-        Use those — Pro is overkill until you outgrow them.
+        Use those — Pro is overkill until you outgrow them. The OSS Rehearse runner is free for local execution if you don't need a remote VM at all.
       </p>
     </div>
   </div>
@@ -352,13 +354,12 @@
 <section class="py-20 hairline bg-track">
   <div class="max-w-6xl mx-auto px-5">
     <div class="eyebrow">// Same data, scannable</div>
-    <h2 class="mt-2 text-3xl font-semibold gradient-text">Per-minute vs flat-rate at common volumes.</h2>
+    <h2 class="mt-2 text-3xl font-semibold gradient-text">Per-minute vs $49 / 25k blocks at common volumes.</h2>
     <p class="mt-4 text-[var(--rh-muted)] max-w-3xl">
-      Rehearse Pro at $49/mo flat crosses over Blacksmith Ubuntu
-      ($0.004/min) at exactly <span class="text-white">12,250 minutes/month</span>.
-      Below that, Blacksmith is cheaper. Above that, Pro is cheaper.
-      The break-even shifts further if you also count macOS/Windows
-      (Blacksmith charges $0.008-$0.08/min for those).
+      Rehearse Pro = <span class="text-white">$49 per 25,000-minute block</span>.
+      Stays at $49 until you cross 25k; then $98 (2 blocks) until 50k; then
+      $147 (3 blocks) until 75k. Predictable, no surprises. Per-minute
+      competitors keep climbing linearly.
     </p>
 
     <div class="card mt-8 p-0 overflow-x-auto">
@@ -366,64 +367,70 @@
         <thead class="bg-white/[0.02] text-[var(--rh-muted)] text-left">
           <tr>
             <th class="py-3 px-5 font-semibold">Monthly CI minutes</th>
-            <th class="py-3 px-5 font-semibold text-right">Blacksmith Ubuntu</th>
+            <th class="py-3 px-5 font-semibold text-right">Blacksmith</th>
+            <th class="py-3 px-5 font-semibold text-right">GitHub Actions</th>
             <th class="py-3 px-5 font-semibold text-right">Rehearse Pro</th>
-            <th class="py-3 px-5 font-semibold text-right">Winner</th>
+            <th class="py-3 px-5 font-semibold text-right">Cheapest</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-white/5 text-white/90">
           <tr>
-            <td class="py-3 px-5">3,000 min (free tier ceiling)</td>
+            <td class="py-3 px-5">3,000 min (free tiers cover it)</td>
             <td class="py-3 px-5 text-right text-white">$0</td>
-            <td class="py-3 px-5 text-right text-white">$49</td>
+            <td class="py-3 px-5 text-right text-white">$8</td>
+            <td class="py-3 px-5 text-right text-white">$49 (1 block)</td>
             <td class="py-3 px-5 text-right text-[var(--rh-muted)]">Blacksmith free tier</td>
           </tr>
           <tr>
-            <td class="py-3 px-5">8,000 min (light user)</td>
-            <td class="py-3 px-5 text-right text-white">$32</td>
-            <td class="py-3 px-5 text-right text-white">$49</td>
-            <td class="py-3 px-5 text-right text-[var(--rh-muted)]">Blacksmith</td>
-          </tr>
-          <tr>
-            <td class="py-3 px-5">12,250 min (crossover)</td>
-            <td class="py-3 px-5 text-right text-white">$49</td>
-            <td class="py-3 px-5 text-right text-white">$49</td>
-            <td class="py-3 px-5 text-right text-[var(--rh-muted)]">tied</td>
+            <td class="py-3 px-5">12,000 min (light team)</td>
+            <td class="py-3 px-5 text-right text-white">$48</td>
+            <td class="py-3 px-5 text-right text-white">$96</td>
+            <td class="py-3 px-5 text-right text-white">$49 (1 block)</td>
+            <td class="py-3 px-5 text-right text-[var(--rh-muted)]">tied — Blacksmith / Pro</td>
           </tr>
           <tr>
             <td class="py-3 px-5">25,000 min (active dev)</td>
             <td class="py-3 px-5 text-right text-white">$100</td>
-            <td class="py-3 px-5 text-right accent-text">$49</td>
-            <td class="py-3 px-5 text-right accent-text">Pro</td>
+            <td class="py-3 px-5 text-right text-white">$200</td>
+            <td class="py-3 px-5 text-right accent-text">$49 (1 block)</td>
+            <td class="py-3 px-5 text-right accent-text">Pro (2× cheaper)</td>
           </tr>
           <tr>
             <td class="py-3 px-5">50,000 min (heavy CI)</td>
             <td class="py-3 px-5 text-right text-white">$200</td>
-            <td class="py-3 px-5 text-right accent-text">$49</td>
-            <td class="py-3 px-5 text-right accent-text">Pro (4× cheaper)</td>
+            <td class="py-3 px-5 text-right text-white">$400</td>
+            <td class="py-3 px-5 text-right accent-text">$98 (2 blocks)</td>
+            <td class="py-3 px-5 text-right accent-text">Pro (2× cheaper)</td>
           </tr>
           <tr>
             <td class="py-3 px-5">100,000 min (multi-developer team)</td>
             <td class="py-3 px-5 text-right text-white">$400</td>
-            <td class="py-3 px-5 text-right accent-text">$49</td>
-            <td class="py-3 px-5 text-right accent-text">Pro (8× cheaper)</td>
+            <td class="py-3 px-5 text-right text-white">$800</td>
+            <td class="py-3 px-5 text-right accent-text">$196 (4 blocks)</td>
+            <td class="py-3 px-5 text-right accent-text">Pro (2× cheaper)</td>
+          </tr>
+          <tr>
+            <td class="py-3 px-5">200,000 min (talk to us)</td>
+            <td class="py-3 px-5 text-right text-white">$800</td>
+            <td class="py-3 px-5 text-right text-white">$1,600</td>
+            <td class="py-3 px-5 text-right text-[var(--rh-muted)]">Enterprise (custom)</td>
+            <td class="py-3 px-5 text-right text-[var(--rh-muted)]">talk to us</td>
           </tr>
         </tbody>
       </table>
     </div>
 
     <p class="mt-6 text-[12.5px] font-mono text-[var(--rh-muted)] max-w-3xl">
-      <span class="text-white">For a small team or solo dev pushing
-      a few PRs/week, Blacksmith's free tier wins.</span> For anyone
-      doing actual CI volume — matrix builds, integration suites,
-      multiple repos — Pro's flat-rate model is meaningfully cheaper.
+      <span class="text-white">Below 12k min/mo, Blacksmith's free tier wins.</span>
+      Above that, Pro stays at ~50% of Blacksmith's bill at every volume because
+      blocks of 25k cost less than the equivalent Blacksmith minutes. macOS/Windows
+      shifts the math further (Blacksmith charges $0.008-$0.08/min for those).
     </p>
     <p class="mt-3 text-[12.5px] font-mono text-[var(--rh-muted)] max-w-3xl">
-      <span class="text-white">And the big point both miss:</span> if your
+      <span class="text-white">The big point all of these miss:</span> if your
       CI runs locally with the OSS runner before push, you're not burning
       <em>anyone's</em> minutes. The cost question only kicks in for the
-      offload target — and Pro's flat rate hedges your bill against
-      runaway CI usage.
+      offload target.
     </p>
   </div>
 </section>

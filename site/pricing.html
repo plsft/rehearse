@@ -75,16 +75,18 @@
         <h2 class="text-2xl font-semibold mb-1">Pro</h2>
         <p class="text-[var(--rh-muted)] text-sm mb-6">For when the laptop isn't enough. Single-tenant VM with whole-rootfs persistence — every cache survives forever.</p>
         <div class="text-4xl font-semibold mb-1">
-          <span x-show="billing==='monthly'">$49<span class="text-[var(--rh-muted)] text-base font-normal"> / month flat</span></span>
-          <span x-show="billing==='yearly'" x-cloak>$490<span class="text-[var(--rh-muted)] text-base font-normal"> / year flat</span></span>
+          <span x-show="billing==='monthly'">$49<span class="text-[var(--rh-muted)] text-base font-normal"> / month</span></span>
+          <span x-show="billing==='yearly'" x-cloak>$490<span class="text-[var(--rh-muted)] text-base font-normal"> / year</span></span>
         </div>
-        <p class="text-[12px] font-mono text-[var(--rh-muted)] mb-6">Unlimited minutes · Cancel anytime · 14-day refund</p>
+        <p class="text-[12px] font-mono text-[var(--rh-muted)] mb-1"><span class="text-white">25,000 minutes/month included</span></p>
+        <p class="text-[12px] font-mono text-[var(--rh-muted)] mb-6">+$49 per additional 25k block · Cancel anytime · 14-day refund</p>
         <ul class="space-y-2 text-sm mb-8">
           <li><span class="ok">●</span> Everything in OSS, plus:</li>
           <li><span class="ok">●</span> Single-tenant VM, hardware-isolated</li>
           <li><span class="ok">●</span> <span class="text-white">Whole-rootfs persistence</span> (not just declared paths)</li>
           <li><span class="ok">●</span> 100 GB persistent storage</li>
-          <li><span class="ok">●</span> <span class="text-white">Unlimited minutes</span> (no per-minute meter)</li>
+          <li><span class="ok">●</span> <span class="text-white">25,000 active CPU minutes/month</span></li>
+          <li><span class="ok">●</span> Email alerts at 75%, 90%, 100% of cap</li>
           <li><span class="ok">●</span> Live streaming logs</li>
           <li><span class="ok">●</span> Email support within 24h</li>
         </ul>
@@ -114,15 +116,22 @@
 
     <div class="mt-12 max-w-3xl mx-auto text-left">
       <p class="text-[var(--rh-muted)] text-sm">
-        <span class="text-white">Comparing to per-minute hosted runners?</span>
-        Pro at $49/mo flat crosses over Blacksmith Ubuntu ($0.004/min)
-        at exactly <span class="text-white">12,250 minutes/month</span>.
-        Heavy users save real money on flat-rate; light users may pay
-        less per-minute on a competitor's free tier. We did the math
-        honestly — see <a href="/vs" class="link">/vs</a>.
+        <span class="text-white">How the 25k minute cap works:</span>
+        Pro is $49/mo for 25,000 active CPU minutes — the time the VM
+        spends actually executing your workflow. Idle time between
+        runs is free. If you cross the cap, your runs pause; reply to
+        the alert email and we add another $49 / 25k block within an
+        hour. Cap resets the first of each UTC month.
+      </p>
+      <p class="text-[var(--rh-muted)] text-sm mt-4">
+        <span class="text-white">Why 25k:</span> covers most active
+        teams. A developer pushing 100 PRs/month at 5 min each = 500
+        minutes. Heavy CI loads (large matrices, integration suites)
+        are the most likely to need overage blocks. Predictable
+        25k-minute increments beat per-minute surprises.
       </p>
       <p class="text-[12px] font-mono text-[var(--rh-muted)] mt-4">
-        No team tier, no seat surcharges, no usage-based pricing. We tried the matrix. It made the pricing page worse.
+        Compare against per-minute hosted runners on <a href="/vs" class="link">/vs</a>.
       </p>
     </div>
   </div>
@@ -142,8 +151,12 @@
         <p class="text-[var(--rh-muted)]">Yes. Stripe Customer Portal handles cancellation, refund (14-day window), card update, plan switch. We never gate it.</p>
       </div>
       <div>
-        <p class="font-semibold mb-1">Are there usage limits?</p>
-        <p class="text-[var(--rh-muted)]">Not at v0 launch. Your VM is provisioned with 100 GB persistent storage; that's the natural ceiling. If you're running CI heavily and need more, talk to me before I have to email you about it. We'll figure it out before adding any cap.</p>
+        <p class="font-semibold mb-1">What's the 25,000-minute cap and how does it work?</p>
+        <p class="text-[var(--rh-muted)]">The cap is on <span class="text-white">active CPU minutes</span> — the actual time the VM is executing your workflow. Idle time is free; you only burn minutes when <code class="font-mono">runner run --remote</code> is doing real work on your VM. Email alerts fire at 75% and 90% of your cap. Hit 100% and your runs pause until the cap resets (first of next UTC month) OR you add another $49 / 25k block. To add a block, just reply to the alert email — I'll bump your cap within an hour.</p>
+      </div>
+      <div>
+        <p class="font-semibold mb-1">What if I outgrow 25,000 minutes?</p>
+        <p class="text-[var(--rh-muted)]">Each additional <span class="text-white">$49 / 25,000-minute block</span> stacks on your base. Two blocks = $98/mo for 50k minutes; three = $147/mo for 75k. No tier ladders, no seat surcharges. If you're consistently above 100k min/mo, talk to George about Enterprise — bulk pricing makes more sense at that volume.</p>
       </div>
       <div>
         <p class="font-semibold mb-1">How long does provisioning take?</p>
