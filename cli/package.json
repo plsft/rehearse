@@ -1,6 +1,6 @@
 {
   "name": "@rehearse/cli",
-  "version": "0.5.4",
+  "version": "0.6.0",
   "description": "Rehearse — local-first GitHub Actions runner + TypeScript-pipeline CLI. Single binary `rh`.",
   "license": "Apache-2.0",
   "type": "module",
