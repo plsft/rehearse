@@ -6,8 +6,26 @@ import { parseWorkflow } from '@rehearse/ci';
 import { existsSync, readFileSync } from 'node:fs';
 import { cpus } from 'node:os';
 import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { performance } from 'node:perf_hooks';
 import pc from 'picocolors';
+
+/**
+ * Read the CLI's own version from package.json. Same trick as cli/index.ts:
+ * the file is two dirs up from `dist/runner/` at runtime. Fail open to '0.0.0'
+ * if anything's wrong (printing an unknown version is better than crashing).
+ */
+function readPkgVersion(): string {
+  try {
+    const here = dirname(fileURLToPath(import.meta.url));
+    // dist/runner/orchestrator.js → ../../package.json
+    const pkgPath = resolve(here, '..', '..', 'package.json');
+    const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8')) as { version?: string };
+    return pkg.version ?? '0.0.0';
+  } catch {
+    return '0.0.0';
+  }
+}
 import { ContainerBackend } from './backends/container.js';
 import { HostBackend } from './backends/host.js';
 import { plan } from './planner.js';
@@ -64,8 +82,18 @@ export async function run(options: RunOptions): Promise<RunResult> {
   const isTty = process.stdout.isTTY === true;
 
   if (verbose) {
-    // Banner — gray comment style, matches the simulated terminal demo.
-    console.log(`${pc.gray('#')} ${pc.bold('rehearse')} ${pc.gray('·')} ${wf.name ?? 'workflow'}`);
+    // Banner — tool identity + workflow context. Two-line gray "comment"
+    // header matches the simulated terminal demo on rehearse.sh; users
+    // explicitly asked to see version + cpu utilisation up front.
+    const totalCpus = cpus().length;
+    const usedCpus = Math.min(maxParallel, totalCpus);
+    const sep = pc.gray('·');
+    console.log(
+      `${pc.gray('#')} ${pc.bold('rehearse')} ${pc.dim('v' + readPkgVersion())} ${sep} ` +
+      `${pc.dim('rehearse.sh')} ${sep} ` +
+      `${pc.dim(`${usedCpus} of ${totalCpus} cpus`)}`,
+    );
+    console.log(`${pc.gray('#')} ${pc.bold(wf.name ?? 'workflow')}`);
     console.log(pc.gray(`workflow: ${wfPath}`));
     console.log(pc.gray(`jobs:     ${planned.length}  (parallel ≤ ${maxParallel})`));
   }
