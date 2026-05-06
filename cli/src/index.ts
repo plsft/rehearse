@@ -442,6 +442,69 @@ program
   });
 
 // ============================================================
+// rh log <run-id>  — fetch a captured log from the Pro API
+// ============================================================
+program
+  .command('log <runId>')
+  .description("Fetch the captured log for a previous --remote run by id")
+  .option('--api-url <url>', 'override Pro API URL', 'https://api.rehearse.sh')
+  .option('--meta', 'show only run metadata (status, exit code, duration), no log body')
+  .action(async (runId: string, opts: { apiUrl: string; meta?: boolean }) => {
+    const token = process.env.REHEARSE_TOKEN ?? '';
+    if (!token) {
+      process.stderr.write(pc.red('REHEARSE_TOKEN env var is required\n'));
+      process.stderr.write('Get one at https://pro.rehearse.sh/dashboard/keys\n');
+      await exitWithDrain(2);
+      return;
+    }
+    const res = await fetch(`${opts.apiUrl}/v1/runs/${encodeURIComponent(runId)}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (res.status === 404) {
+      process.stderr.write(pc.red(`✗ run not found: ${runId}\n`));
+      process.stderr.write(pc.gray('  (check the id and that it belongs to your team)\n'));
+      await exitWithDrain(1);
+      return;
+    }
+    if (!res.ok) {
+      const body = await res.text().catch(() => '');
+      process.stderr.write(pc.red(`✗ API ${res.status}: ${body.slice(0, 200)}\n`));
+      await exitWithDrain(2);
+      return;
+    }
+    const data = await res.json() as {
+      run_id: string;
+      status: string;
+      exit_code: number | null;
+      duration_ms: number | null;
+      started_at: number;
+      finished_at: number | null;
+      log: string;
+    };
+    // Header — same compact identity style as the run-time banner.
+    const dur = data.duration_ms != null
+      ? (data.duration_ms < 1000 ? `${data.duration_ms}ms` : `${(data.duration_ms / 1000).toFixed(2)}s`)
+      : '?';
+    const statusColor = data.status === 'success' ? pc.green : data.status === 'failure' ? pc.red : pc.yellow;
+    process.stderr.write(
+      `${pc.gray('#')} ${pc.bold('rehearse log')} ${pc.gray('·')} ${pc.dim(data.run_id)} ${pc.gray('·')} ` +
+      `${statusColor(data.status)} ${pc.gray('·')} exit=${data.exit_code ?? '?'} ${pc.gray('·')} ${pc.dim(dur)}\n`,
+    );
+    process.stderr.write(pc.gray('─'.repeat(72)) + '\n');
+    if (opts.meta) {
+      // Metadata-only mode: no body, just confirm the run exists.
+      await exitWithDrain(data.exit_code === 0 ? 0 : 1);
+      return;
+    }
+    // Stream the captured log to stdout (same stream the user would
+    // see live during a --remote run). Includes ANSI codes from the
+    // VM-side rh — terminal renders them correctly.
+    process.stdout.write(data.log);
+    if (data.log && !data.log.endsWith('\n')) process.stdout.write('\n');
+    await exitWithDrain(data.exit_code === 0 ? 0 : 1);
+  });
+
+// ============================================================
 // rh install-hook  — pre-push git hook
 // ============================================================
 program
