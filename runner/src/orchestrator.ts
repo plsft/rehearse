@@ -30,6 +30,12 @@ function statusMark(s: JobStatus): string {
   return pc.gray('⊘');
 }
 
+const LABEL_COL = 42;
+function padLabel(label: string): string {
+  if (label.length > LABEL_COL - 1) return label.slice(0, LABEL_COL - 2) + '…';
+  return label.padEnd(LABEL_COL);
+}
+
 export async function run(options: RunOptions): Promise<RunResult> {
   const wfPath = resolve(process.cwd(), options.workflowPath);
   if (!existsSync(wfPath)) throw new Error(`workflow not found: ${wfPath}`);
@@ -48,12 +54,26 @@ export async function run(options: RunOptions): Promise<RunResult> {
   const maxParallel = options.maxParallel ?? Math.min(cpus().length, 4);
 
   const verbose = options.verbosity !== 'quiet';
+  const isTty = process.stdout.isTTY === true;
+
   if (verbose) {
-    console.log(pc.bold(`runner · ${wf.name ?? wfPath}`));
+    // Banner — gray comment style, matches the simulated terminal demo.
+    console.log(`${pc.gray('#')} ${pc.bold('rehearse')} ${pc.gray('·')} ${wf.name ?? 'workflow'}`);
     console.log(pc.gray(`workflow: ${wfPath}`));
-    console.log(pc.gray(`cwd:      ${cwd}`));
     console.log(pc.gray(`jobs:     ${planned.length}  (parallel ≤ ${maxParallel})`));
   }
+
+  // Live-overwrite state: when a step-start writes a "running…" pre-line
+  // without a trailing \n, we remember which job owns the current line so
+  // the matching step-end can erase + replace it. Any other write that
+  // breaks the ownership (a different job's event, job-start, summary)
+  // calls flushInflight() to push the cursor down to a clean line first.
+  let inflightJobId: string | null = null;
+  const flushInflight = () => {
+    if (inflightJobId === null) return;
+    process.stdout.write('\n');
+    inflightJobId = null;
+  };
 
   const t0 = performance.now();
   const jobs = await runJobs(planned, {
@@ -65,22 +85,53 @@ export async function run(options: RunOptions): Promise<RunResult> {
     onEvent: (e) => {
       if (!verbose) return;
       switch (e.kind) {
-        case 'job-start':
-          console.log(`\n${pc.cyan('▶')} ${pc.bold(`job: ${e.job.jobName}`)} ${pc.gray(`(${e.job.backend} · ${e.job.runsOn})`)}`);
+        case 'job-start': {
+          flushInflight();
+          const cell = e.job.matrixCell
+            ? ' ' + pc.gray(`[${Object.entries(e.job.matrixCell).map(([k, v]) => `${k}=${v}`).join(',')}]`)
+            : '';
+          console.log(`\n${pc.cyan('▶')} ${pc.bold(`job: ${e.job.jobName}`)} ${pc.gray(`(${e.job.backend} · ${e.job.runsOn})`)}${cell}`);
           break;
-        case 'step-end':
-          if (e.result.status === 'skipped') {
-            console.log(`  ${pc.gray('⊘')} ${e.step.label.padEnd(50)} ${pc.gray(`(${e.result.reason})`)}`);
+        }
+        case 'step-start': {
+          if (!isTty) break;        // non-TTY: skip the pre-line — final line says it all
+          flushInflight();           // clear any other job's running… line first
+          process.stdout.write(`  ${pc.yellow('▸')} ${padLabel(e.step.label)} ${pc.gray('running…')}`);
+          inflightJobId = e.job.id;
+          break;
+        }
+        case 'step-end': {
+          // If our own step-start is still on the cursor line, erase it.
+          // Otherwise push to a fresh line.
+          if (isTty && inflightJobId === e.job.id) {
+            process.stdout.write('\r\x1B[K');
+            inflightJobId = null;
           } else {
-            console.log(`  ${statusMark(e.result.status)} ${e.step.label.padEnd(50)} ${pc.gray(fmtMs(e.result.durationMs))}`);
+            flushInflight();
+          }
+          // Three render modes, matching the simulated demo on rehearse.sh:
+          //   - skipped:                       ⊘ <label>  <reason>
+          //   - host-shortcut (no-op success): ⊘ <label>  <reason>
+          //   - real work:                     ✓ / ✗ / ● <label>  <duration>
+          const isHostShortcut = e.result.status === 'success'
+            && e.result.durationMs < 5
+            && !!e.result.reason;
+          if (e.result.status === 'skipped' || isHostShortcut) {
+            console.log(`  ${pc.gray('⊘')} ${padLabel(e.step.label)} ${pc.gray(e.result.reason ?? 'skipped')}`);
+          } else {
+            console.log(`  ${statusMark(e.result.status)} ${padLabel(e.step.label)} ${pc.gray(fmtMs(e.result.durationMs))}`);
           }
           break;
+        }
         case 'job-end':
-          // summary printed below
+          // Per-job rollup is printed in the summary block at the end.
           break;
       }
     },
   });
+
+  // Make sure the cursor is on a clean line before the summary.
+  flushInflight();
 
   const overallStatus: JobStatus =
     jobs.some((j) => j.status === 'failure') ? 'failure'
@@ -88,7 +139,7 @@ export async function run(options: RunOptions): Promise<RunResult> {
       : 'success';
 
   const totalMs = performance.now() - t0;
-  if (verbose) printSummary(wf.name ?? wfPath, jobs, overallStatus, totalMs);
+  if (verbose) printSummary(wf.name ?? wfPath, jobs, overallStatus, totalMs, maxParallel);
 
   return { workflow: wfPath, status: overallStatus, durationMs: totalMs, jobs };
 }
@@ -122,15 +173,26 @@ function baseContext(job: PlannedJob, needs: Record<string, JobResult>, opts: Ru
   };
 }
 
-function printSummary(wfName: string, jobs: JobResult[], overall: JobStatus, totalMs: number): void {
+function printSummary(wfName: string, jobs: JobResult[], overall: JobStatus, totalMs: number, maxParallel: number): void {
   const ran = jobs.filter((j) => j.status !== 'skipped' && j.status !== 'cancelled').length;
   const skipped = jobs.filter((j) => j.status === 'skipped').length;
-  console.log('\n' + pc.gray('─'.repeat(74)));
+  const hasMatrix = jobs.some((j) => j.matrixCell);
+
+  console.log(pc.gray('─'.repeat(72)));
   const tag = overall === 'success' ? pc.green('PASS') : overall === 'failure' ? pc.red('FAIL') : pc.yellow(overall.toUpperCase());
-  console.log(`${pc.bold(wfName)}  ${tag}  ${pc.cyan(fmtMs(totalMs))}  ${pc.gray(`(${ran} ran, ${skipped} skipped)`)}`);
-  for (const j of jobs) {
-    const cell = j.matrixCell ? pc.gray(` [${Object.entries(j.matrixCell).map(([k, v]) => `${k}=${v}`).join(',')}]`) : '';
-    console.log(`  ${statusMark(j.status)} ${pc.cyan(j.jobName.padEnd(20))} ${fmtMs(j.durationMs).padStart(8)}${cell}${j.reason ? pc.gray(`  ${j.reason}`) : ''}`);
+  const parallelHint = ran > 1 && maxParallel > 1 ? ` ${pc.gray('·')} ${pc.gray(`${ran} jobs in parallel`)}` : ran === 1 ? ` ${pc.gray('·')} ${pc.gray('1 job')}` : ` ${pc.gray('·')} ${pc.gray(`${ran} jobs`)}`;
+  const skipHint = skipped > 0 ? pc.gray(` · ${skipped} skipped`) : '';
+  console.log(`${pc.bold(wfName)}  ${tag}  ${pc.cyan(fmtMs(totalMs))}${parallelHint}${skipHint}`);
+
+  // Per-job rollup only when it adds information: matrix cells, or >3 jobs.
+  // For the simple 1–2 job case the in-flight step lines are already
+  // self-evident.
+  if (hasMatrix || jobs.length > 3) {
+    for (const j of jobs) {
+      const cell = j.matrixCell
+        ? pc.gray(` [${Object.entries(j.matrixCell).map(([k, v]) => `${k}=${v}`).join(',')}]`)
+        : '';
+      console.log(`  ${statusMark(j.status)} ${pc.cyan(j.jobName.padEnd(20))} ${fmtMs(j.durationMs).padStart(8)}${cell}${j.reason ? pc.gray(`  ${j.reason}`) : ''}`);
+    }
   }
-  console.log(pc.gray('─'.repeat(74)));
 }
