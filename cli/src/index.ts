@@ -44,6 +44,29 @@ import { watchWorkflow } from './runner/watch.js';
 import type { BackendName } from './runner/types.js';
 
 /**
+ * Exit with `code` AFTER stdout/stderr fully drain.
+ *
+ * `process.exit()` is synchronous — it terminates immediately, and any
+ * data still buffered in stdout/stderr (pipes only — TTYs are synchronous
+ * by default in Node) gets dropped on the floor. This bit us hard on
+ * --remote runs: the orchestrator's printSummary() wrote `────────` and
+ * `ci PASS Xs · N jobs` via `console.log`, which on a pipe is async; then
+ * `process.exit(0)` ran before the kernel buffer drained, and the customer
+ * saw output stop right before the summary.
+ *
+ * This helper writes a zero-byte chunk with a callback — Node's stream
+ * machinery only fires the callback once the buffer is fully flushed —
+ * then exits. Works on TTY and pipe equally.
+ */
+async function exitWithDrain(code: number): Promise<never> {
+  await Promise.all([
+    new Promise<void>((r) => process.stdout.write('', () => r())),
+    new Promise<void>((r) => process.stderr.write('', () => r())),
+  ]);
+  process.exit(code);
+}
+
+/**
  * --matrix flag collector. Accepts either repeated flags or comma-separated
  * pairs:
  *   --matrix os=ubuntu-latest --matrix node-version=20
@@ -120,7 +143,7 @@ program
         maxParallel: typeof opts.maxParallel === 'number' ? opts.maxParallel : undefined,
         env,
       });
-      process.exit(code);
+      await exitWithDrain(code);
     }
 
     const result = await run({
@@ -143,7 +166,7 @@ program
         jobs: result.jobs.map((j) => ({ id: j.jobId, status: j.status, ms: j.durationMs })),
       }) + '\n');
     }
-    process.exit(result.status === 'failure' ? 1 : 0);
+    await exitWithDrain(result.status === 'failure' ? 1 : 0);
   });
 
 /**
@@ -411,10 +434,10 @@ program
     try {
       const result = compat(workflow);
       printReport(result, { json: opts.json });
-      process.exit(0);
+      await exitWithDrain(0);
     } catch (err) {
       console.error(pc.red('✗ ' + ((err as Error).message ?? String(err))));
-      process.exit(2);
+      await exitWithDrain(2);
     }
   });
 
@@ -457,29 +480,29 @@ ci.command('compile')
   .option('--out <dir>', 'Output directory')
   .option('--in <dir>', 'Pipelines directory')
   .action(async (opts: { out?: string; in?: string }) => {
-    process.exit(await runCompile({ outDir: opts.out, pipelinesDir: opts.in }));
+    await exitWithDrain(await runCompile({ outDir: opts.out, pipelinesDir: opts.in }));
   });
 ci.command('init')
   .description('Scaffold .rehearse/pipelines/ci.ts and rehearse.config.ts')
-  .action(async () => process.exit(await runInit()));
+  .action(async () => exitWithDrain(await runInit()));
 ci.command('convert <yamlFile>')
   .description('Convert a GitHub Actions YAML file to TypeScript')
   .option('--out <dir>', 'Output directory')
   .action(async (yamlFile: string, opts: { out?: string }) =>
-    process.exit(await runConvert(yamlFile, opts)),
+    exitWithDrain(await runConvert(yamlFile, opts)),
   );
 ci.command('validate')
   .description('Validate that all pipelines compile cleanly')
-  .action(async () => process.exit(await runValidate()));
+  .action(async () => exitWithDrain(await runValidate()));
 ci.command('watch')
   .description('Watch pipelines and recompile on change')
-  .action(async () => process.exit(await runCiWatch()));
+  .action(async () => exitWithDrain(await runCiWatch()));
 ci.command('estimate')
   .description('Estimate GitHub-hosted CI cost per run and per month')
   .option('--durations <json>', 'JSON object: { jobName: minutes }')
   .option('--runs-per-month <n>', 'Pipeline runs per month', (v) => Number(v))
   .action(async (opts: { durations?: string; runsPerMonth?: number }) =>
-    process.exit(await runEstimate(opts)),
+    exitWithDrain(await runEstimate(opts)),
   );
 
 function loadEnvFile(path: string): Record<string, string> {
