@@ -146,6 +146,13 @@ body {
 .btn-ghost { color: var(--rh-fg); background: transparent; }
 .btn-ghost:hover { border-color: var(--rh-line-strong); background: rgba(255,255,255,0.03); }
 
+/* Smaller modifier for header CTA pair */
+.btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 8px; }
+
+/* Header nav: keep links visible across screen sizes; horizontal scroll if too tight */
+.nav-scroll { scrollbar-width: none; -ms-overflow-style: none; }
+.nav-scroll::-webkit-scrollbar { display: none; }
+
 .tag {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 3px 10px;
