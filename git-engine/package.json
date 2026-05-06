@@ -1,6 +1,6 @@
 {
   "name": "@rehearse/git-core",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Pure-TypeScript git protocol: objects, packfiles, smart-HTTP, diff, merge, refs",
   "license": "Apache-2.0",
   "type": "module",
