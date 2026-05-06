@@ -57,10 +57,61 @@
 <section class="py-16 hairline">
   <div class="max-w-3xl mx-auto px-5 space-y-12">
 
+    <!-- v0.5.4 -->
+    <article>
+      <div class="flex items-baseline gap-3 mb-3">
+        <h2 class="text-2xl font-semibold gradient-text">v0.5.4</h2>
+        <span class="text-[12px] font-mono text-[var(--rh-muted)]">2026-05-06 · matrix install correctness</span>
+      </div>
+      <div class="card p-6 space-y-4 text-[var(--rh-muted)]">
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1">Runner — matrix scratch caches</div>
+          <ul class="space-y-1 text-sm">
+            <li>— Matrix cells now write to <strong class="text-white">isolated per-cell package-manager caches</strong> for race-prone managers (npm, yarn, pip). Path: <code class="font-mono">.runner/cache/&lt;cellId&gt;/{npm,yarn,pip}/</code> — deterministic so caches warm across runs of the same matrix configuration.</li>
+            <li>— Content-addressed managers (pnpm, bun, cargo, Go) keep using the user's global cache — they're parallel-safe by design and benefit from existing warm state.</li>
+            <li>— Each matrix cell now installs into its own worktree's <code class="font-mono">node_modules</code> (previously symlinked to the parent, which let parallel <code class="font-mono">npm install</code> cells trample each other's tree on the shared path).</li>
+            <li>— <code class="font-mono">git worktree add</code> now robust against stale registrations (fires <code class="font-mono">git worktree remove --force</code> + <code class="font-mono">prune</code> before adding, so <code class="font-mono">rm -rf .runner/</code> between runs no longer corrupts state).</li>
+          </ul>
+        </div>
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1">Validated on fastify (Windows x64)</div>
+          <ul class="space-y-1 text-sm">
+            <li>— 2-cell <code class="font-mono">test-pino-compat</code> matrix: <strong class="text-white">PASS in 1m44s</strong>, zero TAR-rename errors.</li>
+            <li>— Cold install per cell: ~40.7s. Warm install per cell (second run): ~31.6s — per-cell cache reuse confirmed.</li>
+            <li>— Eliminates the <code class="font-mono">npm warn tar TAR_ENTRY_ERROR</code> floods previously seen on parallel <code class="font-mono">npm install</code> on Windows.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <!-- v0.5.3 -->
+    <article>
+      <div class="flex items-baseline gap-3 mb-3">
+        <h2 class="text-2xl font-semibold gradient-text">v0.5.3</h2>
+        <span class="text-[12px] font-mono text-[var(--rh-muted)]">2026-05-06 · reusable workflows + matrix backend</span>
+      </div>
+      <div class="card p-6 space-y-4 text-[var(--rh-muted)]">
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1">Three bugfixes from fastify CI audit</div>
+          <ul class="space-y-1 text-sm">
+            <li>— <code class="font-mono">rehearse compat</code> no longer crashes with <em>"Cannot read properties of undefined (reading 'map')"</em> when a workflow has reusable-workflow callers (job-level <code class="font-mono">uses:</code>). Synthesizes a single <code class="font-mono">reusable-local</code> or <code class="font-mono">reusable-remote</code> step entry so the audit completes.</li>
+            <li>— Backend selection now reads the <strong class="text-white">matrix-substituted</strong> <code class="font-mono">runs-on</code>. Previously a Windows host running a job with <code class="font-mono">runs-on: ${{ matrix.os }}</code> would always pick <code class="font-mono">host</code> backend regardless of cell target. Now correctly falls back to <code class="font-mono">container</code> for cross-OS cells.</li>
+            <li>— Remote reusable workflows (<code class="font-mono">org/repo/.github/workflows/x.yml@ref</code>) now show a clear <code class="font-mono">⊘ remote reusable workflow not supported: …</code> skip line at run time, instead of phantom-running with 0 steps.</li>
+          </ul>
+        </div>
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1">UX</div>
+          <ul class="space-y-1 text-sm">
+            <li>— <code class="font-mono">--job &lt;key&gt;</code> filter now also matches expanded reusable inner jobs by caller-key prefix (e.g. <code class="font-mono">--job coverage-nix</code> matches <code class="font-mono">coverage-nix__check-coverage</code>).</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
     <!-- v0.5.2 -->
     <article>
       <div class="flex items-baseline gap-3 mb-3">
-        <h2 class="text-2xl font-semibold gradient-text">v0.5.2</h2>
+        <h2 class="text-2xl font-semibold text-white">v0.5.2</h2>
         <span class="text-[12px] font-mono text-[var(--rh-muted)]">2026-05-06 · CLI UX redesign</span>
       </div>
       <div class="card p-6 space-y-4 text-[var(--rh-muted)]">
