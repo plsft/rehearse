@@ -21,7 +21,7 @@
     <a href="/" class="flex items-center gap-2.5 font-mono group" aria-label="Rehearse home">
       <span class="logo-mark logo-mark-md text-[var(--rh-accent)] transition-transform group-hover:scale-110"></span>
       <span class="font-semibold tracking-tight text-white">rehearse</span>
-      <span class="hidden sm:inline text-[11px] text-[var(--rh-muted)] border border-white/10 rounded px-1.5 py-0.5">v0.5.0 · 4 pkgs · 323 tests</span>
+      <span class="hidden sm:inline text-[11px] text-[var(--rh-muted)] border border-white/10 rounded px-1.5 py-0.5">v0.5.1 · 4 pkgs · 323 tests</span>
     </a>
     <nav class="hidden md:flex items-center gap-7">
       <a href="/packages" class="nav-link ">Packages</a>
@@ -54,10 +54,59 @@
 <section class="py-16 hairline">
   <div class="max-w-3xl mx-auto px-5 space-y-12">
 
+    <!-- v0.5.1 -->
+    <article>
+      <div class="flex items-baseline gap-3 mb-3">
+        <h2 class="text-2xl font-semibold gradient-text">v0.5.1</h2>
+        <span class="text-[12px] font-mono text-[var(--rh-muted)]">2026-05-06 · binary-rename completion</span>
+      </div>
+      <div class="card p-6 space-y-4 text-[var(--rh-muted)]">
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1">Runner</div>
+          <ul class="space-y-1 text-sm">
+            <li>— <code class="font-mono">rehearse install-hook</code> now writes a more robust pre-push hook using <code class="font-mono">npx -p @rehearse/runner rehearse run</code> (explicit bin), instead of relying on npx's single-bin default resolution.</li>
+            <li>— Internal docstrings + <code class="font-mono">--help</code> text updated to use the new <code class="font-mono">rehearse</code> binary name everywhere (residual <code class="font-mono">runner</code> references from the v0.5.0 rename).</li>
+          </ul>
+        </div>
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1">Marketing site</div>
+          <ul class="space-y-1 text-sm">
+            <li>— <code class="font-mono">site/docs.html</code> generated-hook example: fixed bogus <code class="font-mono">@rehearse/rehearse</code> package name (a typo — only <code class="font-mono">@rehearse/runner</code> exists on npm).</li>
+            <li>— <code class="font-mono">/blog</code> launched: 4 SEO posts targeting <em>act alternative</em>, <em>github actions before push</em>, <em>typescript github actions</em>, and a real-time dogfood diary.</li>
+            <li>— <code class="font-mono">/sitemap.xml</code> with all 20 canonical URLs; <code class="font-mono">BlogPosting</code> + <code class="font-mono">FAQPage</code> Schema.org markup on each post.</li>
+            <li>— <code class="font-mono">llms.txt</code> + <code class="font-mono">llms-full.txt</code> updated with /blog section.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <!-- v0.5.0 -->
+    <article>
+      <div class="flex items-baseline gap-3 mb-3">
+        <h2 class="text-2xl font-semibold gradient-text">v0.5.0</h2>
+        <span class="text-[12px] font-mono text-[var(--rh-muted)]">2026-05-06 · breaking — binary rename</span>
+      </div>
+      <div class="card p-6 space-y-4 text-[var(--rh-muted)]">
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-amber)] mb-1">⚠ Breaking — @rehearse/runner</div>
+          <ul class="space-y-1 text-sm">
+            <li>— Binary renamed: <code class="font-mono">runner</code> → <code class="font-mono">rehearse</code>. Old: <code class="font-mono">runner run ci.yml</code>. New: <code class="font-mono">rehearse run ci.yml</code>. Migration: re-run <code class="font-mono">npm install -g @rehearse/runner@latest</code> and update any pre-push hook (delete <code class="font-mono">.git/hooks/pre-push</code> + re-run <code class="font-mono">rehearse install-hook</code>).</li>
+            <li>— Package name unchanged (<code class="font-mono">@rehearse/runner</code>); only the bin target changed.</li>
+          </ul>
+        </div>
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1">Pricing</div>
+          <ul class="space-y-1 text-sm">
+            <li>— <strong class="text-white">Intro pricing</strong> framing: $49/mo today, <span class="line-through opacity-60">$69/mo</span> regular post-launch. Same 25,000 active CPU minutes / month + $49 per additional 25k block.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
     <!-- v0.4.0 -->
     <article>
       <div class="flex items-baseline gap-3 mb-3">
-        <h2 class="text-2xl font-semibold gradient-text">v0.4.0</h2>
+        <h2 class="text-2xl font-semibold text-white">v0.4.0</h2>
         <span class="text-[12px] font-mono text-[var(--rh-muted)]">2026-05-05 · positioning + breaking SDK</span>
       </div>
       <div class="card p-6 space-y-4 text-[var(--rh-muted)]">
@@ -243,7 +292,7 @@
         <span class="text-white">rehearse</span> · by <a href="https://github.com/plsft" class="link">plsft</a>
       </div>
       <div class="font-mono text-[11px] text-[var(--rh-muted)]">
-        <span class="ok">●</span> v0.5.0 · Apache 2.0
+        <span class="ok">●</span> v0.5.1 · Apache 2.0
       </div>
     </div>
   </div>

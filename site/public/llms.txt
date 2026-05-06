@@ -57,8 +57,8 @@ Rehearse is four npm packages that together let you author CI in TypeScript, exe
 
 ## Customers + changelog
 
-- [Customers](https://rehearse.sh/customers): Repos using Rehearse in production (currently typey + rehearse itself). Honest framing — we just shipped v0.5.0; list grows as users come on.
-- [Changelog](https://rehearse.sh/changelog): Release notes from v0.5.0 backwards. Covers the 0.3.x stabilization series and pre-pivot v0.1–v0.2 archive context.
+- [Customers](https://rehearse.sh/customers): Repos using Rehearse in production (currently typey + rehearse itself). Honest framing — we just shipped v0.5.1; list grows as users come on.
+- [Changelog](https://rehearse.sh/changelog): Release notes from v0.5.1 backwards. Covers the 0.3.x stabilization series and pre-pivot v0.1–v0.2 archive context.
 
 ## Blog
 
