@@ -117,6 +117,7 @@ program
         repoSubdirOverride: opts.repoSubdir,
         jobFilter: opts.job,
         matrixFilter: opts.matrix && Object.keys(opts.matrix).length > 0 ? opts.matrix : undefined,
+        maxParallel: typeof opts.maxParallel === 'number' ? opts.maxParallel : undefined,
         env,
       });
       process.exit(code);
@@ -168,6 +169,13 @@ async function runRemote(args: {
   jobFilter?: string;
   /** --matrix <k=v>(,..) forwarded to the VM-side `rh run`. */
   matrixFilter?: Record<string, string>;
+  /**
+   * --max-parallel forwarded to the VM-side `rh run`. Default 1
+   * (sequential matrix). Pass 4+ to run cells in parallel for the
+   * 3×+ speedup on multi-cell matrices — confirm your workflow
+   * doesn't depend on fixed-port `listen()` or shared /tmp locks first.
+   */
+  maxParallel?: number;
   /**
    * Env vars (typically loaded from --env-file). Shipped to the VM where
    * they become BOTH process env AND `${{ secrets.* }}` for workflow
@@ -227,6 +235,7 @@ async function runRemote(args: {
       env: args.env && Object.keys(args.env).length > 0 ? args.env : undefined,
       job_filter: args.jobFilter,
       matrix_filter: args.matrixFilter,
+      max_parallel: args.maxParallel,
     }),
   });
   if (!res.ok || !res.body) {
