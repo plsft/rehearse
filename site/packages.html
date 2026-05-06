@@ -14,25 +14,24 @@
 </head>
 <body class="antialiased" x-data="{ scrolled: false }" x-init="window.addEventListener('scroll', () => scrolled = window.scrollY > 8)">
 
+<!-- ============== NAV ============== -->
 <header :class="scrolled ? 'border-b border-white/10 backdrop-blur bg-black/55' : 'border-b border-transparent'"
         class="fixed inset-x-0 top-0 z-50 transition-colors">
   <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
     <a href="/" class="flex items-center gap-2.5 font-mono group" aria-label="Rehearse home">
       <span class="logo-mark logo-mark-md text-[var(--rh-accent)] transition-transform group-hover:scale-110"></span>
       <span class="font-semibold tracking-tight text-white">rehearse</span>
-      <span class="hidden sm:inline text-[11px] text-[var(--rh-muted)] border border-white/10 rounded px-1.5 py-0.5">v0.4.0 · alpha</span>
+      <span class="hidden sm:inline text-[11px] text-[var(--rh-muted)] border border-white/10 rounded px-1.5 py-0.5">v0.4.0 · 4 pkgs · 323 tests</span>
     </a>
     <nav class="hidden md:flex items-center gap-7">
-      <a href="/#bench" class="nav-link">Bench</a>
-      <a href="/#features" class="nav-link">Features</a>
       <a href="/packages" class="nav-link nav-link-active">Packages</a>
-      <a href="/docs" class="nav-link">Docs</a>
-      <a href="/vs" class="nav-link">vs</a>
-      <a href="/about" class="nav-link">About</a>
-      <a href="/pro" class="nav-link text-white">Pro
+      <a href="/docs" class="nav-link ">Docs</a>
+      <a href="/bench" class="nav-link ">Bench</a>
+      <a href="/vs" class="nav-link ">vs</a>
+      <a href="/customers" class="nav-link ">Customers</a>
+      <a href="/pro" class="nav-link text-white ">Pro
         <span class="ml-1 text-[10px] font-mono text-[var(--rh-accent)] border border-[var(--rh-accent)]/40 rounded px-1 py-0.5 align-middle">$49/mo</span>
       </a>
-      <a href="https://pro.rehearse.sh/sign-in" class="nav-link">Sign in</a>
       <a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a>
     </nav>
     <a href="/#install" class="btn btn-primary">Install</a>
@@ -486,19 +485,34 @@
   </div>
 </section>
 
+<!-- ============== FOOTER ============== -->
 <footer class="py-14 hairline">
-  <div class="max-w-6xl mx-auto px-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 font-mono text-sm text-[var(--rh-muted)]">
-    <div class="flex items-center gap-2">
-      <span class="logo-mark logo-mark-sm text-[var(--rh-accent)]"></span>
-      <span class="text-white">rehearse</span> · by <a href="https://github.com/plsft" class="link">plsft</a>
+  <div class="max-w-6xl mx-auto px-5 flex flex-col gap-5">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div class="flex items-center gap-2 font-mono text-sm text-[var(--rh-muted)]">
+        <span class="logo-mark logo-mark-sm text-[var(--rh-accent)]"></span>
+        <span class="text-white">rehearse</span> · by <a href="https://github.com/plsft" class="link">plsft</a>
+      </div>
+      <div class="flex flex-wrap gap-x-5 gap-y-2 font-mono text-[13px]">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/packages" class="nav-link">Packages</a>
+        <a href="/docs" class="nav-link">Docs</a>
+        <a href="/pro" class="nav-link">Pro</a>
+        <a href="/pricing" class="nav-link">Pricing</a>
+        <a href="/vs" class="nav-link">vs</a>
+        <a href="/bench" class="nav-link">Bench</a>
+        <a href="/customers" class="nav-link">Customers</a>
+        <a href="/changelog" class="nav-link">Changelog</a>
+        <a href="/about" class="nav-link">About</a>
+        <a href="/security" class="nav-link">Security</a>
+        <a href="https://pro.rehearse.sh/sign-in" class="nav-link">Sign in</a>
+        <a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a>
+        <a href="https://www.npmjs.com/package/@rehearse/runner" class="nav-link">npm</a>
+        <a href="https://github.com/plsft/rehearse/issues" class="nav-link">Issues</a>
+      </div>
     </div>
-    <div class="flex flex-wrap gap-x-6 gap-y-2">
-      <a href="/" class="nav-link">Home</a>
-      <a href="/packages" class="nav-link">Packages</a>
-      <a href="/docs" class="nav-link">Docs</a>
-      <a href="/about" class="nav-link">About</a>
-      <a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a>
-      <a href="https://github.com/plsft/rehearse/issues" class="nav-link">Issues</a>
+    <div class="font-mono text-[11px] text-[var(--rh-muted)]">
+      <span class="ok">●</span> v0.4.0 · Apache 2.0 · No telemetry · No phone-home
     </div>
   </div>
 </footer>

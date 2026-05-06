@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#08090c" />
+<title>Bench — Rehearse</title>
+<meta name="description" content="Real benchmark numbers. Rehearse vs GitHub Actions and vs nektos/act. Reproducible methodology, per-OS data, no marketing math." />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script type="module" src="/src/main.ts"></script>
+</head>
+<body class="antialiased" x-data="{ scrolled: false }" x-init="window.addEventListener('scroll', () => scrolled = window.scrollY > 8)">
+
+<!-- ============== NAV ============== -->
+<header :class="scrolled ? 'border-b border-white/10 backdrop-blur bg-black/55' : 'border-b border-transparent'"
+        class="fixed inset-x-0 top-0 z-50 transition-colors">
+  <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2.5 font-mono group" aria-label="Rehearse home">
+      <span class="logo-mark logo-mark-md text-[var(--rh-accent)] transition-transform group-hover:scale-110"></span>
+      <span class="font-semibold tracking-tight text-white">rehearse</span>
+      <span class="hidden sm:inline text-[11px] text-[var(--rh-muted)] border border-white/10 rounded px-1.5 py-0.5">v0.4.0 · 4 pkgs · 323 tests</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-7">
+      <a href="/packages" class="nav-link">Packages</a>
+      <a href="/docs" class="nav-link">Docs</a>
+      <a href="/bench" class="nav-link nav-link-active">Bench</a>
+      <a href="/vs" class="nav-link">vs</a>
+      <a href="/customers" class="nav-link">Customers</a>
+      <a href="/pro" class="nav-link text-white">Pro
+        <span class="ml-1 text-[10px] font-mono text-[var(--rh-accent)] border border-[var(--rh-accent)]/40 rounded px-1 py-0.5 align-middle">$49/mo</span>
+      </a>
+      <a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a>
+    </nav>
+    <a href="/#install" class="btn btn-primary">Install</a>
+  </div>
+</header>
+
+<!-- ============== HERO ============== -->
+<section class="bg-grid pt-36 pb-12">
+  <div class="max-w-3xl mx-auto px-5">
+    <div class="eyebrow">// Bench</div>
+    <h1 class="mt-2 text-4xl sm:text-5xl font-semibold tracking-tight gradient-text">
+      Real workflows. Real numbers.
+    </h1>
+    <p class="mt-5 text-lg text-[var(--rh-muted)]">
+      Two comparisons. <span class="text-white">Rehearse vs GitHub Actions</span>
+      (the comparison most users care about) and <span class="text-white">Rehearse
+      vs <code class="font-mono">act</code></span> (the OSS-vs-OSS comparison).
+      Both reproducible, methodology below.
+    </p>
+  </div>
+</section>
+
+<!-- ============== HEADLINE: 3-TARGET ============== -->
+<section class="py-16 hairline bg-track">
+  <div class="max-w-6xl mx-auto px-5">
+    <div class="eyebrow">// Headline · Same source, three execution targets</div>
+    <h2 class="mt-2 text-3xl font-semibold gradient-text">A real 9-cell matrix workflow.</h2>
+    <p class="mt-4 text-[var(--rh-muted)] max-w-3xl">
+      <a href="https://github.com/plsft/typey" class="link">plsft/typey</a> —
+      a real Bun CLI repo. CI runs <span class="text-white">3 OS × 3 Bun
+      versions</span> = 9 cells, each with checkout / setup-bun / install /
+      format / lint / typecheck / test / build. The same compiled YAML on
+      three execution targets:
+    </p>
+
+    <div class="mt-10 grid md:grid-cols-3 gap-5">
+      <div class="card p-6">
+        <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">LOCAL · runner run</div>
+        <div class="text-5xl font-semibold text-white">1.5<span class="text-2xl text-[var(--rh-muted)]">s</span></div>
+        <p class="mt-3 text-sm text-[var(--rh-muted)]">Sub-second per cell, warm. Worker concurrency capped at 4.</p>
+      </div>
+      <div class="card p-6 border-[var(--rh-accent)]/40">
+        <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">PRO · runner run --remote</div>
+        <div class="text-5xl font-semibold text-white">5<span class="text-2xl text-[var(--rh-muted)]">s</span></div>
+        <p class="mt-3 text-sm text-[var(--rh-muted)]">Single-tenant VM. Network roundtrip + actual VM execution. Cells serialize on Pro to avoid bun-cache install race.</p>
+      </div>
+      <div class="card p-6">
+        <div class="font-mono text-xs text-[var(--rh-muted)] mb-2">GH ACTIONS</div>
+        <div class="text-5xl font-semibold text-[var(--rh-muted)]">95<span class="text-2xl">s</span></div>
+        <p class="mt-3 text-sm text-[var(--rh-muted)]">9 fresh containers, each downloads Bun cold, each cold-loads every tool. Wall = slowest cell.</p>
+      </div>
+    </div>
+
+    <p class="mt-6 text-[12.5px] font-mono text-[var(--rh-muted)] max-w-3xl">
+      <span class="text-white">63× faster local · 19× faster on Pro vs GitHub
+      Actions on the same workflow.</span> Numbers measured 2026-05-05 on
+      <code class="font-mono">v0.4.0</code> against <code class="font-mono">plsft/typey@6595d95</code>.
+    </p>
+  </div>
+</section>
+
+<!-- ============== FOOTNOTE: VS ACT ============== -->
+<section class="py-16 hairline">
+  <div class="max-w-6xl mx-auto px-5">
+    <div class="eyebrow">// vs nektos/act</div>
+    <h2 class="mt-2 text-3xl font-semibold gradient-text">vs the OSS comparison.</h2>
+    <p class="mt-4 text-[var(--rh-muted)] max-w-3xl">
+      Most folks comparison-shop us against <a href="https://github.com/nektos/act" class="link">nektos/act</a>
+      since we share a category (local-first GH Actions runners). Four
+      fixture workflows on a fresh GitHub-hosted Linux runner, both tools
+      timed warm (second run — deps already on disk).
+    </p>
+
+    <div class="mt-8 term">
+      <div class="term-header">
+        <span class="term-dot dot-r"></span><span class="term-dot dot-y"></span><span class="term-dot dot-g"></span>
+        <span class="term-title">$ pnpm tsx bench/compare.ts --skip-cold</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm font-mono">
+          <thead class="bg-white/[0.02] text-[var(--rh-muted)] text-left">
+            <tr>
+              <th class="py-3 px-5 font-semibold">Target</th>
+              <th class="py-3 px-5 font-semibold text-right">Rehearse</th>
+              <th class="py-3 px-5 font-semibold text-right">act</th>
+              <th class="py-3 px-5 font-semibold text-right">Speedup</th>
+              <th class="py-3 px-5 font-semibold w-[28%]">Visual</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5 text-white/90">
+            <tr>
+              <td class="py-3 px-5">our-ci<div class="text-[11px] text-[var(--rh-muted)]">typecheck + tests, 2 jobs</div></td>
+              <td class="py-3 px-5 text-right ok font-bold">12.19s</td>
+              <td class="py-3 px-5 text-right text-[var(--rh-muted)]">63.78s</td>
+              <td class="py-3 px-5 text-right ok font-bold">5.23×</td>
+              <td class="py-3 px-5">
+                <div class="flex flex-col gap-1.5">
+                  <div class="bar-track"><div class="bar-fill" style="width: 21%"></div></div>
+                  <div class="bar-track"><div class="bar-fill bar-fill-act" style="width: 100%"></div></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="py-3 px-5">node-matrix<div class="text-[11px] text-[var(--rh-muted)]">matrix [18.x, 20.x, 22.x] · 3 cells, parallel</div></td>
+              <td class="py-3 px-5 text-right ok font-bold">1.12s</td>
+              <td class="py-3 px-5 text-right text-[var(--rh-muted)]">10.07s</td>
+              <td class="py-3 px-5 text-right ok font-bold">8.99×</td>
+              <td class="py-3 px-5">
+                <div class="flex flex-col gap-1.5">
+                  <div class="bar-track"><div class="bar-fill" style="width: 11%"></div></div>
+                  <div class="bar-track"><div class="bar-fill bar-fill-act" style="width: 100%"></div></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="py-3 px-5">service-postgres<div class="text-[11px] text-[var(--rh-muted)]">postgres:16 + 4 psql steps</div></td>
+              <td class="py-3 px-5 text-right ok font-bold">10.97s</td>
+              <td class="py-3 px-5 text-right err">timed out (&gt;360s)</td>
+              <td class="py-3 px-5 text-right ok font-bold">32.82× — act fails</td>
+              <td class="py-3 px-5">
+                <div class="flex flex-col gap-1.5">
+                  <div class="bar-track"><div class="bar-fill" style="width: 3%"></div></div>
+                  <div class="bar-track"><div class="bar-fill bar-fill-fail" style="width: 100%"></div></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="py-3 px-5">hono-bun<div class="text-[11px] text-[var(--rh-muted)]">real OSS · honojs/hono · bun job</div></td>
+              <td class="py-3 px-5 text-right ok font-bold">7.58s</td>
+              <td class="py-3 px-5 text-right text-[var(--rh-muted)]">n/a</td>
+              <td class="py-3 px-5 text-right text-[var(--rh-muted)]">act lacks bun</td>
+              <td class="py-3 px-5">
+                <div class="flex flex-col gap-1.5">
+                  <div class="bar-track"><div class="bar-fill" style="width: 100%"></div></div>
+                  <div class="text-[10px] text-[var(--rh-muted)] font-mono">26 hono tests through the runner</div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== METHODOLOGY ============== -->
+<section class="py-16 hairline bg-track">
+  <div class="max-w-3xl mx-auto px-5">
+    <div class="eyebrow">// Methodology</div>
+    <h2 class="mt-2 text-3xl font-semibold gradient-text">Reproducibility checklist.</h2>
+
+    <div class="mt-8 space-y-6 text-[var(--rh-muted)] text-sm">
+
+      <div>
+        <h3 class="text-lg font-semibold text-white mb-2">Environment</h3>
+        <ul class="space-y-1 list-disc list-outside pl-5">
+          <li>GitHub-hosted <code class="font-mono">ubuntu-latest</code> runner (2-core, 7 GB RAM, free tier).</li>
+          <li>For the typey 9-cell matrix: 3 OSs (ubuntu-latest, macos-latest, windows-latest) × 3 Bun versions (1.2.x, 1.3.x, latest).</li>
+          <li>Local Rehearse run on a Windows 11 laptop, host backend, default <code class="font-mono">--max-parallel 4</code>.</li>
+          <li>Pro Rehearse run via <code class="font-mono">runner run --remote</code> against a default-tier microVM.</li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold text-white mb-2">Methodology</h3>
+        <ul class="space-y-1 list-disc list-outside pl-5">
+          <li><span class="text-white">Warm-cache numbers</span> are the second run, with deps already on disk. Cold-vs-cold is narrower because a fresh <code class="font-mono">pnpm install</code> dominates everything.</li>
+          <li>Each comparison is the <strong class="text-white">same YAML file</strong> with no Rehearse-specific edits — the bench compares execution paths, not config rewrites.</li>
+          <li><code class="font-mono">act</code> timed against the same YAML with <code class="font-mono">--no-cache-server</code> + <code class="font-mono">-P</code> label mappings.</li>
+          <li>Pro VM cells serialize via <code class="font-mono">--max-parallel 1</code> on the daemon side to avoid the <code class="font-mono">bun install</code> hardlink race that affects parallel installs against a shared cache.</li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold text-white mb-2">Reproduce locally</h3>
+        <pre class="mt-3 font-mono text-[12.5px] text-white/90 bg-black/40 p-4 rounded border border-white/10 overflow-x-auto"><span class="comment"># Rehearse vs act fixtures</span>
+$ git clone https://github.com/plsft/rehearse && cd rehearse
+$ pnpm install
+$ pnpm tsx bench/compare.ts --skip-cold
+
+<span class="comment"># Rehearse vs GitHub Actions on plsft/typey (9-cell matrix)</span>
+$ git clone https://github.com/plsft/typey && cd typey
+$ time runner run .github/workflows/ci.yml
+$ time runner run --remote .github/workflows/ci.yml
+$ git push  <span class="comment"># GH Actions runs in the background, see Actions tab</span></pre>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold text-white mb-2">Honest caveats</h3>
+        <ul class="space-y-1 list-disc list-outside pl-5">
+          <li>Numbers vary by region, upstream-registry latency, and time of day. Treat the <em>ratios</em> as load-bearing, not absolute milliseconds.</li>
+          <li>The <code class="font-mono">hono-node-matrix</code> target currently regresses on GH-hosted runners (works locally; under investigation). Excluded from the headline.</li>
+          <li>Bench was last refreshed for <code class="font-mono">v0.4.0</code> against the v0.3.11 baseline. Per-OS macOS/Windows numbers (host backend only — no Docker on those GH runners) in <a href="https://github.com/plsft/rehearse/blob/main/bench/RESULTS.md" class="link">bench/RESULTS.md</a>.</li>
+          <li>Rehearse's local run uses host bun + warm node_modules. If you wipe both, the cold run is closer to act in absolute time (~10-15s on the typey demo) — though still meaningfully faster, and the warm-loop gap is what matters for daily iteration.</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <p class="mt-6 text-[12.5px] font-mono text-[var(--rh-muted)]">
+      Full methodology + per-OS table: <a href="https://github.com/plsft/rehearse/blob/main/bench/RESULTS.md" class="link">bench/RESULTS.md</a> on GitHub.
+    </p>
+  </div>
+</section>
+
+<!-- ============== CTA ============== -->
+<section class="py-20 hairline">
+  <div class="max-w-3xl mx-auto px-5 text-center">
+    <h2 class="text-3xl font-semibold gradient-text tracking-tight">Run the bench yourself.</h2>
+    <p class="mt-4 text-[var(--rh-muted)]">
+      The harness is in the repo. Don't take our word — point it at your own workflow.
+    </p>
+    <div class="mt-8 inline-flex flex-wrap justify-center gap-3">
+      <a href="https://github.com/plsft/rehearse/blob/main/bench/RESULTS.md" class="btn btn-primary">RESULTS.md →</a>
+      <a href="/#install" class="btn btn-ghost">Install Rehearse</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============== FOOTER ============== -->
+<footer class="py-14 hairline">
+  <div class="max-w-6xl mx-auto px-5 flex flex-col gap-5">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div class="flex items-center gap-2 font-mono text-sm text-[var(--rh-muted)]">
+        <span class="logo-mark logo-mark-sm text-[var(--rh-accent)]"></span>
+        <span class="text-white">rehearse</span> · by <a href="https://github.com/plsft" class="link">plsft</a>
+      </div>
+      <div class="flex flex-wrap gap-x-5 gap-y-2 font-mono text-[13px]">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/packages" class="nav-link">Packages</a>
+        <a href="/docs" class="nav-link">Docs</a>
+        <a href="/pro" class="nav-link">Pro</a>
+        <a href="/pricing" class="nav-link">Pricing</a>
+        <a href="/vs" class="nav-link">vs</a>
+        <a href="/bench" class="nav-link">Bench</a>
+        <a href="/customers" class="nav-link">Customers</a>
+        <a href="/changelog" class="nav-link">Changelog</a>
+        <a href="/about" class="nav-link">About</a>
+        <a href="/security" class="nav-link">Security</a>
+        <a href="https://pro.rehearse.sh/sign-in" class="nav-link">Sign in</a>
+        <a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a>
+        <a href="https://www.npmjs.com/package/@rehearse/runner" class="nav-link">npm</a>
+        <a href="https://github.com/plsft/rehearse/issues" class="nav-link">Issues</a>
+      </div>
+    </div>
+    <div class="font-mono text-[11px] text-[var(--rh-muted)]">
+      <span class="ok">●</span> v0.4.0 · Apache 2.0 · No telemetry · No phone-home
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

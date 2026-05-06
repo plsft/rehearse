@@ -14,22 +14,22 @@
 </head>
 <body class="antialiased" x-data="{ scrolled: false }" x-init="window.addEventListener('scroll', () => scrolled = window.scrollY > 8)">
 
+<!-- ============== NAV ============== -->
 <header :class="scrolled ? 'border-b border-white/10 backdrop-blur bg-black/55' : 'border-b border-transparent'"
         class="fixed inset-x-0 top-0 z-50 transition-colors">
   <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
     <a href="/" class="flex items-center gap-2.5 font-mono group" aria-label="Rehearse home">
       <span class="logo-mark logo-mark-md text-[var(--rh-accent)] transition-transform group-hover:scale-110"></span>
       <span class="font-semibold tracking-tight text-white">rehearse</span>
-      <span class="hidden sm:inline text-[11px] text-[var(--rh-muted)] border border-white/10 rounded px-1.5 py-0.5">vs</span>
+      <span class="hidden sm:inline text-[11px] text-[var(--rh-muted)] border border-white/10 rounded px-1.5 py-0.5">v0.4.0 · 4 pkgs · 323 tests</span>
     </a>
     <nav class="hidden md:flex items-center gap-7">
-      <a href="/#bench" class="nav-link">Bench</a>
-      <a href="/#features" class="nav-link">Features</a>
-      <a href="/packages" class="nav-link">Packages</a>
-      <a href="/docs" class="nav-link">Docs</a>
-      <a href="/vs" class="nav-link nav-link-active text-white">vs</a>
-      <a href="/about" class="nav-link">About</a>
-      <a href="/pro" class="nav-link text-white">Pro
+      <a href="/packages" class="nav-link ">Packages</a>
+      <a href="/docs" class="nav-link ">Docs</a>
+      <a href="/bench" class="nav-link ">Bench</a>
+      <a href="/vs" class="nav-link nav-link-active">vs</a>
+      <a href="/customers" class="nav-link ">Customers</a>
+      <a href="/pro" class="nav-link text-white ">Pro
         <span class="ml-1 text-[10px] font-mono text-[var(--rh-accent)] border border-[var(--rh-accent)]/40 rounded px-1 py-0.5 align-middle">$49/mo</span>
       </a>
       <a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a>
@@ -142,14 +142,24 @@
     <div class="eyebrow">// Feature comparison</div>
     <h2 class="mt-2 text-3xl font-semibold gradient-text">Where each tool wins.</h2>
 
+    <p class="mt-3 text-[var(--rh-muted)] max-w-3xl">
+      The honest baseline is <span class="text-white">GitHub Actions itself</span> —
+      that's what you're moving from. The hosted-runner SaaS layer
+      (Blacksmith, Ubicloud, RunsOn, Depot, WarpBuild) competes on
+      cheaper-and-faster GH replacement. Rehearse competes on a different
+      execution loop.
+    </p>
+
     <div class="card mt-8 p-0 overflow-x-auto">
       <table class="w-full text-sm font-mono">
         <thead class="bg-white/[0.02] text-[var(--rh-muted)] text-left">
           <tr>
             <th class="py-3 px-5 font-semibold">&nbsp;</th>
-            <th class="py-3 px-5 font-semibold text-center w-[20%]">Rehearse</th>
-            <th class="py-3 px-5 font-semibold text-center w-[20%]">Blacksmith</th>
-            <th class="py-3 px-5 font-semibold text-center w-[20%]">Ubicloud / RunsOn</th>
+            <th class="py-3 px-5 font-semibold text-center w-[16%]">Rehearse</th>
+            <th class="py-3 px-5 font-semibold text-center w-[14%]">GitHub Actions</th>
+            <th class="py-3 px-5 font-semibold text-center w-[14%]">Blacksmith</th>
+            <th class="py-3 px-5 font-semibold text-center w-[14%]">Ubicloud / RunsOn</th>
+            <th class="py-3 px-5 font-semibold text-center w-[14%]">Depot / WarpBuild</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-white/5 text-white/90">
@@ -158,10 +168,14 @@
             <td class="py-3 px-5 text-center accent-text">✓</td>
             <td class="py-3 px-5 text-center text-[var(--rh-muted)]">—</td>
             <td class="py-3 px-5 text-center text-[var(--rh-muted)]">—</td>
+            <td class="py-3 px-5 text-center text-[var(--rh-muted)]">—</td>
+            <td class="py-3 px-5 text-center text-[var(--rh-muted)]">—</td>
           </tr>
           <tr>
             <td class="py-3 px-5 text-[var(--rh-muted)]">Watch mode (CI on every save)</td>
             <td class="py-3 px-5 text-center accent-text">✓</td>
+            <td class="py-3 px-5 text-center text-[var(--rh-muted)]">—</td>
+            <td class="py-3 px-5 text-center text-[var(--rh-muted)]">—</td>
             <td class="py-3 px-5 text-center text-[var(--rh-muted)]">—</td>
             <td class="py-3 px-5 text-center text-[var(--rh-muted)]">—</td>
           </tr>
@@ -170,54 +184,72 @@
             <td class="py-3 px-5 text-center accent-text">✓</td>
             <td class="py-3 px-5 text-center text-[var(--rh-muted)]">—</td>
             <td class="py-3 px-5 text-center text-[var(--rh-muted)]">—</td>
+            <td class="py-3 px-5 text-center text-[var(--rh-muted)]">—</td>
+            <td class="py-3 px-5 text-center text-[var(--rh-muted)]">—</td>
           </tr>
           <tr>
             <td class="py-3 px-5 text-[var(--rh-muted)]">TypeScript-authored CI (compile to YAML)</td>
             <td class="py-3 px-5 text-center accent-text">✓ <span class="text-[10px] block text-[var(--rh-muted)]">@rehearse/ci</span></td>
             <td class="py-3 px-5 text-center text-[var(--rh-muted)]">—</td>
             <td class="py-3 px-5 text-center text-[var(--rh-muted)]">—</td>
+            <td class="py-3 px-5 text-center text-[var(--rh-muted)]">—</td>
+            <td class="py-3 px-5 text-center text-[var(--rh-muted)]">—</td>
           </tr>
           <tr>
             <td class="py-3 px-5 text-[var(--rh-muted)]">Hosted runner replacement (drop-in for GH-hosted)</td>
             <td class="py-3 px-5 text-center text-[var(--rh-muted)]">— <span class="text-[10px] block">use GH directly</span></td>
+            <td class="py-3 px-5 text-center accent-text">native</td>
+            <td class="py-3 px-5 text-center accent-text">✓</td>
             <td class="py-3 px-5 text-center accent-text">✓</td>
             <td class="py-3 px-5 text-center accent-text">✓</td>
           </tr>
           <tr>
-            <td class="py-3 px-5 text-[var(--rh-muted)]">Per-minute pricing</td>
-            <td class="py-3 px-5 text-center text-[var(--rh-muted)]">$49/mo flat</td>
-            <td class="py-3 px-5 text-center text-white">$0.004-0.08/min</td>
-            <td class="py-3 px-5 text-center text-white">$0.005-0.04/min</td>
+            <td class="py-3 px-5 text-[var(--rh-muted)]">Pricing model</td>
+            <td class="py-3 px-5 text-center text-white">$49/mo flat</td>
+            <td class="py-3 px-5 text-center text-white">$0.008/min Linux</td>
+            <td class="py-3 px-5 text-center text-white">$0.004/min</td>
+            <td class="py-3 px-5 text-center text-white">$0.001-0.04/min</td>
+            <td class="py-3 px-5 text-center text-white">$0.004 + $20/seat</td>
           </tr>
           <tr>
             <td class="py-3 px-5 text-[var(--rh-muted)]">Free tier</td>
             <td class="py-3 px-5 text-center text-white">OSS forever</td>
+            <td class="py-3 px-5 text-center text-white">2,000 min/mo</td>
             <td class="py-3 px-5 text-center text-white">3,000 min/mo</td>
             <td class="py-3 px-5 text-center text-[var(--rh-muted)]">varies</td>
+            <td class="py-3 px-5 text-center text-[var(--rh-muted)]">7-day trial</td>
           </tr>
           <tr>
             <td class="py-3 px-5 text-[var(--rh-muted)]">Persistent cache scope</td>
             <td class="py-3 px-5 text-center accent-text">Whole rootfs</td>
+            <td class="py-3 px-5 text-center text-[var(--rh-muted)]">actions/cache only <span class="text-[10px] block">size-capped</span></td>
             <td class="py-3 px-5 text-center text-white">Sticky disks <span class="text-[10px] block text-[var(--rh-muted)]">declared paths only</span></td>
             <td class="py-3 px-5 text-center text-white">actions/cache only</td>
+            <td class="py-3 px-5 text-center text-white">Layer cache + actions/cache</td>
           </tr>
           <tr>
             <td class="py-3 px-5 text-[var(--rh-muted)]">Single-tenant VM (not shared pool)</td>
             <td class="py-3 px-5 text-center accent-text">✓ <span class="text-[10px] block text-[var(--rh-muted)]">Pro</span></td>
-            <td class="py-3 px-5 text-center text-[var(--rh-muted)]">— <span class="text-[10px] block">shared pool + sticky disks</span></td>
+            <td class="py-3 px-5 text-center text-[var(--rh-muted)]">— <span class="text-[10px] block">shared pool</span></td>
+            <td class="py-3 px-5 text-center text-[var(--rh-muted)]">— <span class="text-[10px] block">shared + sticky</span></td>
+            <td class="py-3 px-5 text-center text-[var(--rh-muted)]">— <span class="text-[10px] block">shared pool</span></td>
             <td class="py-3 px-5 text-center text-[var(--rh-muted)]">— <span class="text-[10px] block">shared pool</span></td>
           </tr>
           <tr>
             <td class="py-3 px-5 text-[var(--rh-muted)]">OSS / open source</td>
             <td class="py-3 px-5 text-center accent-text">Apache 2.0</td>
-            <td class="py-3 px-5 text-center text-[var(--rh-muted)]">closed SaaS</td>
-            <td class="py-3 px-5 text-center text-[var(--rh-muted)]">closed SaaS <span class="text-[10px] block">(Ubicloud has OSS components)</span></td>
+            <td class="py-3 px-5 text-center text-[var(--rh-muted)]">closed</td>
+            <td class="py-3 px-5 text-center text-[var(--rh-muted)]">closed</td>
+            <td class="py-3 px-5 text-center text-[var(--rh-muted)]">closed <span class="text-[10px] block">(Ubicloud OSS bits)</span></td>
+            <td class="py-3 px-5 text-center text-[var(--rh-muted)]">closed</td>
           </tr>
           <tr>
             <td class="py-3 px-5 text-[var(--rh-muted)]">Lock-in if vendor disappears</td>
-            <td class="py-3 px-5 text-center accent-text">None — runs locally forever</td>
-            <td class="py-3 px-5 text-center text-[var(--rh-muted)]">CI breaks until you reconfigure</td>
-            <td class="py-3 px-5 text-center text-[var(--rh-muted)]">CI breaks until you reconfigure</td>
+            <td class="py-3 px-5 text-center accent-text">None — runs locally</td>
+            <td class="py-3 px-5 text-center text-[var(--rh-muted)]">N/A — GitHub itself</td>
+            <td class="py-3 px-5 text-center text-[var(--rh-muted)]">CI breaks</td>
+            <td class="py-3 px-5 text-center text-[var(--rh-muted)]">CI breaks</td>
+            <td class="py-3 px-5 text-center text-[var(--rh-muted)]">CI breaks</td>
           </tr>
         </tbody>
       </table>
@@ -225,11 +257,105 @@
   </div>
 </section>
 
-<!-- ============== PRICING MATH ============== -->
+<!-- ============== COST CALCULATOR ============== -->
 <section class="py-20 hairline">
+  <div class="max-w-6xl mx-auto px-5"
+       x-data="{
+         minutes: 25000,
+         price(perMin, flat) {
+           if (flat !== undefined) return flat;
+           return Math.round(this.minutes * perMin);
+         }
+       }">
+    <div class="eyebrow">// Interactive cost calculator</div>
+    <h2 class="mt-2 text-3xl font-semibold gradient-text">Paste your monthly minutes. See the bill.</h2>
+    <p class="mt-4 text-[var(--rh-muted)] max-w-3xl">
+      All Linux/Ubuntu minutes. Add per-OS multipliers for macOS/Windows yourself —
+      both inflate per-minute pricing on the SaaS competitors and have no
+      bearing on Rehearse Pro's flat rate. Numbers are list prices as of
+      2026-05-05; verify against current rate cards before quoting.
+    </p>
+
+    <div class="mt-8 card p-7">
+      <label class="block">
+        <div class="flex items-baseline justify-between">
+          <span class="text-sm font-mono text-[var(--rh-muted)]">CI minutes per month</span>
+          <span class="text-2xl font-semibold text-white" x-text="minutes.toLocaleString()"></span>
+        </div>
+        <input type="range" min="0" max="200000" step="500" x-model.number="minutes"
+               class="w-full mt-3 accent-[var(--rh-accent)]" />
+        <div class="flex justify-between text-[11px] font-mono text-[var(--rh-muted)] mt-1">
+          <span>0</span><span>50k</span><span>100k</span><span>150k</span><span>200k</span>
+        </div>
+      </label>
+
+      <div class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Rehearse Pro: $49 flat -->
+        <div class="border border-[var(--rh-accent)]/40 rounded-lg p-5 bg-[var(--rh-accent-glow)]/30">
+          <div class="font-mono text-xs text-[var(--rh-accent)]">★ REHEARSE PRO</div>
+          <div class="mt-2 text-3xl font-semibold text-white">$49<span class="text-sm text-[var(--rh-muted)]">/mo</span></div>
+          <div class="text-[12px] text-[var(--rh-muted)] mt-1">Flat. Unlimited minutes. <span x-show="minutes > 0">$<span x-text="(49/Math.max(minutes,1)*1000).toFixed(2)"></span> / 1k min effective.</span></div>
+        </div>
+
+        <!-- GitHub Actions Linux -->
+        <div class="border border-white/10 rounded-lg p-5">
+          <div class="font-mono text-xs text-[var(--rh-muted)]">GITHUB ACTIONS</div>
+          <div class="mt-2 text-3xl font-semibold text-white">$<span x-text="price(0.008).toLocaleString()"></span><span class="text-sm text-[var(--rh-muted)]">/mo</span></div>
+          <div class="text-[12px] text-[var(--rh-muted)] mt-1">$0.008/min Ubuntu (after 2k free)</div>
+        </div>
+
+        <!-- Blacksmith -->
+        <div class="border border-white/10 rounded-lg p-5">
+          <div class="font-mono text-xs text-[var(--rh-muted)]">BLACKSMITH</div>
+          <div class="mt-2 text-3xl font-semibold text-white">$<span x-text="price(0.004).toLocaleString()"></span><span class="text-sm text-[var(--rh-muted)]">/mo</span></div>
+          <div class="text-[12px] text-[var(--rh-muted)] mt-1">$0.004/min Ubuntu (after 3k free)</div>
+        </div>
+
+        <!-- Ubicloud -->
+        <div class="border border-white/10 rounded-lg p-5">
+          <div class="font-mono text-xs text-[var(--rh-muted)]">UBICLOUD</div>
+          <div class="mt-2 text-3xl font-semibold text-white">$<span x-text="price(0.0010).toLocaleString()"></span><span class="text-sm text-[var(--rh-muted)]">/mo</span></div>
+          <div class="text-[12px] text-[var(--rh-muted)] mt-1">$0.001/min Standard (cheapest)</div>
+        </div>
+
+        <!-- Depot -->
+        <div class="border border-white/10 rounded-lg p-5">
+          <div class="font-mono text-xs text-[var(--rh-muted)]">DEPOT</div>
+          <div class="mt-2 text-3xl font-semibold text-white">$<span x-text="(price(0.004)+20).toLocaleString()"></span><span class="text-sm text-[var(--rh-muted)]">/mo</span></div>
+          <div class="text-[12px] text-[var(--rh-muted)] mt-1">$0.004/min + $20 seat</div>
+        </div>
+
+        <!-- WarpBuild -->
+        <div class="border border-white/10 rounded-lg p-5">
+          <div class="font-mono text-xs text-[var(--rh-muted)]">WARPBUILD</div>
+          <div class="mt-2 text-3xl font-semibold text-white">$<span x-text="price(0.004).toLocaleString()"></span><span class="text-sm text-[var(--rh-muted)]">/mo</span></div>
+          <div class="text-[12px] text-[var(--rh-muted)] mt-1">$0.004/min (2vCPU)</div>
+        </div>
+      </div>
+
+      <p class="mt-6 text-[12.5px] font-mono text-[var(--rh-muted)] max-w-3xl" x-show="minutes >= 12250">
+        <span class="accent-text">★ Pro saves money</span> at this volume.
+        At <span x-text="minutes.toLocaleString()"></span> min/mo, Pro's $49 flat is
+        <span class="text-white" x-text="(price(0.008)/49).toFixed(1)"></span>× cheaper than GitHub Actions and
+        <span class="text-white" x-text="(price(0.004)/49).toFixed(1)"></span>× cheaper than Blacksmith.
+      </p>
+      <p class="mt-6 text-[12.5px] font-mono text-[var(--rh-muted)] max-w-3xl" x-show="minutes < 12250 && minutes > 3000">
+        <span class="text-[var(--rh-muted)]">At this volume, Blacksmith's free tier or per-minute pricing beats Pro's flat $49.</span>
+        Crossover happens at 12,250 min/mo on Linux.
+      </p>
+      <p class="mt-6 text-[12.5px] font-mono text-[var(--rh-muted)] max-w-3xl" x-show="minutes <= 3000">
+        <span class="text-[var(--rh-muted)]">At this volume, you fit inside Blacksmith's 3,000-min free tier and GitHub Actions' 2,000-min free tier.</span>
+        Use those — Pro is overkill until you outgrow them.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============== PRICING MATH (TABLE) ============== -->
+<section class="py-20 hairline bg-track">
   <div class="max-w-6xl mx-auto px-5">
-    <div class="eyebrow">// The pricing math</div>
-    <h2 class="mt-2 text-3xl font-semibold gradient-text">Per-minute vs flat-rate, side by side.</h2>
+    <div class="eyebrow">// Same data, scannable</div>
+    <h2 class="mt-2 text-3xl font-semibold gradient-text">Per-minute vs flat-rate at common volumes.</h2>
     <p class="mt-4 text-[var(--rh-muted)] max-w-3xl">
       Rehearse Pro at $49/mo flat crosses over Blacksmith Ubuntu
       ($0.004/min) at exactly <span class="text-white">12,250 minutes/month</span>.
@@ -378,18 +504,32 @@
 
 <!-- ============== FOOTER ============== -->
 <footer class="py-14 hairline">
-  <div class="max-w-6xl mx-auto px-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 font-mono text-sm text-[var(--rh-muted)]">
-    <div class="flex items-center gap-2">
-      <span class="logo-mark logo-mark-sm text-[var(--rh-accent)]"></span>
-      <span class="text-white">rehearse</span> · by <a href="https://github.com/plsft" class="link">plsft</a>
+  <div class="max-w-6xl mx-auto px-5 flex flex-col gap-5">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div class="flex items-center gap-2 font-mono text-sm text-[var(--rh-muted)]">
+        <span class="logo-mark logo-mark-sm text-[var(--rh-accent)]"></span>
+        <span class="text-white">rehearse</span> · by <a href="https://github.com/plsft" class="link">plsft</a>
+      </div>
+      <div class="flex flex-wrap gap-x-5 gap-y-2 font-mono text-[13px]">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/packages" class="nav-link">Packages</a>
+        <a href="/docs" class="nav-link">Docs</a>
+        <a href="/pro" class="nav-link">Pro</a>
+        <a href="/pricing" class="nav-link">Pricing</a>
+        <a href="/vs" class="nav-link">vs</a>
+        <a href="/bench" class="nav-link">Bench</a>
+        <a href="/customers" class="nav-link">Customers</a>
+        <a href="/changelog" class="nav-link">Changelog</a>
+        <a href="/about" class="nav-link">About</a>
+        <a href="/security" class="nav-link">Security</a>
+        <a href="https://pro.rehearse.sh/sign-in" class="nav-link">Sign in</a>
+        <a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a>
+        <a href="https://www.npmjs.com/package/@rehearse/runner" class="nav-link">npm</a>
+        <a href="https://github.com/plsft/rehearse/issues" class="nav-link">Issues</a>
+      </div>
     </div>
-    <div class="flex flex-wrap gap-x-6 gap-y-2">
-      <a href="/" class="nav-link">Home</a>
-      <a href="/packages" class="nav-link">Packages</a>
-      <a href="/pro" class="nav-link">Pro</a>
-      <a href="/vs" class="nav-link">vs</a>
-      <a href="/docs" class="nav-link">Docs</a>
-      <a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a>
+    <div class="font-mono text-[11px] text-[var(--rh-muted)]">
+      <span class="ok">●</span> v0.4.0 · Apache 2.0 · No telemetry · No phone-home
     </div>
   </div>
 </footer>
