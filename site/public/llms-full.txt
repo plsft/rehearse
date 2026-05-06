@@ -15,7 +15,7 @@ Rehearse is four npm packages working together:
 3. **@rehearse/cli** (binary: `rh`) — companion CLI for `@rehearse/ci`. `init`, `compile`, `convert`, `validate`, `watch`, `estimate`.
 4. **@rehearse/git-core** — pure-TypeScript git protocol implementation. Runs in Cloudflare Workers, browsers, Deno, Node, Bun. Standalone.
 
-All four are Apache 2.0, all four versioned in lockstep (currently v0.5.4). The runner alone is enough for most users; the others compose for richer workflows.
+All four are Apache 2.0, all four versioned in lockstep (currently v0.6.0). The runner alone is enough for most users; the others compose for richer workflows.
 
 Optional commercial layer: **Rehearse Pro** at $49/mo for 25,000 active CPU minutes per month + $49 per additional 25,000-minute block. Single-tenant VM with whole-rootfs cache persistence. Same `rehearse` binary — pass `--remote` to ship workflow execution to your VM. Drop the flag and you're back to free local execution. No vendor lock-in.
 
@@ -179,7 +179,7 @@ The Pro hosted layer source is in a separate private repo (`plsft/rehearse-pro`)
 - **PHP on Pro** — verified locally; not yet preinstalled on the Pro VM.
 - **No SOC 2** today. Talk to us if you need it; we'll discuss timeline + cost-share.
 
-All other features documented as supported are tested + working at v0.5.4.
+All other features documented as supported are tested + working at v0.6.0.
 
 ---
 

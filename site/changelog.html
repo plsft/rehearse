@@ -57,10 +57,47 @@
 <section class="py-16 hairline">
   <div class="max-w-3xl mx-auto px-5 space-y-12">
 
+    <!-- v0.6.0 -->
+    <article>
+      <div class="flex items-baseline gap-3 mb-3">
+        <h2 class="text-2xl font-semibold gradient-text">v0.6.0</h2>
+        <span class="text-[12px] font-mono text-[var(--rh-muted)]">2026-05-06 · breaking — single binary <code class="font-mono">rh</code></span>
+      </div>
+      <div class="card p-6 space-y-4 text-[var(--rh-muted)]">
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-amber)] mb-1">⚠ Breaking — package structure</div>
+          <ul class="space-y-1 text-sm">
+            <li>— <strong class="text-white">Two npm packages now, not four:</strong> <code class="font-mono">@rehearse/cli</code> (the binary <code class="font-mono">rh</code>) and <code class="font-mono">@rehearse/ci</code> (the TypeScript SDK). <code class="font-mono">@rehearse/runner</code> and <code class="font-mono">@rehearse/git-core</code> are no longer published — folded into <code class="font-mono">@rehearse/cli</code>.</li>
+            <li>— <strong class="text-white">One binary, not two:</strong> <code class="font-mono">rh</code>. Old <code class="font-mono">rehearse</code> binary is gone. <code class="font-mono">rh run</code>, <code class="font-mono">rh watch</code>, <code class="font-mono">rh compat</code>, <code class="font-mono">rh install-hook</code> for the runner; <code class="font-mono">rh ci compile</code>, <code class="font-mono">rh ci convert</code>, <code class="font-mono">rh ci init</code>, <code class="font-mono">rh ci validate</code>, <code class="font-mono">rh ci watch</code>, <code class="font-mono">rh ci estimate</code> for TS-pipeline ergonomics.</li>
+          </ul>
+        </div>
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1">Migration</div>
+          <pre class="font-mono text-[12px] text-white/85 bg-black/40 p-3 rounded border border-white/10 overflow-x-auto"><span class="comment"># before</span>
+npm install -g @rehearse/runner @rehearse/cli
+rehearse run .github/workflows/ci.yml
+rh ci compile
+
+<span class="comment"># after</span>
+npm install -g @rehearse/cli
+rh run .github/workflows/ci.yml
+rh ci compile</pre>
+        </div>
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1">Why</div>
+          <p class="text-sm leading-relaxed">The two-package, two-binary split was a historical accident from the project's pivot. <code class="font-mono">@rehearse/cli</code> contained the <em>companion</em> CLI (<code class="font-mono">rh</code>) while <code class="font-mono">@rehearse/runner</code> contained the <em>main</em> binary (<code class="font-mono">rehearse</code>) — backwards from intuition. Now <code class="font-mono">@rehearse/cli</code> is THE Rehearse CLI, and <code class="font-mono">@rehearse/ci</code> is the SDK you import when you author pipelines in TypeScript.</p>
+        </div>
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1">Pre-push hook</div>
+          <p class="text-sm">Existing <code class="font-mono">.git/hooks/pre-push</code> from v0.5.x still references <code class="font-mono">@rehearse/runner</code> and will continue to work via the v0.5.4 npm package (frozen forever). Re-run <code class="font-mono">rh install-hook</code> after upgrading to switch to the new <code class="font-mono">npx -p @rehearse/cli rh run</code> form.</p>
+        </div>
+      </div>
+    </article>
+
     <!-- v0.5.4 -->
     <article>
       <div class="flex items-baseline gap-3 mb-3">
-        <h2 class="text-2xl font-semibold gradient-text">v0.5.4</h2>
+        <h2 class="text-2xl font-semibold text-white">v0.5.4</h2>
         <span class="text-[12px] font-mono text-[var(--rh-muted)]">2026-05-06 · matrix install correctness</span>
       </div>
       <div class="card p-6 space-y-4 text-[var(--rh-muted)]">
