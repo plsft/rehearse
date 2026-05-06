@@ -1,0 +1,253 @@
+# Rehearse — full LLM context
+
+> Local-first GitHub Actions runner with TypeScript-authored CI and an optional hosted offload target. Same YAML, three execution targets, no lock-in. Apache 2.0.
+
+This file inlines the canonical descriptions of every Rehearse surface in plain text, intended as a single context drop for an LLM. For the structured link index, see https://rehearse.sh/llms.txt.
+
+---
+
+## What Rehearse is
+
+Rehearse is four npm packages working together:
+
+1. **@rehearse/runner** (binary: `runner`) — the local GitHub Actions runner. Reads `.github/workflows/*.yml` and executes locally with two backends (host subprocess for speed, Docker container for parity).
+2. **@rehearse/ci** — TypeScript SDK that compiles to standard GitHub Actions YAML. Lossless forward path; one-command migration on-ramp from existing YAML.
+3. **@rehearse/cli** (binary: `rh`) — companion CLI for `@rehearse/ci`. `init`, `compile`, `convert`, `validate`, `watch`, `estimate`.
+4. **@rehearse/git-core** — pure-TypeScript git protocol implementation. Runs in Cloudflare Workers, browsers, Deno, Node, Bun. Standalone.
+
+All four are Apache 2.0, all four versioned in lockstep (currently v0.4.0). The runner alone is enough for most users; the others compose for richer workflows.
+
+Optional commercial layer: **Rehearse Pro** at $49/mo for 25,000 active CPU minutes per month + $49 per additional 25,000-minute block. Single-tenant VM with whole-rootfs cache persistence. Same `runner` binary — pass `--remote` to ship workflow execution to your VM. Drop the flag and you're back to free local execution. No vendor lock-in.
+
+---
+
+## The three execution targets
+
+The same `.github/workflows/*.yml` runs in three places, exact same shape, exact same exit codes:
+
+**1. Local** (`runner run .github/workflows/ci.yml`)
+
+Free, sub-second on warm cache for trivial workflows; ~1–5s for typical CI workflows on a developer laptop. Use the `host` backend (subprocess against your host's installed toolchains) when you don't need container parity, or the `container` backend (Docker, real services networking) when you do. Pair with `runner watch` for save-triggered reruns or `runner install-hook` for a pre-push gate.
+
+**2. Pro VM** (`runner run --remote .github/workflows/ci.yml`)
+
+$49/mo for 25,000 active CPU minutes; +$49 per additional 25k block. Single-tenant Linux microVM with persistent rootfs. Whole-filesystem cache persistence — every `~/.npm`, `~/.cache/pip`, `~/.cargo/registry`, `node_modules`, build artifact survives between runs forever, no `actions/cache` blocks needed. ~5s warm on the typey 9-cell matrix workflow. Cap-hit triggers a 402 with a Stripe link to buy another block; usage alerts fire at 75% / 90% / 100% of monthly cap.
+
+**3. GitHub Actions** (`git push`)
+
+The compiled YAML works on stock GitHub Actions with zero Rehearse runtime dependency. Same workflow file you authored or compiled from TypeScript runs natively on whatever runner pool you've configured (GitHub-hosted, self-hosted, or third-party providers like Blacksmith / Ubicloud / RunsOn). ~95s on the typey 9-cell matrix workflow.
+
+---
+
+## TypeScript-authored CI (`@rehearse/ci`)
+
+YAML for CI breaks down past a few hundred lines: no types, no autocomplete, no refactor, awkward expression escaping, hostile diffs. `@rehearse/ci` gives you typed builders that compile to standard GitHub Actions YAML you commit alongside your TS source.
+
+Forward path (`rh ci compile`, TS → YAML) is **100% lossless**. Every public SDK feature produces canonical GH Actions YAML, snapshot-tested against 6 reference workflows covering matrix (variables, include, exclude, fail-fast, max-parallel), services (image, env, ports, options), concurrency, defaults, environment blocks (name + url), workflow + job + step env, workflow + job permissions, conditions, outputs, schedule triggers, workflow_dispatch with inputs, all standard step constructs (run / action / checkout with id, condition, env, continueOnError, with), composite actions (local + remote), local reusable workflows, camel→kebab auto-translation (`idToken` → `id-token`, `cancelInProgress` → `cancel-in-progress`, etc.).
+
+Reverse path (`rh ci convert`, YAML → TS) is a **migration starter**, not a faithful round-trip. Common shapes survive: triggers, jobs with name/needs/condition/env/timeoutMinutes/outputs, runner (recognized labels become `Runner.github(...)`; matrix expressions fall back to `Runner.custom(...)`), all standard step constructs, workflow-level permissions and env. Dropped on convert (hand-port after, usually 5–15 minutes): matrix block, services, concurrency, defaults, job-level permissions when different from workflow-level, environment block (name + url object form), workflow_dispatch inputs (type/options/required). The SDK supports authoring all of these — only the converter doesn't auto-extract them yet.
+
+The compiled YAML has **zero runtime dependency** on `@rehearse/ci`. You can `npm uninstall @rehearse/ci` and your `.github/workflows/ci.yml` keeps working on stock GitHub Actions.
+
+Pair with `@rehearse/cli` for ergonomics: `rh ci init` scaffolds a typed pipeline based on detected stack (Bun / Node / Rust / Go / Python / .NET), `rh ci compile` recompiles, `rh ci validate` type-checks without writing output, `rh ci watch` recompiles on save, `rh ci estimate` reports per-run and monthly cost on GitHub-hosted runners (price-list snapshot baked in; refresh per release).
+
+---
+
+## The OSS runner (`@rehearse/runner`)
+
+The headline product. Reads existing `.github/workflows/*.yml`, executes locally, no edits to your YAML.
+
+**Two backends per job, picked automatically:**
+
+- **host** — subprocess against your host's installed toolchains. Reuses your `node_modules`, `~/.bun-install`, `~/.cache/pip`, etc. Skips Docker entirely. Fast for jobs that don't need container parity. Default for most workflows.
+- **container** — Docker, real services networking with `--network-alias`. Used automatically when a job declares `services:` or pins a container-only image. Health-check waiting included.
+
+**Matrix isolation via per-cell git worktree.** When `strategy.matrix` runs N cells, each gets its own isolated git checkout under `.runner/worktrees/<cell-id>/` so cells never race on shared workspace state. Per-cell `${{ matrix.* }}` substitution. `include` and `exclude` honored.
+
+**`actions/cache` semantics on local fs.** Real exact-key + restore-key longest-prefix matching. `cache-hit`, `cache-primary-key`, `cache-matched-key` outputs. Persistent across runs — pulls from `~/.cache/rehearse-runner/cache/`.
+
+**Composite actions** — local (`./.github/actions/*`) and remote (`org/repo[/sub]@ref`, auto-cloned to `.runner/actions/<slug>/`). `${{ inputs.* }}` substituted from the parent's `with:`.
+
+**Local reusable workflows** — `uses: ./.github/workflows/foo.yml` at job level, with `with:` and `secrets: inherit`.
+
+**JavaScript actions** (`runs.using: node20|node18|node16`) — auto-cloned at the requested ref. Full `INPUT_*` and `GITHUB_OUTPUT` contract.
+
+**16 in-process action shims** — `actions/checkout`, `actions/setup-{node,python,go,java,dotnet,bun}`, `actions/setup-pnpm`, `denoland/setup-deno`, `dtolnay/rust-toolchain`, `ruby/setup-ruby`, `actions/cache` + `/save` + `/restore`, `actions/upload-artifact`, `actions/download-artifact`, `codecov`, `actions/github-script`. `setup-dotnet` is a real shim that runs Microsoft's `dotnet-install.sh` and caches the SDK side-by-side on the persistent rootfs.
+
+**Conditional expressions** — `if:` on jobs and steps with full context: `${{ matrix.* }}`, `env`, `secrets`, `vars`, `needs`, `steps`, `runner`, `github`, `inputs`.
+
+**Topological scheduling** — `needs:` correctly orders parallel jobs with bounded concurrency.
+
+**Four CLI subcommands:**
+
+- `runner run <workflow.yml>` — execute the workflow once.
+- `runner watch <workflow.yml>` — re-run on every file save (debounced, queue-coalesced).
+- `runner install-hook` — write `.git/hooks/pre-push` that runs the workflow first; only let push proceed if green.
+- `runner compat <workflow.yml>` — static audit; how much of this YAML would actually execute? Returns coverage percentage and a per-step report.
+
+**`--remote` flag** — ships the workflow YAML to a Pro VM via the same binary. Auto-detects git origin URL + HEAD SHA + monorepo subdir from `cwd`. `--env-file` ships secrets to the VM as `${{ secrets.* }}`.
+
+**Tests** — 121 unit + integration tests across 13 suites, all green on each release.
+
+---
+
+## Compatibility against real workflows
+
+We audited the published CI of two large OSS projects:
+
+- **vitejs/vite** — 5 jobs, 26 steps. **96.2% compat** (one step uses an unsupported feature, the rest run as-is).
+- **honojs/hono** — 14 jobs, 71 steps. **97.2% compat**.
+- **plsft/rehearse (own CI)** — 2 jobs, 11 steps. **100% compat**.
+
+Conservative summary: ~97% of real workflows just work without edits. The gaps that exist are documented (remote reusable workflows, Docker actions, OIDC, concurrency cancellation).
+
+---
+
+## The bench
+
+Two comparisons.
+
+**vs GitHub Actions** — same 9-cell matrix workflow on three execution targets, measured against the real `plsft/typey` repo (a Bun CLI, not a fixture):
+
+- Local (`runner run`, warm): **1.5s** wall
+- Pro (`runner run --remote`, warm): **5s** wall
+- GitHub Actions: **95s** wall
+
+The speedup is the spin-up tax that hosted runners can't avoid — cold container, fresh toolchain install, cold module caches on every push. Local skips all of it; Pro keeps everything warm between runs.
+
+**vs nektos/act** — head-to-head on standard fixture workflows:
+
+- our-ci (typecheck + tests): **12.19s** Rehearse vs 63.78s act = **5.23×**
+- node-matrix [18.x, 20.x, 22.x]: **1.12s** vs 10.07s = **8.99×**
+- service-postgres (postgres:16 + 4 psql steps): **10.97s** vs timed-out (>360s) = **32.82× — act fails**
+- hono-bun (real OSS, honojs/hono bun job): **7.58s** vs n/a (act lacks bun)
+
+Reproducibility: `pnpm tsx bench/compare.ts --skip-cold` from the rehearse repo, plus `time runner run` / `time runner run --remote` against `github.com/plsft/typey`.
+
+---
+
+## Comparisons against adjacent tools
+
+**vs nektos/act:** act is the OSS pioneer in the local-GH-Actions-runner category since 2019 (~56k stars, MIT). We share the category. Differences: Rehearse has a host backend (act is Docker-only), watch mode, pre-push hook, real services networking (act times out on this), 5–30× faster on the bench, and an optional same-binary hosted offload via Rehearse Pro.
+
+**vs hosted-runner SaaS (Blacksmith / Ubicloud / RunsOn / BuildJet / Namespace / Depot / WarpBuild):** these products start the clock at `git push`. They give you a faster, cheaper drop-in replacement for GitHub-hosted runners. They compete with each other on price-per-minute, instance specs, sticky-disk caching, and bare-metal hardware. They don't try to do local execution at all — they bill per minute and "watch on every save" would bankrupt you. Rehearse occupies a different position in the workflow (pre-push + offload), not a different price point. If you want a GH-hosted replacement and your CI is fully post-push, use one of them.
+
+**vs Pulumi / Earthly / Dagger** (TypeScript / pipeline-as-code tools): Pulumi compiles to GH Actions YAML but as part of a larger IaC stack with state-backend requirements. Earthly outputs Earthfiles (their own DSL, not standard GH Actions YAML) and runs on Earthly's runtime. Dagger runs pipelines on its own runtime locally or in cloud, not as GH Actions. `@rehearse/ci`'s niche is typed TS that compiles lossless to standard GH Actions YAML with zero runtime dependency on us.
+
+---
+
+## Pricing
+
+**OSS** (`@rehearse/runner` from npm) — free forever. Apache 2.0. No signup, no telemetry, no phone-home. Full feature set: host + container backends, matrix, services, watch, pre-push hook, all the action shims. Pair with `@rehearse/ci` and `@rehearse/cli` for the TypeScript authoring story.
+
+**Pro** — $49/mo for 25,000 active CPU minutes per month. +$49 per additional 25,000-minute block (buy via https://buy.stripe.com/6oU9AMdTI8VUdZH7ehgjC0r — webhook auto-bumps your cap within seconds). Email alerts at 75%, 90%, 100% of cap. Cap resets the first of each UTC month. Single-tenant Linux microVM with hardware isolation, 100 GB persistent storage, whole-rootfs cache persistence. Cancel anytime via Stripe Customer Portal; 14-day refund window.
+
+**Enterprise** — custom. Larger VMs (negotiated), parallel matrix execution across multiple VMs, Slack Connect channel with George, best-effort 4-hour response SLA, DPA + security questionnaires (SOC 2 on request — currently no SOC 2). Email pro@rehearse.sh.
+
+**Honest cap math:** Pro at 25,000 minutes covers most active teams. A developer pushing 100 PRs/month at 5 min each = 500 minutes. Heavy CI loads (large matrices, integration suites) are the most likely to need overage blocks. Hard cap is to prevent runaway-usage surprises on either side — yours OR ours.
+
+---
+
+## Repo layout (for navigation)
+
+```
+runner/        — @rehearse/runner    — the CLI (binary: `runner`)
+ts-ci/         — @rehearse/ci         — author workflows in TypeScript
+git-engine/    — @rehearse/git-core   — pure-TypeScript git protocol
+cli/           — @rehearse/cli        — `rh` CLI (compile / convert TS pipelines)
+examples/      — 5 sample projects (node, dotnet, php, python, composite-action-demo)
+bench/         — runner-vs-act bench harness + RESULTS.md
+poc/           — fixture workflows used by the bench harness
+.rehearse/     — TypeScript source for this repo's own CI
+.github/       — generated workflow YAML (do not edit by hand)
+site/          — marketing site source (Vite + Tailwind, deploys to Cloudflare Workers)
+```
+
+Source: https://github.com/plsft/rehearse (Apache 2.0).
+
+The Pro hosted layer source is in a separate private repo (`plsft/rehearse-pro`): API on Cloudflare Workers + D1, dashboard on Astro/Cloudflare Workers, daemon installed on each customer's microVM. Customers don't interact with these directly — they use the OSS `runner` binary with the `--remote` flag.
+
+---
+
+## Known gaps (honest list)
+
+- **Remote reusable workflows** (`org/repo/.github/workflows/foo.yml@ref`) — local form (`./.github/workflows/foo.yml`) works.
+- **Docker actions** (`runs.using: docker`) — JS-action runtime ships, Docker doesn't yet.
+- **OIDC** / `id-token: write` — Pro VMs need an OIDC issuer for `aws-actions/configure-aws-credentials` etc. Plan: stand up `oidc.rehearse.sh` per-team. Workaround today: long-lived IAM keys via `--env-file`.
+- **`concurrency:` cancellation** — parsed, not enforced.
+- **Pro `services:`** — works locally via container backend; not yet on Pro VMs (needs Docker on the VM).
+- **PHP on Pro** — verified locally; not yet preinstalled on the Pro VM.
+- **No SOC 2** today. Talk to us if you need it; we'll discuss timeline + cost-share.
+
+All other features documented as supported are tested + working at v0.4.0.
+
+---
+
+## Programmatic APIs
+
+**`@rehearse/runner`:**
+
+```ts
+import { run, compat } from '@rehearse/runner';
+
+const result = await run({
+  workflowPath: '.github/workflows/ci.yml',
+  jobFilter: 'test',
+  backend: 'auto',           // 'host' | 'container' | 'auto'
+  maxParallel: 4,
+});
+// → { workflow, status, durationMs, jobs }
+
+const audit = compat('.github/workflows/ci.yml');
+// → { coverage, jobs, stepsTotal }
+```
+
+**`@rehearse/ci`:**
+
+```ts
+import { pipeline, job, step, triggers, Runner, compile, toYaml } from '@rehearse/ci';
+import { node } from '@rehearse/ci/presets';
+
+const ci = pipeline('CI', {
+  triggers: [triggers.pullRequest(), triggers.push({ branches: ['main'] })],
+  jobs: [
+    job('test', {
+      runner: Runner.github('ubuntu-latest'),
+      steps: [step.checkout(), node.setup('20'), node.install(), node.test()],
+    }),
+  ],
+});
+
+const workflow = compile(ci);
+const yaml = toYaml(workflow);
+
+// Convert direction:
+import { convert } from '@rehearse/ci';
+const { source, warnings } = convert(yamlString);
+```
+
+**`@rehearse/git-core`:**
+
+```ts
+import { GitClient, parseTree, parsePackfile, computeDiff } from '@rehearse/git-core';
+
+const client = new GitClient({ fetch });
+const result = await client.clone({
+  url: 'https://github.com/honojs/hono.git',
+  ref: 'main',
+  depth: 1,
+});
+// → { objects, refs, head }
+```
+
+---
+
+## Where to find more
+
+- Marketing site: https://rehearse.sh
+- GitHub: https://github.com/plsft/rehearse
+- npm packages: https://www.npmjs.com/package/@rehearse/runner, /@rehearse/ci, /@rehearse/cli, /@rehearse/git-core
+- Pro signup: https://rehearse.sh/pricing → /checkout
+- Pro dashboard: https://pro.rehearse.sh
+- Issues + roadmap: https://github.com/plsft/rehearse/issues
+- Maintainer: George Rios at Plural Software (plsft on GitHub) — george@pluralsoftware.com

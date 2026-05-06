@@ -1,0 +1,70 @@
+# Rehearse
+
+> Local-first GitHub Actions runner with TypeScript-authored CI and an optional hosted offload target. Run your `.github/workflows/*.yml` on every save in sub-second; same YAML scales to a single-tenant VM ($49/mo for 25,000 CPU minutes) and to stock GitHub Actions. Apache 2.0.
+
+Rehearse is four npm packages that together let you author CI in TypeScript, execute it locally on your laptop, push it to a private VM when the laptop isn't enough, and ship the same compiled YAML to standard GitHub Actions — no Rehearse runtime dependency on GitHub's side. The OSS runner is free forever; Pro is the optional hosted offload at $49/mo for 25,000 active CPU minutes per month, with $49 per additional 25,000-minute block. Project source: https://github.com/plsft/rehearse. Marketing site: https://rehearse.sh.
+
+## Documentation
+
+- [Homepage](https://rehearse.sh/): Hero, three-target wedge (1.5s local · 5s Pro · 95s GH Actions on a real 9-cell matrix), feature overview, install command.
+- [Quickstart](https://rehearse.sh/docs): 30-second install + run instructions, CLI subcommands, watch mode, pre-push hook.
+- [Packages](https://rehearse.sh/packages): Full reference for all four npm packages (`@rehearse/runner`, `@rehearse/ci`, `@rehearse/cli`, `@rehearse/git-core`) — what each does, public API, programmatic usage examples, cross-references.
+- [TypeScript GitHub Actions](https://rehearse.sh/typescript-github-actions): Deep dive on `@rehearse/ci` — author CI in typed TS, compile to standard GH Actions YAML. Forward path is 100% lossless (snapshot-tested); reverse path (YAML → TS) is a one-command migration starter.
+- [Run GitHub Actions locally](https://rehearse.sh/local-github-actions): SEO landing for the act-alternative use case. Sample workflow + sample CLI + sample output + vs-act feature table.
+- [About](https://rehearse.sh/about): Project orientation, what it is, what it isn't.
+- [Security](https://rehearse.sh/security): Pro VM isolation model, what we store on the control plane, what we don't, how to report a finding.
+
+## Packages
+
+- [@rehearse/runner](https://www.npmjs.com/package/@rehearse/runner) (binary: `runner`): Local-first GitHub Actions runner. Reads `.github/workflows/*.yml`, executes with two backends (host subprocess + container via Docker), supports matrix / services / cache / composite actions / JS actions / per-cell git worktrees. CLI subcommands: `run`, `watch`, `install-hook`, `compat`, `--remote` for Pro offload.
+- [@rehearse/ci](https://www.npmjs.com/package/@rehearse/ci): TypeScript-authored CI SDK. Typed builders compile to standard GitHub Actions YAML. Forward path (`compile`) is 100% lossless — every public SDK feature produces canonical YAML, snapshot-tested against 6 reference workflows. Reverse path (`convert`) is a migration starter: handles common YAML shapes for adopting the SDK on existing repos. Zero runtime dependency on the compiled YAML.
+- [@rehearse/cli](https://www.npmjs.com/package/@rehearse/cli) (binary: `rh`): Companion CLI for `@rehearse/ci`. Six subcommands: `init` (scaffold), `compile` (TS → YAML), `convert` (YAML → TS migration), `validate` (type-check), `watch` (recompile on save), `estimate` (per-run + monthly cost on GH-hosted).
+- [@rehearse/git-core](https://www.npmjs.com/package/@rehearse/git-core): Pure-TypeScript implementation of the git protocol — objects, packfiles, smart-HTTP wire, Myers diff, three-way merge, refs. Zero native dependencies. Runs in Cloudflare Workers, browsers, Deno, Node, Bun. The unique-fit use case is anywhere the system `git` binary isn't an option.
+
+## Key concepts
+
+- [Three execution targets](https://rehearse.sh/#bench): Same YAML, three places it can run. Local (`runner run`, sub-second on warm cache, free), Pro VM (`runner run --remote`, ~5s on warm cache, $49/mo for 25,000 minutes), GitHub Actions (`git push`, ~95s on the typey 9-cell matrix). Switch with one flag.
+- [TypeScript-first CI authoring](https://rehearse.sh/typescript-github-actions): Author workflows in typed TS instead of YAML. Compiles to canonical GH Actions YAML you commit. Snapshot-tested for losslessness. Includes a one-command migration on-ramp for adopting on existing repos (`rh ci convert`).
+- [Same-binary OSS + Pro](https://rehearse.sh/pro): The `runner` binary is the same code path locally and on Pro — Pro is just an execution target, not a fork. Drop the `--remote` flag and you're back to free local execution. No vendor lock-in: the OSS runner is Apache 2.0 and runs on a laptop forever.
+- [Whole-rootfs cache persistence](https://rehearse.sh/pro): Pro VM is single-tenant Linux with persistent rootfs. Every cache, every build artifact, every tool install survives between runs forever — no `actions/cache` declarations needed, no sticky-disk path lists. This is the differentiator vs Blacksmith Sticky Disks / RunsOn / Ubicloud, which require declared paths.
+- [Pre-push CI loop](https://rehearse.sh/local-github-actions): `runner watch` reruns CI on every save (debounced, queue-coalesced); `runner install-hook` writes a pre-push git hook that gates pushes on a green local run. Hosted-runner SaaS competitors can't match this — they bill per minute and watch mode would bankrupt you.
+
+## Examples
+
+- [examples/node-app](https://github.com/plsft/rehearse/tree/main/examples/node-app): Node + Vitest, 3-cell Node-version matrix, parallel via per-cell git worktree, `actions/cache` for npm, upload-artifact for coverage.
+- [examples/dotnet-app](https://github.com/plsft/rehearse/tree/main/examples/dotnet-app): .NET multi-target framework matrix (net8.0, net9.0, net10.0). Real `actions/setup-dotnet@v4` shim that runs Microsoft's `dotnet-install.sh` and caches SDKs side-by-side on the persistent VM rootfs.
+- [examples/php-app](https://github.com/plsft/rehearse/tree/main/examples/php-app): PHP + PHPUnit + PHPStan, 3-cell PHP-version matrix via `shivammathur/setup-php@v2` (a JS action — auto-cloned at the requested ref by the runner).
+- [examples/python-api](https://github.com/plsft/rehearse/tree/main/examples/python-api): FastAPI + pytest + Postgres `services:` block. Uses the container backend; `act` doesn't complete this workflow.
+- [examples/composite-action-demo](https://github.com/plsft/rehearse/tree/main/examples/composite-action-demo): Local composite action authoring + use. Shows composite expansion + `${{ inputs.* }}` substitution.
+- [plsft/typey](https://github.com/plsft/typey): External (non-Rehearse) repo using Rehearse in its CI. 9-cell matrix (3 OS × 3 Bun versions). The bench numbers on the homepage come from this workflow.
+
+## Comparisons
+
+- [vs other CI runners](https://rehearse.sh/vs): Honest comparison vs Blacksmith / Ubicloud / RunsOn / BuildJet / Namespace / Depot / WarpBuild. Different shape entirely — those products are hosted-runner replacements (post-push), Rehearse is local-first (pre-push) plus optional offload. Includes feature-by-feature table, interactive cost calculator, "when to pick the other guys" callouts, pricing math.
+- [vs nektos/act](https://rehearse.sh/local-github-actions): act is the OSS pioneer in the local-GH-Actions-runner category (~56k stars, MIT). We share the category; we compete on speed (5–30× faster on the bench), feature coverage (host backend, watch mode, pre-push hook, real `services:` networking), and an optional same-binary hosted offload target via Rehearse Pro.
+- [vs Pulumi / Earthly / Dagger](https://rehearse.sh/typescript-github-actions): These are adjacent "CI in code" tools. Pulumi compiles to GH Actions YAML but as part of a larger IaC stack. Earthly outputs Earthfiles (their DSL, not GH Actions). Dagger runs pipelines on its own runtime. `@rehearse/ci`'s niche is typed TS that compiles lossless to standard GH Actions YAML with zero runtime dependency on us.
+
+## Bench
+
+- [Bench page](https://rehearse.sh/bench): Three-target headline (1.5s local · 5s Pro · 95s GH Actions on the typey 9-cell matrix), act-comparison footnote (5.23× / 8.99× / 32.82×), reproducibility commands, methodology, honest caveats.
+- [bench/RESULTS.md on GitHub](https://github.com/plsft/rehearse/blob/main/bench/RESULTS.md): Full per-OS data, raw timings, methodology details.
+
+## Pricing
+
+- [Pricing page](https://rehearse.sh/pricing): Three tiers. OSS (free forever, Apache 2.0), Pro ($49/mo for 25,000 active CPU minutes; +$49 per additional 25,000-minute block, no per-minute meter, no overage shock), Enterprise (custom — larger VMs, parallel matrix, dedicated support).
+- [Buy a Pro block — $49 / 25,000 minutes](https://buy.stripe.com/6oU9AMdTI8VUdZH7ehgjC0r): Stripe payment link. Auto-bumps your `block_count` via webhook. Email confirmation with new monthly cap arrives within seconds.
+- [How the cap works](https://rehearse.sh/pricing#cap): Cap is on active CPU minutes (the time the VM is executing your workflow); idle time is free. Email alerts at 75%, 90%, 100% of cap. At 100% your runs pause — buy another block via Stripe or wait until the first of next UTC month.
+
+## Customers + changelog
+
+- [Customers](https://rehearse.sh/customers): Repos using Rehearse in production (currently typey + rehearse itself). Honest framing — we just shipped v0.4.0; list grows as users come on.
+- [Changelog](https://rehearse.sh/changelog): Release notes from v0.4.0 backwards. Covers the 0.3.x stabilization series and pre-pivot v0.1–v0.2 archive context.
+
+## Optional
+
+- [Demo cue sheets](https://github.com/plsft/rehearse-pro/tree/main/demo-walkthrus): Cue sheets for live recording — bun, dotnet, rust, python, go, plus a tight 45-second typey opener. Each scripts a YAML→TS migration arc plus three-target wall-clock comparison.
+- [GitHub repo](https://github.com/plsft/rehearse): Source for all 4 packages, bench harness, marketing site, docs.
+- [Releases on GitHub](https://github.com/plsft/rehearse/releases): Auto-generated release notes per tag.
+- [Issues](https://github.com/plsft/rehearse/issues): Bug reports, feature requests, roadmap discussion.
+- [Maintainer GitHub](https://github.com/plsft): plsft (Plural Software).
+- [llms-full.txt](https://rehearse.sh/llms-full.txt): Same content as this file but with full documentation text inlined for LLMs that want a single-file context.

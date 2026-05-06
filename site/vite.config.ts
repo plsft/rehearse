@@ -21,6 +21,7 @@ export default defineConfig({
         customers: resolve(__dirname, 'customers.html'),
         changelog: resolve(__dirname, 'changelog.html'),
         localGithubActions: resolve(__dirname, 'local-github-actions.html'),
+        typescriptGithubActions: resolve(__dirname, 'typescript-github-actions.html'),
         checkout: resolve(__dirname, 'checkout.html'),
         checkoutSuccess: resolve(__dirname, 'checkout/success.html'),
         docsPro: resolve(__dirname, 'docs/pro.html'),
