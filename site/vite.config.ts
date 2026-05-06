@@ -29,7 +29,6 @@ export default defineConfig({
         blogActAlternative: resolve(__dirname, 'blog/act-alternative.html'),
         blogPrePush: resolve(__dirname, 'blog/github-actions-before-push.html'),
         blogTsYaml: resolve(__dirname, 'blog/typescript-github-actions-yaml.html'),
-        blogDogfood: resolve(__dirname, 'blog/github-actions-locally-24-repos.html'),
       },
     },
   },

@@ -86,27 +86,21 @@
   </url>
   <url>
     <loc>https://rehearse.sh/blog/act-alternative</loc>
-    <lastmod>2026-05-06</lastmod>
+    <lastmod>2026-05-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://rehearse.sh/blog/github-actions-before-push</loc>
-    <lastmod>2026-05-06</lastmod>
+    <lastmod>2026-04-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://rehearse.sh/blog/typescript-github-actions-yaml</loc>
-    <lastmod>2026-05-06</lastmod>
+    <lastmod>2026-05-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://rehearse.sh/blog/github-actions-locally-24-repos</loc>
-    <lastmod>2026-05-06</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://rehearse.sh/llms.txt</loc>
