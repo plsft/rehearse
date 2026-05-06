@@ -177,7 +177,13 @@ export function plan(workflow: ParsedWorkflow, opts: RunOptions): PlannedJob[] {
       if (!matches) continue;
     }
     const matrix = parseMatrix(rawJob.strategy?.matrix);
-    const cells = expandMatrix(matrix);
+    const allCells = expandMatrix(matrix);
+    // Apply --matrix filter if any. Each filter entry must match a value
+    // on the cell. Cells with NO matrix variable for a given filter key
+    // are dropped (the user asked for X=Y; this cell has no X — exclude).
+    const cells = opts.matrixFilter && Object.keys(opts.matrixFilter).length > 0
+      ? allCells.filter((cell) => Object.entries(opts.matrixFilter!).every(([k, v]) => String(cell[k] ?? '') === v))
+      : allCells;
     const needs = Array.isArray(rawJob.needs) ? rawJob.needs : rawJob.needs ? [rawJob.needs] : [];
 
     for (const cell of cells) {

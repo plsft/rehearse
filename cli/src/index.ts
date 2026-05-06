@@ -43,6 +43,28 @@ import { detectGitContext, redactToken } from './runner/remote.js';
 import { watchWorkflow } from './runner/watch.js';
 import type { BackendName } from './runner/types.js';
 
+/**
+ * --matrix flag collector. Accepts either repeated flags or comma-separated
+ * pairs:
+ *   --matrix os=ubuntu-latest --matrix node-version=20
+ *   --matrix os=ubuntu-latest,node-version=20
+ * Both produce the same `{ os: 'ubuntu-latest', 'node-version': '20' }`.
+ */
+function collectMatrix(value: string, prev: Record<string, string> = {}): Record<string, string> {
+  for (const pair of value.split(',')) {
+    if (!pair.trim()) continue;
+    const eq = pair.indexOf('=');
+    if (eq <= 0) {
+      throw new Error(`invalid --matrix value: "${pair}" (expected key=value)`);
+    }
+    const k = pair.slice(0, eq).trim();
+    const v = pair.slice(eq + 1).trim();
+    if (!k) throw new Error(`invalid --matrix value: "${pair}" (empty key)`);
+    prev[k] = v;
+  }
+  return prev;
+}
+
 function readPackageVersion(): string {
   try {
     const here = dirname(fileURLToPath(import.meta.url));
@@ -67,6 +89,7 @@ program
   .command('run <workflow>')
   .description('Run a GitHub Actions workflow on this machine, or remotely with --remote')
   .option('-j, --job <name>', 'restrict to a single job (matrix variants of that job all run)')
+  .option('-m, --matrix <key=value>', 'filter to specific matrix cell(s); repeatable or comma-separated (e.g. --matrix os=ubuntu-latest)', collectMatrix, {})
   .option('-b, --backend <type>', 'host | container | auto', 'auto')
   .option('-p, --max-parallel <n>', 'max concurrent jobs', (v) => Number(v))
   .option('-c, --cwd <dir>', 'working directory (default: inferred from workflow path)')
@@ -100,6 +123,7 @@ program
       workflowPath: workflow,
       cwd: opts.cwd,
       jobFilter: opts.job,
+      matrixFilter: opts.matrix && Object.keys(opts.matrix).length > 0 ? opts.matrix : undefined,
       backend: opts.backend === 'auto' ? 'auto' : (opts.backend as BackendName),
       maxParallel: opts.maxParallel,
       failFast: opts.failFast,
@@ -243,6 +267,7 @@ program
   .command('watch <workflow>')
   .description('Re-run the workflow on file changes (inner-loop dev tool)')
   .option('-j, --job <name>', 'restrict to a single job')
+  .option('-m, --matrix <key=value>', 'filter to specific matrix cell(s); repeatable or comma-separated', collectMatrix, {})
   .option('-b, --backend <type>', 'host | container | auto', 'auto')
   .option('-p, --max-parallel <n>', 'max concurrent jobs', (v) => Number(v))
   .option('-c, --cwd <dir>', 'working directory')
@@ -253,6 +278,7 @@ program
       workflowPath: workflow,
       cwd: opts.cwd,
       jobFilter: opts.job,
+      matrixFilter: opts.matrix && Object.keys(opts.matrix).length > 0 ? opts.matrix : undefined,
       backend: opts.backend === 'auto' ? 'auto' : (opts.backend as BackendName),
       maxParallel: opts.maxParallel,
       verbosity: 'normal',

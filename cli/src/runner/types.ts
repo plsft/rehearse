@@ -158,8 +158,20 @@ export interface RunOptions {
   workflowPath: string;
   /** Repo root; defaults to `dirname(dirname(dirname(workflowPath)))` if path matches `.github/workflows/*.yml`. */
   cwd?: string;
-  /** Restrict to one job (matrix-expanded variants of that job still all run). */
+  /** Restrict to one job (matrix-expanded variants of that job still all run unless `matrixFilter` also set). */
   jobFilter?: string;
+  /**
+   * Restrict to specific matrix cells. Map of variable name → required value.
+   * Cells whose `matrixCell` doesn't match every entry here are filtered out
+   * before scheduling.
+   *
+   * Example: `{ os: 'ubuntu-latest' }` keeps just the Linux cells of a 9-cell
+   * `[os] × [node-version]` matrix. CLI: `--matrix os=ubuntu-latest`.
+   *
+   * Combine multiple constraints either by passing repeated CLI flags or by
+   * comma-separating: `--matrix os=ubuntu-latest,node-version=20`.
+   */
+  matrixFilter?: Record<string, string>;
   /** Force a backend; default is auto (host unless services/container/runs-on incompatible). */
   backend?: BackendName | 'auto';
   /** Max parallel jobs. Default = min(cpus, 4). */
