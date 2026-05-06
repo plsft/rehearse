@@ -87,6 +87,12 @@ export interface HostBackendOptions {
    * Falls back to the parent repo on non-git workspaces or symlink failures.
    */
   worktreeForMatrix?: boolean;
+  /**
+   * When true, step stdout/stderr stream directly to the parent terminal.
+   * Default (false): step output is buffered and only dumped on failure,
+   * which preserves the orchestrator's clean inline `▸ → ✓` indicator.
+   */
+  verbose?: boolean;
 }
 
 export class HostBackend implements Backend {
@@ -193,6 +199,7 @@ export class HostBackend implements Backend {
     writeFileSync(pathFile, '');
     writeFileSync(summaryFile, '');
 
+    const verbose = this.opts.verbose === true;
     const env: NodeJS.ProcessEnv = {
       ...process.env,
       ...session.env,
@@ -206,10 +213,29 @@ export class HostBackend implements Backend {
       GITHUB_STEP_SUMMARY: summaryFile,
       RUNNER_OS: process.platform === 'win32' ? 'Windows' : process.platform === 'darwin' ? 'macOS' : 'Linux',
       RUNNER_TEMP: session.tempDir,
+      // Captured-output mode: tools like vitest, jest, npm see a pipe (no
+      // TTY) and would normally strip ANSI colors. FORCE_COLOR=1 makes them
+      // emit colors anyway so the buffered output looks right when we dump
+      // it on failure. Skipped in verbose mode where stdio:inherit already
+      // sees a real TTY.
+      ...(verbose ? {} : { FORCE_COLOR: process.env.FORCE_COLOR ?? '1' }),
     };
 
     return new Promise<StepResult>((done) => {
-      const proc = spawn(shell.cmd, shell.args(step.run!), { cwd, env, stdio: 'inherit' });
+      const stdoutChunks: Buffer[] = [];
+      const stderrChunks: Buffer[] = [];
+      const proc = spawn(shell.cmd, shell.args(step.run!), {
+        cwd,
+        env,
+        // verbose: stream every line live (the pre-v0.6.3 firehose default).
+        // default: capture so the orchestrator's `▸ → ✓` indicator stays
+        //          visible; on failure we dump the buffer indented underneath.
+        stdio: verbose ? 'inherit' : ['ignore', 'pipe', 'pipe'],
+      });
+      if (!verbose) {
+        proc.stdout?.on('data', (chunk: Buffer) => stdoutChunks.push(chunk));
+        proc.stderr?.on('data', (chunk: Buffer) => stderrChunks.push(chunk));
+      }
       proc.on('error', (err) => {
         done({
           label: step.label,
@@ -218,6 +244,7 @@ export class HostBackend implements Backend {
           durationMs: performance.now() - t0,
           outputs: {},
           reason: err.message,
+          output: collectOutput(stdoutChunks, stderrChunks),
         });
       });
       proc.on('exit', (code) => {
@@ -239,6 +266,7 @@ export class HostBackend implements Backend {
           exitCode: code ?? -1,
           durationMs: performance.now() - t0,
           outputs,
+          output: collectOutput(stdoutChunks, stderrChunks),
         });
       });
     });
@@ -253,6 +281,17 @@ export class HostBackend implements Backend {
 /** readFileSync that returns '' if the file disappeared (rare cleanup races). */
 function readFileSafe(path: string): string {
   try { return readFileSync(path, 'utf-8'); } catch { return ''; }
+}
+
+/** Combine captured stdout + stderr into a single string for failure dumps. */
+function collectOutput(stdoutChunks: Buffer[], stderrChunks: Buffer[]): string | undefined {
+  if (stdoutChunks.length === 0 && stderrChunks.length === 0) return undefined;
+  const out = Buffer.concat(stdoutChunks).toString('utf-8');
+  const err = Buffer.concat(stderrChunks).toString('utf-8');
+  if (!out && !err) return undefined;
+  if (!err) return out;
+  if (!out) return err;
+  return out + '\n' + err;
 }
 
 function pickShell(scriptShell: string | undefined): { cmd: string; args: (s: string) => string[] } {

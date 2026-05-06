@@ -18,6 +18,13 @@ export interface StepResult {
   durationMs: number;
   outputs: Record<string, string>;
   reason?: string;
+  /**
+   * Captured stdout + stderr from the step, when the backend buffered it
+   * instead of inheriting the parent stdio. Used by the orchestrator to
+   * dump the output on failure (so users can debug) without flooding the
+   * terminal during successful runs.
+   */
+  output?: string;
 }
 
 export interface JobResult {
@@ -188,4 +195,11 @@ export interface RunOptions {
   env?: Record<string, string>;
   /** Secrets resolved up front (loaded from .runner/.env or env vars). */
   secrets?: Record<string, string>;
+  /**
+   * When true, every step's stdout/stderr streams directly to the parent
+   * terminal as it happens (the firehose default of pre-v0.6.3). Default
+   * (false) captures step output silently, shows only the structured
+   * `▸ → ✓` indicator, and dumps captured output only on step failure.
+   */
+  verbose?: boolean;
 }

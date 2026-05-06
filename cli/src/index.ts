@@ -95,6 +95,7 @@ program
   .option('-c, --cwd <dir>', 'working directory (default: inferred from workflow path)')
   .option('--fail-fast', 'cancel sibling jobs on first failure')
   .option('--quiet', 'minimal output (machine-readable result only)')
+  .option('--verbose', "stream every step's stdout in real time (default: capture and dump on failure)")
   .option('--bench', 'output a single JSON line for benchmarking')
   .option('--env-file <file>', 'load env vars from file (KEY=VALUE per line)')
   .option('--remote', 'execute on a Rehearse Pro VM (requires REHEARSE_TOKEN)')
@@ -128,6 +129,7 @@ program
       maxParallel: opts.maxParallel,
       failFast: opts.failFast,
       verbosity: opts.quiet || opts.bench ? 'quiet' : 'normal',
+      verbose: opts.verbose === true,
       env,
       secrets: env,
     });

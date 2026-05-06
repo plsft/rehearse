@@ -48,7 +48,7 @@ export async function run(options: RunOptions): Promise<RunResult> {
   if (planned.length === 0) throw new Error('no jobs match');
 
   const backends: Record<BackendName, Backend> = {
-    host: new HostBackend(),
+    host: new HostBackend({ verbose: options.verbose }),
     container: new ContainerBackend(),
   };
   const maxParallel = options.maxParallel ?? Math.min(cpus().length, 4);
@@ -120,6 +120,20 @@ export async function run(options: RunOptions): Promise<RunResult> {
             console.log(`  ${pc.gray('⊘')} ${padLabel(e.step.label)} ${pc.gray(e.result.reason ?? 'skipped')}`);
           } else {
             console.log(`  ${statusMark(e.result.status)} ${padLabel(e.step.label)} ${pc.gray(fmtMs(e.result.durationMs))}`);
+          }
+          // Dump captured stdout/stderr ONLY on failure (success runs stay
+          // clean). The host backend buffers output by default; --verbose
+          // restores live streaming and skips the buffer (output undefined).
+          if (e.result.status === 'failure' && e.result.output) {
+            const indented = e.result.output
+              .replace(/\r?\n$/, '')
+              .split(/\r?\n/)
+              .map((line) => '    ' + pc.gray('│') + ' ' + line)
+              .join('\n');
+            console.log(indented);
+            if (e.result.reason) {
+              console.log('    ' + pc.gray('│') + ' ' + pc.red(e.result.reason));
+            }
           }
           break;
         }
