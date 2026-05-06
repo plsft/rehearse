@@ -56,31 +56,89 @@
   <div class="max-w-3xl mx-auto px-5">
     <h2 id="quickstart" class="text-2xl font-semibold text-white">Quickstart</h2>
 
-    <div class="mt-6 card">
-      <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">INSTALL</div>
-      <pre class="font-mono text-[13px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>npm install -g @rehearse/cli
-<span class="comment"># or via your package manager of choice</span>
-<span class="prompt"></span>pnpm add -g @rehearse/cli
-<span class="prompt"></span>bun add -g @rehearse/cli
+    <!-- OS-aware install card. Defaults to detected OS via the user-agent;
+         remembers the last choice in localStorage. The `rh` binary is the
+         same on all three OSes — only Node prerequisites differ. -->
+    <div class="mt-6 card"
+         x-data="{ os: localStorage.getItem('rh_os') || (navigator.userAgent.includes('Windows') ? 'windows' : navigator.userAgent.includes('Mac') ? 'macos' : 'linux') }"
+         x-init="$watch('os', v => localStorage.setItem('rh_os', v))">
+      <div class="flex items-center justify-between mb-3">
+        <div class="font-mono text-xs text-[var(--rh-accent)]">INSTALL</div>
+        <div class="flex gap-1">
+          <button @click="os = 'macos'"
+                  :class="os === 'macos' ? 'bg-white/10 text-white' : 'text-[var(--rh-muted)]'"
+                  class="font-mono text-[11px] px-2 py-1 rounded transition-colors hover:text-white">macOS</button>
+          <button @click="os = 'linux'"
+                  :class="os === 'linux' ? 'bg-white/10 text-white' : 'text-[var(--rh-muted)]'"
+                  class="font-mono text-[11px] px-2 py-1 rounded transition-colors hover:text-white">Linux</button>
+          <button @click="os = 'windows'"
+                  :class="os === 'windows' ? 'bg-white/10 text-white' : 'text-[var(--rh-muted)]'"
+                  class="font-mono text-[11px] px-2 py-1 rounded transition-colors hover:text-white">Windows</button>
+        </div>
+      </div>
 
-<span class="comment"># installs a single binary called `rh`</span>
+      <div x-show="os === 'macos'" x-cloak>
+        <pre class="font-mono text-[13px] text-white/90 whitespace-pre-wrap"><span class="comment"># Requires Node 22+ — install via Homebrew if you don't have it:</span>
+<span class="prompt"></span>brew install node
+<span class="prompt"></span>npm install -g @rehearse/cli
 <span class="prompt"></span>rh --version
-<span class="comment">0.5.1</span></pre>
+<span class="comment">0.6.5</span></pre>
+      </div>
+      <div x-show="os === 'linux'" x-cloak>
+        <pre class="font-mono text-[13px] text-white/90 whitespace-pre-wrap"><span class="comment"># Requires Node 22+. Install via your distro's package manager:</span>
+<span class="prompt"></span>sudo apt install nodejs npm     <span class="comment"># Debian/Ubuntu</span>
+<span class="prompt"></span>sudo pacman -S nodejs npm        <span class="comment"># Arch</span>
+<span class="prompt"></span>sudo dnf install nodejs npm      <span class="comment"># Fedora</span>
+<span class="prompt"></span>npm install -g @rehearse/cli
+<span class="prompt"></span>rh --version
+<span class="comment">0.6.5</span></pre>
+      </div>
+      <div x-show="os === 'windows'" x-cloak>
+        <pre class="font-mono text-[13px] text-white/90 whitespace-pre-wrap"><span class="comment"># Requires Node 22+ (PowerShell or Git Bash):</span>
+<span class="prompt"></span>winget install OpenJS.NodeJS    <span class="comment"># or use nvm-windows / scoop</span>
+<span class="prompt"></span>npm install -g @rehearse/cli
+<span class="prompt"></span>rh --version
+<span class="comment">0.6.5</span></pre>
+        <p class="mt-3 text-xs text-[var(--rh-muted)]">
+          <strong class="text-white">Windows tip:</strong> launch <code class="font-mono">rh</code> from the same shell you'd use to run your CI scripts. Bash steps inside <code class="font-mono">run:</code> blocks need Git Bash on PATH; <code class="font-mono">shell: pwsh</code> works natively in PowerShell.
+        </p>
+      </div>
     </div>
 
     <div class="mt-5 card">
       <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">RUN A WORKFLOW</div>
-      <pre class="font-mono text-[13px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>rh run .github/workflows/ci.yml             <span class="comment"># all jobs</span>
-<span class="prompt"></span>rh run .github/workflows/ci.yml --job test   <span class="comment"># one job</span>
-<span class="prompt"></span>rh run … --backend container                 <span class="comment"># force docker</span>
-<span class="prompt"></span>rh run … --max-parallel 8                    <span class="comment"># concurrency knob</span>
-<span class="prompt"></span>rh run … --quiet                             <span class="comment"># for scripts</span></pre>
+      <pre class="font-mono text-[13px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>rh run .github/workflows/ci.yml                       <span class="comment"># all jobs</span>
+<span class="prompt"></span>rh run .github/workflows/ci.yml --job test            <span class="comment"># one job</span>
+<span class="prompt"></span>rh run .github/workflows/ci.yml --matrix os=ubuntu-latest  <span class="comment"># filter cells</span>
+<span class="prompt"></span>rh run … --backend container                          <span class="comment"># force docker</span>
+<span class="prompt"></span>rh run … --max-parallel 8                             <span class="comment"># concurrency knob</span>
+<span class="prompt"></span>rh run … --verbose                                    <span class="comment"># stream all step output</span>
+<span class="prompt"></span>rh run … --quiet                                      <span class="comment"># minimal, scripting</span></pre>
     </div>
 
     <div class="mt-5 card">
       <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">INTEGRATE</div>
       <pre class="font-mono text-[13px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>rh watch .github/workflows/ci.yml             <span class="comment"># inner-loop, re-runs on save</span>
-<span class="prompt"></span>rh install-hook                               <span class="comment"># pre-push git hook</span></pre>
+<span class="prompt"></span>rh install-hook                               <span class="comment"># pre-push git hook</span>
+<span class="prompt"></span>rh compat .github/workflows/ci.yml            <span class="comment"># static audit (% would execute)</span></pre>
+    </div>
+
+    <div class="mt-5 card">
+      <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">PRO (--remote)</div>
+      <pre class="font-mono text-[13px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>export REHEARSE_TOKEN=rh_pro_live_…           <span class="comment"># bash/zsh</span>
+<span class="prompt"></span>$env:REHEARSE_TOKEN = "rh_pro_live_…"          <span class="comment"># PowerShell</span>
+<span class="prompt"></span>rh run --remote .github/workflows/ci.yml      <span class="comment"># ship to your VM</span>
+<span class="prompt"></span>rh run --remote … --matrix os=ubuntu-latest   <span class="comment"># forwarded to VM</span></pre>
+    </div>
+
+    <div class="mt-5 card">
+      <div class="font-mono text-xs text-[var(--rh-accent)] mb-2">TYPESCRIPT PIPELINES</div>
+      <pre class="font-mono text-[13px] text-white/90 whitespace-pre-wrap"><span class="prompt"></span>rh ci init                                   <span class="comment"># scaffold .rehearse/pipelines/</span>
+<span class="prompt"></span>rh ci compile                                <span class="comment"># .ts → .github/workflows/*.yml</span>
+<span class="prompt"></span>rh ci convert .github/workflows/ci.yml       <span class="comment"># existing YAML → TS (migration)</span>
+<span class="prompt"></span>rh ci validate                               <span class="comment"># type-check pipelines</span>
+<span class="prompt"></span>rh ci watch                                  <span class="comment"># recompile on save</span>
+<span class="prompt"></span>rh ci estimate                               <span class="comment"># GH-hosted CI cost (per-run + monthly)</span></pre>
     </div>
   </div>
 </section>
@@ -280,7 +338,7 @@
       <div class="eyebrow">// Reference</div>
       <h2 class="mt-2 text-2xl font-semibold gradient-text">More</h2>
       <ul class="mt-4 space-y-2 text-sm text-[var(--rh-muted)]">
-        <li><a href="https://github.com/plsft/rehearse/blob/main/runner/README.md" class="link">runner README</a> — full flag list and architecture</li>
+        <li><a href="https://github.com/plsft/rehearse/blob/main/cli/README.md" class="link">@rehearse/cli README</a> — full flag list and architecture</li>
         <li><a href="https://github.com/plsft/rehearse/blob/main/bench/RESULTS.md" class="link">bench/RESULTS.md</a> — benchmark methodology and numbers</li>
         <li><a href="https://github.com/plsft/rehearse/blob/main/CONTRIBUTING.md" class="link">CONTRIBUTING.md</a> — set up the repo for development</li>
         <li><a href="https://github.com/plsft/rehearse/issues" class="link">issues</a> — report bugs, request features</li>
