@@ -45,6 +45,18 @@ export const compat = pipeline('Compat scoreboard', {
           with: { 'node-version': '22' },
           name: 'Setup Node 22',
         }),
+        // Install the host tools the compat fixtures expect to find on
+        // PATH. The rh runner's host-shim path assumes these are
+        // installed locally (mirrors a developer's machine running
+        // their own workflows); the GH-hosted ubuntu runner doesn't
+        // ship them. Pre-v0.6.18 the shim silently lied; v0.6.18 fails
+        // loudly when missing — which means the scoreboard runner
+        // actually needs them. Add new tools here when fixtures need
+        // them, not by softening the assertion.
+        step.action('oven-sh/setup-bun@v1', {
+          with: { 'bun-version': 'latest' },
+          name: 'Install bun (host tool for typey fixture)',
+        }),
         step.run(
           'node bench/compat/run.mjs --cli "${{ github.event.inputs.cli || \'@rehearse/cli@latest\' }}"',
           { name: 'Run compat scoreboard' },

@@ -33,6 +33,10 @@ jobs:
         uses: 'actions/setup-node@v4'
         with:
           node-version: '22'
+      - name: Install bun (host tool for typey fixture)
+        uses: 'oven-sh/setup-bun@v1'
+        with:
+          bun-version: latest
       - name: Run compat scoreboard
         run: 'node bench/compat/run.mjs --cli "${{ github.event.inputs.cli || ''@rehearse/cli@latest'' }}"'
       - name: Upload results
