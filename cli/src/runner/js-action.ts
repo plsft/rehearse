@@ -144,14 +144,28 @@ function ensureCheckedOut(uses: string, hostCwd: string): ResolvedAction | null 
   }
 }
 
-/** Inputs land in env as INPUT_<NAME-WITH-DASHES-AS-SPACES>, all caps, dashes → spaces. */
-function inputEnvName(key: string): string {
-  // GitHub's actual rule: replace ' ' with '_', uppercase. Names with
-  // dashes are exposed via INPUT_<NAME> with the dashes preserved as
-  // underscores in env (e.g., 'fetch-depth' → INPUT_FETCH-DEPTH? No,
-  // actually they become INPUT_FETCH_DEPTH). Be safe: replace any
-  // non-word char with `_` and uppercase.
-  return `INPUT_${key.replace(/[\s-]+/g, '_').toUpperCase()}`;
+/**
+ * Compute env-var name(s) for a GitHub Action input.
+ *
+ * Per @actions/core (the canonical contract):
+ *   process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`]
+ * Only SPACES are replaced. Dashes are PRESERVED.
+ *
+ * So `inherit-toolchain` → `INPUT_INHERIT-TOOLCHAIN` (dash stays).
+ * Pre-v0.6.14 we used to replace dashes too, which broke any action
+ * using `core.getInput('foo-bar')` against an input named `foo-bar`
+ * (notably moonrepo/setup-rust's `inherit-toolchain` boolean which
+ * threw via `core.getBooleanInput` because the env var was missing).
+ *
+ * For backward compat with code in the wild that may grep `INPUT_FOO_BAR`
+ * directly (legacy bug, not spec-conformant), we also set the legacy
+ * underscore variant. Two env vars per dashed input — same value, both
+ * shapes. No-op when the name has no dashes.
+ */
+function inputEnvNames(key: string): string[] {
+  const canonical = `INPUT_${key.replace(/ /g, '_').toUpperCase()}`;
+  const legacy = `INPUT_${key.replace(/[\s-]+/g, '_').toUpperCase()}`;
+  return canonical === legacy ? [canonical] : [canonical, legacy];
 }
 
 /**
@@ -252,13 +266,18 @@ export async function runJsAction(
 
   const inputs: Record<string, string> = {};
   for (const [k, v] of Object.entries(step.with)) {
-    inputs[inputEnvName(k)] = v === null || v === undefined ? '' : String(v);
+    const value = v === null || v === undefined ? '' : String(v);
+    for (const name of inputEnvNames(k)) inputs[name] = value;
   }
-  // Defaults from action.yml
+  // Defaults from action.yml. Only set if the user's `with:` block
+  // didn't already provide the value (compare against the canonical
+  // name; if user set foo-bar via `with:`, INPUT_FOO-BAR is in inputs
+  // and we skip).
   for (const [k, spec] of Object.entries(resolved.action.inputs ?? {})) {
-    const envName = inputEnvName(k);
-    if (!(envName in inputs) && spec.default !== undefined) {
-      inputs[envName] = String(spec.default);
+    const names = inputEnvNames(k);
+    if (!(names[0]! in inputs) && spec.default !== undefined) {
+      const value = String(spec.default);
+      for (const name of names) inputs[name] = value;
     }
   }
 
