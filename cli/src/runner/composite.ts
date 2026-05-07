@@ -16,6 +16,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { parse as parseYaml } from 'yaml';
+import { actionSlug, actionsCacheRoot } from './action-cache.js';
 import { evalExpr } from './expression.js';
 import type { ExpressionContext, PlannedStep } from './types.js';
 
@@ -83,8 +84,8 @@ function resolveRemote(uses: string, repoRoot: string): ResolvedAction | null {
   const m = /^([^/]+)\/([^/@]+)(?:\/([^@]+))?@([\w./-]+)$/.exec(uses);
   if (!m) return null;
   const [, owner, repo, subPath, ref] = m;
-  const slug = `${owner}__${repo}__${ref}`.replace(/[^A-Za-z0-9_.-]+/g, '_');
-  const cacheDir = resolve(repoRoot, '.runner', 'actions', slug);
+  const slug = actionSlug(owner!, repo!, ref!);
+  const cacheDir = resolve(actionsCacheRoot(repoRoot), slug);
 
   if (!existsSync(cacheDir)) {
     const url = `https://github.com/${owner}/${repo}.git`;

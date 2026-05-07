@@ -31,6 +31,7 @@ import { HostBackend } from './backends/host.js';
 import { plan } from './planner.js';
 import { runJobs } from './scheduler.js';
 import type { Backend, BackendName, ExpressionContext, JobResult, JobStatus, PlannedJob, RunOptions, RunResult } from './types.js';
+import { declaredInputs, resolveInputs } from './workflow-inputs.js';
 
 function inferRepoRoot(workflowPath: string): string {
   const dir = dirname(workflowPath);
@@ -61,7 +62,26 @@ export async function run(options: RunOptions): Promise<RunResult> {
   if (!existsSync(cwd)) throw new Error(`cwd not found: ${cwd}`);
 
   const wf = parseWorkflow(readFileSync(wfPath, 'utf-8'));
-  const opts: RunOptions = { ...options, cwd };
+
+  // Resolve declared workflow_dispatch inputs (CLI > opts > default >
+  // interactive prompt > error). Pre-v0.6.16 we ignored these, which
+  // meant `${{ inputs.X }}` collapsed to '' silently — workflows that
+  // happened to use defaults worked, ones that required runtime inputs
+  // failed in obscure ways downstream.
+  const declared = declaredInputs(wf);
+  let resolvedInputs: Record<string, string> = {};
+  if (Object.keys(declared).length > 0) {
+    resolvedInputs = await resolveInputs({
+      declared,
+      provided: options.inputs ?? {},
+      // TTY check on stdin AND stderr (we prompt to stderr to keep stdout
+      // clean for --bench JSON). If either is piped, no prompt — fail
+      // with a clear error so CI doesn't hang.
+      interactive: process.stdin.isTTY === true && process.stderr.isTTY === true,
+    });
+  }
+
+  const opts: RunOptions = { ...options, cwd, inputs: resolvedInputs };
   const planned = plan(wf, opts);
   if (planned.length === 0) throw new Error('no jobs match');
 
@@ -272,7 +292,7 @@ function baseContext(job: PlannedJob, needs: Record<string, JobResult>, opts: Ru
       arch: process.arch === 'x64' ? 'X64' : process.arch.toUpperCase(),
       temp: '/tmp',
     },
-    inputs: {},
+    inputs: opts.inputs ?? {},
   };
 }
 

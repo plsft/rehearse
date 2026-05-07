@@ -101,6 +101,36 @@ export async function runJobs(jobs: PlannedJob[], opts: SchedulerOptions): Promi
       return r;
     }
 
+    // v0.6.16: synthetic umbrella job for an expanded reusable workflow.
+    // No steps, no backend — just wait for `needs:` (the inner jobs) to
+    // complete, then evaluate the reusable's outputsSpec against their
+    // results. Downstream `needs.<callerKey>.outputs.<X>` references then
+    // resolve through aggregateNeed's existing outputs-rollup path.
+    if (job.umbrellaOutputsSpec) {
+      const innerResults: Record<string, JobResult> = {};
+      for (const innerKey of Object.values(job.umbrellaInnerKeyMap ?? {})) {
+        const agg = aggregateNeed(innerKey);
+        if (agg) innerResults[innerKey] = agg;
+      }
+      // Worst-status propagation: if any inner job failed, the umbrella
+      // surfaces failure (matches the GH semantics where a reusable workflow's
+      // overall status is the worst of its expanded jobs).
+      let umbrellaStatus: JobStatus = 'success';
+      for (const r of Object.values(innerResults)) {
+        if (r.status === 'failure') umbrellaStatus = 'failure';
+        else if (umbrellaStatus !== 'failure' && r.status === 'cancelled') umbrellaStatus = 'cancelled';
+        else if (umbrellaStatus === 'success' && r.status === 'skipped') umbrellaStatus = 'skipped';
+      }
+      const outputs = evalUmbrellaOutputs(job.umbrellaOutputsSpec, job.umbrellaInnerKeyMap ?? {}, innerResults);
+      const r: JobResult = {
+        jobId: job.id, jobName: job.jobName, matrixCell: undefined,
+        status: umbrellaStatus, durationMs: 0, steps: [], outputs, backend: 'host',
+      };
+      opts.onEvent?.({ kind: 'job-start', job });
+      opts.onEvent?.({ kind: 'job-end', job, result: r });
+      return r;
+    }
+
     const needs: Record<string, JobResult> = {};
     for (const n of job.needs) {
       const agg = aggregateNeed(n);
@@ -192,6 +222,30 @@ export async function runJobs(jobs: PlannedJob[], opts: SchedulerOptions): Promi
     };
     opts.onEvent?.({ kind: 'job-end', job, result });
     return result;
+  }
+
+  function evalUmbrellaOutputs(
+    spec: Record<string, string>,
+    innerKeyMap: Record<string, string>,
+    innerResults: Record<string, JobResult>,
+  ): Record<string, string> {
+    const out: Record<string, string> = {};
+    // Match `${{ jobs.<innerKey>.outputs.<outputName> }}` and substitute
+    // from the inner job's aggregated outputs. The inner-key maps to the
+    // composite (`caller__<innerKey>`) which is the actual aggregation key
+    // we look up. References that don't match the pattern (or that point
+    // at unknown jobs/outputs) collapse to '' — same as the rest of our
+    // expression evaluator.
+    const RE = /\$\{\{\s*jobs\.([\w-]+)\.outputs\.([\w-]+)\s*\}\}/g;
+    for (const [name, expr] of Object.entries(spec)) {
+      out[name] = expr.replace(RE, (_, innerKey: string, outName: string) => {
+        const composite = innerKeyMap[innerKey];
+        if (!composite) return '';
+        const r = innerResults[composite];
+        return r?.outputs?.[outName] ?? '';
+      });
+    }
+    return out;
   }
 
   // Matrix cells of the same jobKey USED to share the host workspace, so we

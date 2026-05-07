@@ -35,7 +35,7 @@ function matrixContext(matrix: Record<string, unknown>, opts: RunOptions): Expre
       arch: process.arch === 'x64' ? 'X64' : process.arch.toUpperCase(),
       temp: '/tmp',
     },
-    inputs: {},
+    inputs: opts.inputs ?? {},
   };
 }
 
@@ -147,20 +147,37 @@ export function plan(workflow: ParsedWorkflow, opts: RunOptions): PlannedJob[] {
   // jobs we can't expand (remote reusables) — emit them as a skipped
   // PlannedJob with a clear reason rather than a phantom 0-step success.
   const unsupportedJobs: Record<string, string> = {};
+  // Synthetic umbrella jobs: one per successfully-expanded reusable caller.
+  // Each is a zero-step PlannedJob whose `needs:` are the inner expansion's
+  // jobKeys, and whose role is to compute outputs (per the reusable's
+  // workflow_call.outputs spec) once the inner jobs finish. Downstream jobs
+  // referencing `needs.<callerKey>.outputs.<X>` then resolve correctly.
+  const umbrellas: Record<string, { outputsSpec: Record<string, string>; innerKeyMap: Record<string, string>; innerKeys: string[]; originalNeeds: string[] }> = {};
   for (const [jobKey, rawJob] of Object.entries(workflow.jobs)) {
     const j = rawJob as ParsedJob & { uses?: string };
     if (isReusableWorkflowUse(j.uses)) {
       const expansion = expandReusable(jobKey, j as never, repoRoot, opts.secrets ?? {});
       if (expansion) {
         for (const [k, v] of Object.entries(expansion.jobs)) flat[k] = v;
+        // Track the umbrella so the planner can synthesize a PlannedJob
+        // for jobKey itself. We capture the caller's original `needs:` so
+        // the umbrella can run AFTER its dependencies (e.g. a `setup` job
+        // that the reusable depends on via `needs:` at the call site).
+        const callerNeeds = Array.isArray(rawJob.needs) ? rawJob.needs : rawJob.needs ? [rawJob.needs] : [];
+        umbrellas[jobKey] = {
+          outputsSpec: expansion.outputsSpec,
+          innerKeyMap: expansion.innerKeyMap,
+          innerKeys: Object.keys(expansion.jobs),
+          originalNeeds: callerNeeds,
+        };
         continue;
       }
-      // Local refs that fail to load are user errors (file missing).
-      // Remote refs (org/repo/.github/workflows/x.yml@ref) are a known
-      // gap — flag them clearly instead of pretending the job succeeded.
+      // Expansion failed — either the file is missing (local) or git
+      // clone failed (remote, network/auth/ref-not-found). Flag with the
+      // best diagnostic we can give.
       const isRemote = j.uses && !(j.uses.startsWith('./') || j.uses.startsWith('.\\'));
       unsupportedJobs[jobKey] = isRemote
-        ? `remote reusable workflow not supported: ${j.uses}`
+        ? `remote reusable workflow could not be fetched: ${j.uses}`
         : `local reusable workflow not found: ${j.uses}`;
       flat[jobKey] = rawJob;
       continue;
@@ -231,6 +248,33 @@ export function plan(workflow: ParsedWorkflow, opts: RunOptions): PlannedJob[] {
         unsupportedReason: unsupportedJobs[jobKey],
       });
     }
+  }
+
+  // Synthesize one umbrella PlannedJob per expanded reusable caller. The
+  // umbrella has zero steps; the scheduler handles it specially: wait for
+  // the inner jobs (in `needs:`) to finish, then evaluate outputsSpec
+  // against their results to produce this umbrella's outputs. Downstream
+  // jobs that ref `${{ needs.<callerKey>.outputs.<X> }}` then resolve
+  // through this PlannedJob's aggregated outputs in the normal way.
+  for (const [callerKey, info] of Object.entries(umbrellas)) {
+    if (opts.jobFilter) {
+      // Honour the same filter rules as real jobs — exact match or prefix.
+      const matches = opts.jobFilter === callerKey || callerKey.startsWith(`${opts.jobFilter}__`);
+      if (!matches) continue;
+    }
+    out.push({
+      id: callerKey,
+      jobKey: callerKey,
+      jobName: callerKey,
+      raw: { 'runs-on': 'umbrella', steps: [] } as unknown as ParsedJob,
+      needs: [...info.originalNeeds, ...info.innerKeys],
+      env: {},
+      steps: [],
+      backend: 'host',
+      runsOn: 'umbrella',
+      umbrellaOutputsSpec: info.outputsSpec,
+      umbrellaInnerKeyMap: info.innerKeyMap,
+    });
   }
   return out;
 }

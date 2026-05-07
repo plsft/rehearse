@@ -31,6 +31,7 @@ import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { performance } from 'node:perf_hooks';
 import { parse as parseYaml } from 'yaml';
+import { actionSlug, actionsCacheRoot } from './action-cache.js';
 import type { JobSession, PlannedStep, StepResult } from './types.js';
 
 // We don't pin the action to a specific node binary — the host's node runs
@@ -81,16 +82,21 @@ export function isJsActionUses(uses: string | undefined): boolean {
 /**
  * Clone (or reuse a cached clone of) the action repo at the requested ref.
  * Falls back to fetching the ref by SHA when the branch/tag form fails.
+ *
+ * v0.6.16: cache lives in a user-wide directory (~/.rehearse/actions-cache)
+ * so the same `actions/checkout@v4` is fetched once per host, not once per
+ * repo. See action-cache.ts.
  */
 function ensureCheckedOut(uses: string, hostCwd: string): ResolvedAction | null {
   const parsed = parseUses(uses);
   if (!parsed) return null;
-  const slug = `${parsed.owner}__${parsed.repo}__${parsed.ref}`.replace(/[^A-Za-z0-9_.-]+/g, '_');
-  const cacheDir = resolve(hostCwd, '.runner', 'actions', slug);
+  const slug = actionSlug(parsed.owner, parsed.repo, parsed.ref);
+  const cacheRoot = actionsCacheRoot(hostCwd);
+  const cacheDir = resolve(cacheRoot, slug);
   const url = `https://github.com/${parsed.owner}/${parsed.repo}.git`;
 
   if (!existsSync(cacheDir)) {
-    mkdirSync(resolve(hostCwd, '.runner', 'actions'), { recursive: true });
+    mkdirSync(cacheRoot, { recursive: true });
     // Try shallow clone at the ref directly (works for branches and tags)
     let r = spawnSync(
       'git',

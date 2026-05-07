@@ -130,7 +130,10 @@ jobs:
     expect(e).toBeNull();
   });
 
-  it('returns null for remote refs (not yet supported)', () => {
+  it('returns null for remote refs that fail to fetch (404 / network)', () => {
+    // We DO support remote reusables (v0.6.16) — but org/repo refs that 404
+    // fall through both the shallow and full clone attempts and return null.
+    // Planner surfaces this as "remote reusable workflow could not be fetched".
     const e = expandReusable('caller', { uses: 'octo/repo/.github/workflows/build.yml@v1' } as never, repo);
     expect(e).toBeNull();
   });
@@ -197,6 +200,86 @@ jobs:
     expect(() =>
       expandReusable('caller', { uses: './.github/workflows/a.yml' } as never, repo),
     ).toThrow(/nesting depth exceeds maximum/i);
+  });
+
+  // ── outputs flow (v0.6.16) ───────────────────────────────────────────
+
+  it('captures on.workflow_call.outputs into expansion.outputsSpec', () => {
+    makeWorkflow(
+      '.github/workflows/release.yml',
+      `on:
+  workflow_call:
+    outputs:
+      url:
+        description: deploy URL
+        value: \${{ jobs.deploy.outputs.endpoint }}
+      tag:
+        value: \${{ jobs.deploy.outputs.tag }}
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    outputs:
+      endpoint: \${{ steps.x.outputs.endpoint }}
+      tag: \${{ steps.x.outputs.tag }}
+    steps:
+      - id: x
+        run: 'echo'
+`,
+    );
+    const e = expandReusable(
+      'release',
+      { uses: './.github/workflows/release.yml' } as never,
+      repo,
+    );
+    expect(e).not.toBeNull();
+    expect(e!.outputsSpec).toEqual({
+      url: '${{ jobs.deploy.outputs.endpoint }}',
+      tag: '${{ jobs.deploy.outputs.tag }}',
+    });
+    expect(e!.innerKeyMap).toEqual({ deploy: 'release__deploy' });
+  });
+
+  it('substitutes inputs into outputsSpec values', () => {
+    makeWorkflow(
+      '.github/workflows/release.yml',
+      `on:
+  workflow_call:
+    inputs:
+      base:
+        type: string
+    outputs:
+      full_url:
+        value: \${{ inputs.base }}/\${{ jobs.deploy.outputs.path }}
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps: [{ run: 'echo' }]
+`,
+    );
+    const e = expandReusable(
+      'release',
+      { uses: './.github/workflows/release.yml', with: { base: 'https://prod.example' } } as never,
+      repo,
+    );
+    expect(e!.outputsSpec.full_url).toBe('https://prod.example/${{ jobs.deploy.outputs.path }}');
+  });
+
+  it('returns empty outputsSpec when reusable declares no outputs', () => {
+    makeWorkflow(
+      '.github/workflows/build.yml',
+      `on: { workflow_call: {} }
+jobs:
+  inner:
+    runs-on: ubuntu-latest
+    steps: [{ run: 'echo' }]
+`,
+    );
+    const e = expandReusable(
+      'caller',
+      { uses: './.github/workflows/build.yml' } as never,
+      repo,
+    );
+    expect(e!.outputsSpec).toEqual({});
   });
 
   it('supports nested reusable workflows up to depth 4', () => {

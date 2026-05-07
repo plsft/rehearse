@@ -71,6 +71,23 @@ export interface PlannedJob {
    * this reason instead of running the (empty) step list.
    */
   unsupportedReason?: string;
+  /**
+   * v0.6.16: this job is a *synthetic umbrella* for an expanded reusable
+   * workflow. It has zero steps; the scheduler's job is to wait for the
+   * inner jobs (in `needs`) to finish, then evaluate this map of
+   * `<outputName> → "${{ jobs.X.outputs.Y }}" expression` against the
+   * inner job results to produce the umbrella's outputs. Downstream jobs
+   * referencing `${{ needs.<callerKey>.outputs.<X> }}` then see the
+   * computed values.
+   */
+  umbrellaOutputsSpec?: Record<string, string>;
+  /**
+   * Companion to umbrellaOutputsSpec: maps the inner-job key as written
+   * in the reusable workflow ('build') to the prefixed jobKey actually
+   * scheduled ('caller__build'). Lets the scheduler resolve
+   * `${{ jobs.build.outputs.X }}` in the spec back to a real job result.
+   */
+  umbrellaInnerKeyMap?: Record<string, string>;
 }
 
 export interface PlannedStep {
@@ -190,6 +207,12 @@ export interface RunOptions {
    * what the values ARE, just gives you one cell.
    */
   noMatrix?: boolean;
+  /**
+   * Resolved `workflow_dispatch` inputs (after CLI/default/prompt). Plumbed
+   * into the expression context so `${{ inputs.X }}` substitutes correctly.
+   * Pre-v0.6.16 we ignored this entirely and every reference collapsed to ''.
+   */
+  inputs?: Record<string, string>;
   /** Force a backend; default is auto (host unless services/container/runs-on incompatible). */
   backend?: BackendName | 'auto';
   /** Max parallel jobs. Default = min(cpus, 4). */

@@ -25,9 +25,11 @@
  *   - Caller's `permissions:` / `concurrency:` propagation.
  */
 import type { ParsedJob, ParsedWorkflow } from '@rehearse/ci';
-import { existsSync, readFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { parse as parseYaml } from 'yaml';
+import { actionSlug, actionsCacheRoot } from './action-cache.js';
 
 export interface ReusableExpansion {
   /** The original caller's job key (used to prefix expanded job ids). */
@@ -40,6 +42,21 @@ export interface ReusableExpansion {
   secrets: Record<string, string>;
   /** The expanded jobs, keyed by `<callerKey>__<innerKey>`. */
   jobs: Record<string, ParsedJob>;
+  /**
+   * Reusable workflow `on.workflow_call.outputs` declarations, with inputs/
+   * secrets already substituted. Each value is a `${{ jobs.X.outputs.Y }}`
+   * expression that references inner-job outputs by their original key
+   * (NOT the prefixed key — the expression evaluator resolves it later
+   * against innerKeyMap). Empty if the reusable declares no outputs.
+   */
+  outputsSpec: Record<string, string>;
+  /**
+   * inner-job-key (as written in the reusable workflow) → composite
+   * jobKey (`caller__inner`). Used by the scheduler to resolve
+   * `${{ jobs.X.outputs.Y }}` expressions in outputsSpec back to the
+   * actual scheduled jobs.
+   */
+  innerKeyMap: Record<string, string>;
 }
 
 /** Recognise a job-level `uses:` that points at a reusable workflow. */
@@ -48,8 +65,7 @@ export function isReusableWorkflowUse(uses: string | undefined): boolean {
   if (uses.startsWith('./') || uses.startsWith('.\\')) {
     return /\.ya?ml$/i.test(uses);
   }
-  // Remote form: org/repo/.github/workflows/foo.yml@ref — flagged but
-  // not handled in v1.
+  // Remote form: org/repo/.github/workflows/foo.yml@ref
   return /\.github\/workflows\/[^/]+\.ya?ml@/.test(uses);
 }
 
@@ -61,6 +77,51 @@ function loadWorkflow(path: string): ParsedWorkflow | null {
   } catch {
     return null;
   }
+}
+
+/**
+ * Resolve an `org/repo/.github/workflows/foo.yml@ref` reference: shallow-
+ * clone (or reuse a cached clone of) the repo at the requested ref into the
+ * shared action cache, return the workflow path and the cloned repo's root
+ * (the root is needed for nested `./` references inside the called workflow,
+ * which resolve relative to ITS repo, not the original caller's).
+ *
+ * v0.6.16: was stubbed pre-this — `expandReusable` returned null for any
+ * remote ref. Real workflows that share helpers across repos via reusables
+ * (e.g. an org-wide `.github/workflows/release.yml`) needed this to run
+ * locally at all.
+ */
+function loadRemoteWorkflow(
+  uses: string,
+  repoRoot: string,
+): { wfPath: string; repoRoot: string } | null {
+  // org/repo/.github/workflows/file.yml@ref (with optional sub-path before
+  // .github, but in practice GH only supports the top-level layout).
+  const m = /^([^/]+)\/([^/@]+)\/(\.github\/workflows\/[^/@]+\.ya?ml)@([\w./-]+)$/.exec(uses);
+  if (!m) return null;
+  const [, owner, repo, wfSubPath, ref] = m;
+  const slug = actionSlug(owner!, repo!, ref!);
+  const cacheDir = resolve(actionsCacheRoot(repoRoot), slug);
+  const url = `https://github.com/${owner}/${repo}.git`;
+
+  if (!existsSync(cacheDir)) {
+    mkdirSync(actionsCacheRoot(repoRoot), { recursive: true });
+    let r = spawnSync(
+      'git',
+      ['clone', '--depth', '1', '--branch', ref!, url, cacheDir],
+      { encoding: 'utf-8' },
+    );
+    if (r.status !== 0) {
+      // Fall back to full clone + checkout for SHA refs.
+      spawnSync('git', ['clone', url, cacheDir], { encoding: 'utf-8' });
+      const co = spawnSync('git', ['checkout', ref!], { cwd: cacheDir, encoding: 'utf-8' });
+      if (co.status !== 0) return null;
+    }
+  }
+
+  const wfPath = resolve(cacheDir, wfSubPath!);
+  if (!existsSync(wfPath)) return null;
+  return { wfPath, repoRoot: cacheDir };
 }
 
 /**
@@ -93,7 +154,7 @@ export function expandReusable(
 ): ReusableExpansion | null {
   const uses = callerJob.uses;
   if (!uses) return null;
-  if (!(uses.startsWith('./') || uses.startsWith('.\\'))) return null; // remote reusables not yet
+  if (!isReusableWorkflowUse(uses)) return null;
 
   if (_depth >= MAX_REUSABLE_DEPTH) {
     throw new Error(
@@ -101,7 +162,19 @@ export function expandReusable(
     );
   }
 
-  const wfPath = resolve(repoRoot, uses);
+  // Resolve the workflow location and the *root for nested ./ refs* — local
+  // refs nest within repoRoot; remote refs nest within the cloned repo.
+  let wfPath: string;
+  let nestedRoot: string;
+  if (uses.startsWith('./') || uses.startsWith('.\\')) {
+    wfPath = resolve(repoRoot, uses);
+    nestedRoot = repoRoot;
+  } else {
+    const remote = loadRemoteWorkflow(uses, repoRoot);
+    if (!remote) return null;
+    wfPath = remote.wfPath;
+    nestedRoot = remote.repoRoot;
+  }
   if (_visited.has(wfPath)) {
     throw new Error(
       `cycle detected in reusable workflows: ${wfPath} is already in the call chain`,
@@ -141,6 +214,7 @@ export function expandReusable(
   // run/with/env/condition/runs-on. Match the caller's planner-level
   // substitution for matrix.* — same shape.
   const substituted: Record<string, ParsedJob> = {};
+  const innerKeyMap: Record<string, string> = {};
   for (const [innerKey, innerJob] of Object.entries(inner.jobs ?? {})) {
     const j = JSON.parse(JSON.stringify(innerJob)) as ParsedJob & { uses?: string };
     walkAndSubstitute(j, inputs, secrets);
@@ -151,27 +225,43 @@ export function expandReusable(
     // _depth + _visited threading guards against infinite loops.
     if (isReusableWorkflowUse(j.uses)) {
       const compositeKey = `${callerKey}__${innerKey}`;
-      // Local ./ reusables always live in the same repo, so resolution is
-      // relative to repoRoot regardless of where the calling workflow file
-      // sits. Cross-repo nested reusables would need remote-fetch plumbing
-      // (out of scope for v1).
+      // Nested ./ refs resolve relative to the *cloned* repo if the parent
+      // is remote, else relative to the original repoRoot. Remote refs
+      // (org/repo/.github/workflows/x.yml@ref) clone independently regardless.
       const nested = expandReusable(
         compositeKey,
         j as never,
-        repoRoot,
+        nestedRoot,
         secrets,
         _depth + 1,
         _visited,
       );
       if (nested) {
         for (const [k, v] of Object.entries(nested.jobs)) substituted[k] = v;
+        innerKeyMap[innerKey] = `${callerKey}__${innerKey}`;
         continue;
       }
       // Nested expansion failed: surface the inner job as-is so the planner
       // can flag it (e.g., remote reusable that we can't resolve).
     }
 
-    substituted[`${callerKey}__${innerKey}`] = j;
+    const composite = `${callerKey}__${innerKey}`;
+    substituted[composite] = j;
+    innerKeyMap[innerKey] = composite;
+  }
+
+  // Pull `on.workflow_call.outputs:` declarations and substitute inputs/
+  // secrets in their `value:` expressions (the inner-job reference part —
+  // `${{ jobs.X.outputs.Y }}` — is left intact for the scheduler to resolve
+  // once those jobs finish).
+  const declaredOutputs = (inner.on && typeof inner.on === 'object' && !Array.isArray(inner.on)
+    ? ((inner.on as Record<string, unknown>).workflow_call as { outputs?: Record<string, { value?: string }> } | undefined)?.outputs
+    : undefined) ?? {};
+  const outputsSpec: Record<string, string> = {};
+  for (const [outName, spec] of Object.entries(declaredOutputs)) {
+    if (typeof spec.value === 'string') {
+      outputsSpec[outName] = substituteString(spec.value, inputs, secrets);
+    }
   }
 
   return {
@@ -180,6 +270,8 @@ export function expandReusable(
     inputs,
     secrets,
     jobs: substituted,
+    outputsSpec,
+    innerKeyMap,
   };
 }
 
