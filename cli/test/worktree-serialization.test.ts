@@ -122,6 +122,72 @@ describe('host backend — concurrent worktree creation', () => {
     await backend.teardown(session);
   });
 
+  it('source-tree walk from inside the worktree terminates (no infinite recursion)', async () => {
+    // Stronger guard than the symlink-type check above. Even if some
+    // future change reintroduces a different kind of recursive structure
+    // (junction on Windows, hardlink, in-tree clone of a parent dir),
+    // walking the worktree must terminate within a sane depth budget.
+    //
+    // Walks up to MAX_DEPTH=20 levels deep; any tree deeper than that
+    // is presumed pathological (the kleur ELOOP went 70+ before Windows
+    // gave up). A real source tree never exceeds this in our fixtures
+    // (a worktree of a fresh empty repo has depth 1).
+    const { existsSync, mkdirSync, readdirSync, statSync, writeFileSync } = await import('node:fs');
+    const repo = mkGitRepo();
+    mkdirSync(resolve(repo, '.runner'), { recursive: true });
+    writeFileSync(resolve(repo, '.runner', 'sentinel.txt'), 'parent');
+    // Add a normal source dir so the walk has SOMETHING to descend into.
+    mkdirSync(resolve(repo, 'src'), { recursive: true });
+    writeFileSync(resolve(repo, 'src', 'a.ts'), '// noop\n');
+    spawnSync('git', ['add', '-A'], { cwd: repo });
+    spawnSync('git', ['commit', '-q', '-m', 'add src'], { cwd: repo });
+
+    const backend = new HostBackend();
+    const session = await backend.prepare({
+      jobId: 'matrix-cell:foo',
+      hostCwd: repo,
+      job: makeJob('matrix-cell:foo', { x: '1' }),
+    });
+
+    const MAX_DEPTH = 20;
+    let entriesVisited = 0;
+    let deepestSeen = 0;
+    function walk(dir: string, depth: number): void {
+      if (depth > MAX_DEPTH) {
+        throw new Error(
+          `walk exceeded MAX_DEPTH=${MAX_DEPTH} at ${dir} — recursive structure detected`,
+        );
+      }
+      deepestSeen = Math.max(deepestSeen, depth);
+      let entries: string[] = [];
+      try {
+        entries = readdirSync(dir);
+      } catch {
+        return; // permissions / vanished — skip
+      }
+      for (const name of entries) {
+        // Skip .git itself — it has its own legitimately-deep tree we
+        // don't care about.
+        if (name === '.git') continue;
+        const child = resolve(dir, name);
+        if (!existsSync(child)) continue;
+        entriesVisited++;
+        let s;
+        try { s = statSync(child); } catch { continue; }
+        if (s.isDirectory()) walk(child, depth + 1);
+      }
+    }
+
+    walk(session.workdir, 0);
+    // Sanity: walk MUST have visited something — at minimum the `src` dir
+    // we created. If entriesVisited is 0 the walk silently no-op'd.
+    expect(entriesVisited).toBeGreaterThan(0);
+    // Deepest legit depth in our fixture is ~2 (src/a.ts). Anything past
+    // 5 indicates structural recursion of some kind.
+    expect(deepestSeen).toBeLessThan(5);
+    await backend.teardown(session);
+  });
+
   it('throws (no silent fallback) when worktree creation fails', async () => {
     // Point at a non-git directory — createWorktree() will throw inside
     // git, and the new behavior should surface it to the caller, not
