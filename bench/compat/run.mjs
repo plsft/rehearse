@@ -16,7 +16,7 @@
  * running real workflows can.
  */
 import { execSync, spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -70,7 +70,6 @@ for (const fx of fixtures) {
         mkdirSync(dirname(wfDest), { recursive: true });
         execSync(`git init -q "${dir}"`);
         execSync(`git -C "${dir}" config user.email t@compat.local && git -C "${dir}" config user.name compat`);
-        const { copyFileSync } = await import('node:fs');
         copyFileSync(src, wfDest);
         execSync(`git -C "${dir}" add -A && git -C "${dir}" commit -q -m fixture`);
       } else {
