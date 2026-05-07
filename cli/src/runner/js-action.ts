@@ -31,7 +31,7 @@ import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { performance } from 'node:perf_hooks';
 import { parse as parseYaml } from 'yaml';
-import { actionSlug, actionsCacheRoot } from './action-cache.js';
+import { actionSlug, actionsCacheRoot, materializeBundledAction } from './action-cache.js';
 import type { JobSession, PlannedStep, StepResult } from './types.js';
 
 // We don't pin the action to a specific node binary — the host's node runs
@@ -96,18 +96,29 @@ function ensureCheckedOut(uses: string, hostCwd: string): ResolvedAction | null 
   const url = `https://github.com/${parsed.owner}/${parsed.repo}.git`;
 
   if (!existsSync(cacheDir)) {
-    mkdirSync(cacheRoot, { recursive: true });
-    // Try shallow clone at the ref directly (works for branches and tags)
-    let r = spawnSync(
-      'git',
-      ['clone', '--depth', '1', '--branch', parsed.ref, url, cacheDir],
-      { encoding: 'utf-8' },
-    );
-    if (r.status !== 0) {
-      // Could be a SHA — clone full and checkout
-      spawnSync('git', ['clone', url, cacheDir], { encoding: 'utf-8' });
-      const co = spawnSync('git', ['checkout', parsed.ref], { cwd: cacheDir, encoding: 'utf-8' });
-      if (co.status !== 0) return null;
+    // P7 (v0.6.19): try the bundled tree first. If `@rehearse/cli`'s
+    // npm tarball ships a pre-fetched (owner, repo, ref), copy from
+    // there instead of doing a network round-trip. Cuts the cold-host
+    // first-resolve from ~2-5s to <50ms for any bundled action. The
+    // current bundle is small (1-2 actions); expand by adding fixtures
+    // under cli/bundled-actions/<owner>__<repo>__<ref>/.
+    if (materializeBundledAction(parsed.owner, parsed.repo, parsed.ref, cacheRoot)) {
+      // Bundled action materialized into cacheDir — fall through to
+      // the action.yml read below. No network needed.
+    } else {
+      mkdirSync(cacheRoot, { recursive: true });
+      // Try shallow clone at the ref directly (works for branches and tags)
+      let r = spawnSync(
+        'git',
+        ['clone', '--depth', '1', '--branch', parsed.ref, url, cacheDir],
+        { encoding: 'utf-8' },
+      );
+      if (r.status !== 0) {
+        // Could be a SHA — clone full and checkout
+        spawnSync('git', ['clone', url, cacheDir], { encoding: 'utf-8' });
+        const co = spawnSync('git', ['checkout', parsed.ref], { cwd: cacheDir, encoding: 'utf-8' });
+        if (co.status !== 0) return null;
+      }
     }
   }
 
