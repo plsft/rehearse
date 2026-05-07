@@ -19,11 +19,19 @@
  */
 import { Runner, github, job, pipeline, secrets, step, triggers } from '@rehearse/ci';
 
+// Publish order: leaves first, dependents later. v0.6.0 folded the
+// runner + git-core packages into @rehearse/cli, so the active publish
+// list is just two packages now. release.mjs bumps both in lockstep
+// before tagging.
+//
+// Pre-fix this list had @rehearse/cli TWICE (the second slot was a
+// stale rename of the now-folded @rehearse/runner). Every release tag's
+// CI run failed on the duplicate invocation with npm 403 "cannot
+// publish over existing version", which also skipped the GitHub Release
+// creation step at the bottom. Caught by inspecting the v0.6.18 run.
 const PACKAGES = [
-  '@rehearse/git-core', // no internal deps — publish first
-  '@rehearse/ci',
+  '@rehearse/ci',  // no internal deps — publish first
   '@rehearse/cli', // depends on @rehearse/ci
-  '@rehearse/cli', // depends on @rehearse/ci + @rehearse/git-core
 ] as const;
 
 // Detect prerelease vs stable from the tag and emit NPM_TAG + PRERELEASE
