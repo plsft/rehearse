@@ -1,0 +1,40 @@
+{
+  "$comment": "Compat scoreboard fixtures — popular OSS workflows we test rh against on every PR + nightly. Add new entries when a real-world repro of a compat gap surfaces. Each row pins (repo, ref, workflow path, expected outcome) so a regression is unambiguous: a PASS that turns into a FAIL is a real compat break, not flakiness.",
+  "$schema_version": 1,
+  "fixtures": [
+    {
+      "name": "typey",
+      "repo": "https://github.com/plsft/typey.git",
+      "ref": "main",
+      "workflow": ".github/workflows/ci.yml",
+      "matrix_filter": "os=ubuntu-latest",
+      "expected": "pass",
+      "rationale": "Canonical first-external-repo validation target. 9-cell os×bun matrix; we filter to ubuntu since cross-OS needs Docker."
+    },
+    {
+      "name": "kleur",
+      "repo": "https://github.com/lukeed/kleur.git",
+      "ref": "master",
+      "workflow": ".github/workflows/ci.yml",
+      "expected": "no-eloop",
+      "rationale": "v0.6.17 worktree ELOOP regression target. Workflow uses c8 coverage which walks the source tree; pre-fix this hit Windows ELOOP. We don't require pass — workflow has unrelated legacy-Node-version failures — but ZERO `ELOOP` mentions in the log."
+    },
+    {
+      "name": "changed-files-dispatch",
+      "repo": "https://github.com/tj-actions/changed-files.git",
+      "ref": "main",
+      "workflow": ".github/workflows/manual-triggered-job-example.yml",
+      "inputs": { "files": "README.md" },
+      "expected": "input-substituted",
+      "rationale": "v0.6.16 workflow_dispatch + --input/-i target. Input must substitute into ${{ inputs.files }} during the run."
+    },
+    {
+      "name": "is-plain-obj",
+      "repo": "https://github.com/sindresorhus/is-plain-obj.git",
+      "ref": "main",
+      "workflow": ".github/workflows/main.yml",
+      "expected": "pass",
+      "rationale": "Tiny package (~10 lines of code), fast install. Smoke test for the host-shim path (actions/checkout, setup-node, no real action download)."
+    }
+  ]
+}

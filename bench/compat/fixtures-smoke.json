@@ -1,0 +1,14 @@
+{
+  "$comment": "Smoke fixtures — single tiny project for fast local validation of the runner script itself. Used by `node bench/compat/run.mjs --fixtures fixtures-smoke.json`. Real CI uses fixtures.json.",
+  "$schema_version": 1,
+  "fixtures": [
+    {
+      "name": "is-plain-obj-smoke",
+      "repo": "https://github.com/sindresorhus/is-plain-obj.git",
+      "ref": "main",
+      "workflow": ".github/workflows/main.yml",
+      "expected": "pass",
+      "rationale": "Smallest possible project — for testing the scoreboard runner end-to-end."
+    }
+  ]
+}

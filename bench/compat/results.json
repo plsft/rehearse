@@ -1,0 +1,16 @@
+{
+  "cli": "@rehearse/cli@latest",
+  "ran_at": "2026-05-07T03:33:13.125Z",
+  "passed": 1,
+  "total": 1,
+  "score": 1,
+  "results": [
+    {
+      "name": "is-plain-obj-smoke",
+      "expected": "pass",
+      "pass": true,
+      "reason": "exit=0",
+      "durationMs": 58337
+    }
+  ]
+}

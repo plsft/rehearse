@@ -1,0 +1,51 @@
+# Source for .github/workflows/compat.yml — kept in bench/compat/ alongside
+# the runner + fixtures so the whole scoreboard ships as a coherent unit.
+# Copy to .github/workflows/compat.yml when ready to enable in CI (or wire
+# it through the rh ci pipeline if you want it TS-authored).
+#
+# Why this lives in the repo: nightly + PR-gated runs are the only way to
+# catch silent compat drift from GH Actions semantics. Unit tests pass
+# locally but can't tell you that a real workflow hangs in production.
+
+name: Compat scoreboard
+on:
+  schedule:
+    - cron: '0 7 * * *'  # 07:00 UTC nightly
+  pull_request:
+    paths:
+      - 'cli/**'
+      - 'ts-ci/**'
+      - 'bench/compat/**'
+  workflow_dispatch:
+    inputs:
+      cli:
+        description: 'CLI package spec to test (default = published @latest)'
+        required: false
+        default: '@rehearse/cli@latest'
+
+permissions:
+  contents: read
+
+jobs:
+  compat:
+    name: compat
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run compat scoreboard
+        env:
+          CLI_PKG: ${{ github.event.inputs.cli || '@rehearse/cli@latest' }}
+        run: node bench/compat/run.mjs --cli "${CLI_PKG}"
+
+      - name: Upload results.json
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: compat-results
+          path: bench/compat/results.json

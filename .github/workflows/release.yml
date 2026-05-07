@@ -62,8 +62,8 @@ jobs:
         run: 'pnpm --filter @rehearse/cli publish --tag "$NPM_TAG" --access public --no-git-checks'
         env:
           NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
-      - name: 'Publish @rehearse/runner'
-        run: 'pnpm --filter @rehearse/runner publish --tag "$NPM_TAG" --access public --no-git-checks'
+      - name: 'Publish @rehearse/cli'
+        run: 'pnpm --filter @rehearse/cli publish --tag "$NPM_TAG" --access public --no-git-checks'
         env:
           NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
       - name: Create GitHub Release with auto-generated notes

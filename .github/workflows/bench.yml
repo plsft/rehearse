@@ -44,7 +44,7 @@ jobs:
         run: pnpm install --frozen-lockfile
         shell: bash
       - name: Build runner (and workspace deps)
-        run: 'pnpm turbo build --filter=@rehearse/runner...'
+        run: 'pnpm turbo build --filter=@rehearse/cli...'
         shell: bash
       - name: Install act (Linux only)
         if: 'runner.os == ''Linux'''
