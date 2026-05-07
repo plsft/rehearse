@@ -61,7 +61,11 @@ describe('setupDotnetShim', () => {
     }
   });
 
-  it('rejects clearly when the installer is unreachable for a real channel (offline-safe smoke)', async () => {
+  // Bumped past the default 5s — the smoke test invokes the real
+  // dotnet-install.sh which does an HTTPS round-trip to dot.net and can
+  // sit around the 4-5s mark depending on network latency. The original
+  // 5s default flaked when the round-trip slipped over the boundary.
+  it('rejects clearly when the installer is unreachable for a real channel (offline-safe smoke)', { timeout: 30000 }, async () => {
     // This is a smoke test, not a network test. We pass an obviously-broken
     // version so dotnet-install.sh exits non-zero quickly. If the host has
     // no curl/bash/powershell at all, we expect a non-success result.

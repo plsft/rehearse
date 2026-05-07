@@ -57,6 +57,37 @@
 <section class="py-16 hairline">
   <div class="max-w-3xl mx-auto px-5 space-y-12">
 
+    <!-- Pro daemon v0.2.2 — server-side reliability fix -->
+    <article>
+      <div class="flex items-baseline gap-3 mb-3">
+        <h2 class="text-2xl font-semibold text-white">Pro daemon v0.2.2</h2>
+        <span class="text-[12px] font-mono text-[var(--rh-muted)]">2026-05-06 · server-side fix · no client upgrade needed</span>
+      </div>
+      <div class="card p-6 space-y-4 text-[var(--rh-muted)]">
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-amber)] mb-1">Fixed: silent stall on <code class="font-mono">--remote</code> runs</div>
+          <p class="text-sm leading-relaxed">A subset of <code class="font-mono">rh run --remote</code> requests stalled with no output past the initial <code class="font-mono">[remote] clone…</code> line. Root cause: the sprite VM image uses <code class="font-mono">nvm</code>, which installs npm-globals to a path the daemon's systemd PATH excluded — so the daemon's <code class="font-mono">bash -c "rh run …"</code> couldn't resolve <code class="font-mono">rh</code>, and on this image the missing-binary case manifested as a silent shell hang rather than a clean exit-127.</p>
+        </div>
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1">Fix</div>
+          <ul class="space-y-1 text-sm">
+            <li>— Daemon resolves <code class="font-mono">rh</code>'s absolute path at startup via <code class="font-mono">npm config get prefix</code>; uses it directly when spawning instead of relying on PATH.</li>
+            <li>— Prepends npm-global-bin to the workflow runner env so any other npm-installed tool a workflow expects is also reachable.</li>
+            <li>— <code class="font-mono">ensureCliInstalled</code> now logs npm errors to the daemon journal; previously failures were silent.</li>
+            <li>— Hard-fails with a clear stream message + <code class="font-mono">exit 127</code> if <code class="font-mono">rh</code> is missing after install — no more silent voids.</li>
+          </ul>
+        </div>
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1">Validated</div>
+          <p class="text-sm leading-relaxed">3 back-to-back <code class="font-mono">--remote</code> runs against typey ci.yml: each completed in <code class="font-mono">vm=3.1-3.2s wall=4.5-4.9s</code> with full logs persisted. Cold-wake budget (60s, from v0.6.15) confirmed adequate; no transient 500s observed.</p>
+        </div>
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1">Customer impact</div>
+          <p class="text-sm leading-relaxed">No CLI upgrade required — daemon is server-side. Rolled to all customer sprites manually for now; new provisions pick it up automatically.</p>
+        </div>
+      </div>
+    </article>
+
     <!-- v0.6.17 -->
     <article>
       <div class="flex items-baseline gap-3 mb-3">
