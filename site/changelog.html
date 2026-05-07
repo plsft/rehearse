@@ -62,6 +62,85 @@
 <section class="py-16 hairline">
   <div class="max-w-3xl mx-auto px-5 space-y-12">
 
+    <!-- v0.6.19 — bundled-action prewarming + Pro infra hardening sweep -->
+    <article>
+      <div class="flex items-baseline gap-3 mb-3">
+        <h2 class="text-2xl font-semibold gradient-text">v0.6.19</h2>
+        <span class="text-[12px] font-mono text-[var(--rh-muted)]">2026-05-07 · bundled-action prewarming + Pro infra sweep · 355 tests across the platform</span>
+      </div>
+      <div class="card p-6 space-y-4 text-[var(--rh-muted)]">
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1">Bundled-action prewarming (the user-visible CLI win)</div>
+          <p class="text-sm leading-relaxed">
+            <code class="font-mono">@rehearse/cli</code>'s npm tarball now ships a small set of
+            pre-fetched JS-action sources under <code class="font-mono">bundled-actions/</code>.
+            On a cold-host first resolve, the runner copies from the bundle in
+            &lt;50 ms instead of doing a <code class="font-mono">git clone</code> (~2-5s).
+            Subsequent resolves use the shared user-wide cache exactly as before.
+            Bundle ships with <code class="font-mono">dorny/paths-filter@v3</code> as the
+            proof-of-concept — it's not shimmed (so the bundled path is actually
+            exercised) and common in monorepo CI. Adding more is mechanical;
+            ~1-2 MB per bundled action.
+          </p>
+        </div>
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1">Compat scoreboard expanded 4 → 10 fixtures</div>
+          <p class="text-sm leading-relaxed">
+            Added: <code class="font-mono">needs-outputs</code> (job-output flow via needs),
+            <code class="font-mono">matrix-include-exclude</code>, <code class="font-mono">cache-hashfiles</code>,
+            <code class="font-mono">nested-reusable</code> (3-deep workflow chain),
+            <code class="font-mono">composite-of-composite</code>, <code class="font-mono">services-postgres</code>.
+            Three of the new ones surfaced real compat gaps and ship as
+            <code class="font-mono">expected: known-fail</code> — they're tracked
+            line-items at <a href="/compat" class="link">rehearse.sh/compat</a>, not silent
+            drift. The whole point of the scoreboard.
+          </p>
+        </div>
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1">Pro infrastructure hardening (server-side, no client upgrade needed)</div>
+          <ul class="space-y-1 text-sm">
+            <li>— <strong class="text-white">Automated daemon redeploy.</strong>
+              <code class="font-mono">scripts/redeploy-daemon.mjs</code> iterates
+              <code class="font-mono">team_sprites</code> from D1 and ships the latest
+              <code class="font-mono">server.mjs</code> + <code class="font-mono">lib/paths.mjs</code> to each
+              customer Sprite + verifies post-restart health. Removes the manual
+              base64-pipe-per-customer ritual that was the biggest scaling
+              bottleneck.</li>
+            <li>— <strong class="text-white">Stuck-run alerter.</strong> Daily Cloudflare cron scans
+              D1 for runs in <code class="font-mono">status='running'</code> older than 10
+              minutes, marks them <code class="font-mono">'abandoned'</code>, emails the
+              maintainer with a per-row summary + redeploy/log-tail recipes.
+              Closes the "wedged-run sits forever" failure mode.</li>
+            <li>— <strong class="text-white">List endpoint.</strong>
+              <code class="font-mono">GET /v1/runs?team_id=&amp;limit=&amp;before=</code> with cursor
+              pagination, log_blob excluded for size. The dashboard at
+              <a href="https://pro.rehearse.sh" class="link">pro.rehearse.sh</a> can now
+              render a real "recent runs" view.</li>
+            <li>— <strong class="text-white">Docker on Pro VMs — investigated, blocked
+              upstream.</strong> Spent 30 min installing + registering dockerd +
+              containerd as sprite-env services on the customer VM. <code class="font-mono">docker run</code>
+              fails with <code class="font-mono">failed to mount overlay … invalid argument</code> —
+              Fly Machines' kernel disallows overlay mounts (security policy). The
+              <code class="font-mono">vfs</code> storage-driver workaround also fails because
+              containerd's snapshotter uses overlay internally regardless. Two
+              forward paths exist (rootless docker w/ fuse-overlayfs; or migrate
+              Pro off Fly to a runtime that allows overlay). Until then,
+              workflows declaring <code class="font-mono">services:</code> or cross-OS matrix cells
+              should keep them on local OSS where the host's Docker just works.</li>
+          </ul>
+        </div>
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1">Test totals</div>
+          <p class="text-sm leading-relaxed">
+            Platform-wide: <strong class="text-white">355 tests, 100% passing</strong>
+            (<code class="font-mono">@rehearse/cli</code> 179, <code class="font-mono">@rehearse/ci</code> 40,
+            <code class="font-mono">@rehearse-pro/api</code> 88, daemon 14, scripts 26, shared 8).
+            Up from 284 at v0.6.18.
+          </p>
+        </div>
+      </div>
+    </article>
+
     <!-- Pro daemon v0.2.2 — server-side reliability fix -->
     <article>
       <div class="flex items-baseline gap-3 mb-3">
@@ -530,7 +609,7 @@ rh ci compile</pre>
           <li><a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a></li>
           <li><a href="https://www.npmjs.com/package/@rehearse/runner" class="nav-link">npm</a></li>
           <li><a href="https://github.com/plsft/rehearse/issues" class="nav-link">Issues</a></li>
-          <li><a href="/changelog" class="nav-link">Changelog</a></li>
+          
           <li><a href="/llms.txt" class="nav-link">llms.txt</a></li>
         </ul>
       </div>
