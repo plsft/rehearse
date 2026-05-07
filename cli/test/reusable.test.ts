@@ -152,4 +152,82 @@ jobs:
     const e = expandReusable('caller', { uses: './.github/workflows/multi.yml' } as never, repo);
     expect(Object.keys(e!.jobs)).toEqual(['caller__alpha', 'caller__beta']);
   });
+
+  // ── recursive nesting + cycle detection (v0.6.15+) ───────────────────
+
+  it('detects cycles: workflow that calls itself throws', () => {
+    // self.yml has one inner job that re-uses self.yml — a self-reference.
+    makeWorkflow(
+      '.github/workflows/self.yml',
+      `on:
+  workflow_call: {}
+jobs:
+  recurse:
+    uses: ./.github/workflows/self.yml
+`,
+    );
+    expect(() =>
+      expandReusable('caller', { uses: './.github/workflows/self.yml' } as never, repo),
+    ).toThrow(/cycle detected/i);
+  });
+
+  it('throws when nesting depth exceeds the GH Actions limit (4)', () => {
+    // Chain: a → b → c → d → e (depth 5, one over the limit)
+    for (const [from, to] of [['a', 'b'], ['b', 'c'], ['c', 'd'], ['d', 'e']]) {
+      makeWorkflow(
+        `.github/workflows/${from}.yml`,
+        `on:
+  workflow_call: {}
+jobs:
+  next:
+    uses: ./.github/workflows/${to}.yml
+`,
+      );
+    }
+    makeWorkflow(
+      '.github/workflows/e.yml',
+      `on:
+  workflow_call: {}
+jobs:
+  terminal:
+    runs-on: ubuntu-latest
+    steps: [{ run: 'echo done' }]
+`,
+    );
+    expect(() =>
+      expandReusable('caller', { uses: './.github/workflows/a.yml' } as never, repo),
+    ).toThrow(/nesting depth exceeds maximum/i);
+  });
+
+  it('supports nested reusable workflows up to depth 4', () => {
+    // Chain: a → b → c → d (depth 4, at the limit)
+    for (const [from, to] of [['a', 'b'], ['b', 'c'], ['c', 'd']]) {
+      makeWorkflow(
+        `.github/workflows/${from}.yml`,
+        `on:
+  workflow_call: {}
+jobs:
+  next:
+    uses: ./.github/workflows/${to}.yml
+`,
+      );
+    }
+    makeWorkflow(
+      '.github/workflows/d.yml',
+      `on:
+  workflow_call: {}
+jobs:
+  terminal:
+    runs-on: ubuntu-latest
+    steps: [{ run: 'echo done' }]
+`,
+    );
+    const e = expandReusable('caller', { uses: './.github/workflows/a.yml' } as never, repo);
+    expect(e).not.toBeNull();
+    // 4-level chain: caller → next → next → next → terminal
+    // Composite key reflects every hop: caller__next__next__next__terminal
+    const keys = Object.keys(e!.jobs);
+    expect(keys.length).toBe(1);
+    expect(keys[0]).toMatch(/^caller__next__next__next__terminal$/);
+  });
 });

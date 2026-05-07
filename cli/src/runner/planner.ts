@@ -177,7 +177,15 @@ export function plan(workflow: ParsedWorkflow, opts: RunOptions): PlannedJob[] {
       if (!matches) continue;
     }
     const matrix = parseMatrix(rawJob.strategy?.matrix);
-    const allCells = expandMatrix(matrix);
+    let allCells = expandMatrix(matrix);
+    // --no-matrix: collapse to a single representative cell (first value
+    // of each matrix variable). Useful for fast iteration when you don't
+    // care which permutation runs — just want green/red signal once.
+    // Applied BEFORE --matrix filter (filter then sees a 1-cell list and
+    // is effectively a no-op).
+    if (opts.noMatrix && allCells.length > 1) {
+      allCells = allCells.slice(0, 1);
+    }
     // Apply --matrix filter if any.
     //
     // Semantics: a cell passes the filter iff every constraint either

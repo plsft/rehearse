@@ -77,6 +77,41 @@ describe('plan() — matrix filter', () => {
     expect(jobs).toHaveLength(9);
   });
 
+  // ── --collapse-matrix (noMatrix flag) ───────────────────────────────
+
+  it('--collapse-matrix collapses 9 cells to 1 (first-of-each-variable)', () => {
+    const jobs = plan(wf(), {
+      workflowPath: '.',
+      cwd: '.',
+      noMatrix: true,
+    });
+    expect(jobs).toHaveLength(1);
+    // First values from the matrix definitions
+    expect(jobs[0]!.matrixCell).toMatchObject({ 'node-version': 20, os: 'ubuntu-latest' });
+  });
+
+  it('--collapse-matrix is a no-op for non-matrix jobs', () => {
+    const wf2: ParsedWorkflow = {
+      name: 'ci',
+      on: 'push',
+      jobs: { build: { 'runs-on': 'ubuntu-latest', steps: [{ run: 'echo' }] } },
+    } as unknown as ParsedWorkflow;
+    const jobs = plan(wf2, { workflowPath: '.', cwd: '.', noMatrix: true });
+    expect(jobs).toHaveLength(1);
+  });
+
+  it('--collapse-matrix combines with --matrix filter (collapse runs first)', () => {
+    // After collapse there's 1 cell with first-values; the matrix filter
+    // then has to match those first-values to keep the cell.
+    const jobs = plan(wf(), {
+      workflowPath: '.',
+      cwd: '.',
+      noMatrix: true,
+      matrixFilter: { os: 'ubuntu-latest' }, // matches the first-value
+    });
+    expect(jobs).toHaveLength(1);
+  });
+
   it('non-matrix job + matrix filter → job runs (non-strict)', () => {
     // Mirrors the hono/main case: job with NO strategy.matrix block,
     // user passes --matrix os=ubuntu-latest. Pre-fix, this returned 0

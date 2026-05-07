@@ -113,6 +113,7 @@ program
   .description('Run a GitHub Actions workflow on this machine, or remotely with --remote')
   .option('-j, --job <name>', 'restrict to a single job (matrix variants of that job all run)')
   .option('-m, --matrix <key=value>', 'filter to specific matrix cell(s); repeatable or comma-separated (e.g. --matrix os=ubuntu-latest)', collectMatrix, {})
+  .option('--collapse-matrix', 'collapse all matrix combinations into a single representative cell (first value of each variable) — fast iteration')
   .option('-b, --backend <type>', 'host | container | auto', 'auto')
   .option('-p, --max-parallel <n>', 'max concurrent jobs', (v) => Number(v))
   .option('-c, --cwd <dir>', 'working directory (default: inferred from workflow path)')
@@ -151,6 +152,7 @@ program
       cwd: opts.cwd,
       jobFilter: opts.job,
       matrixFilter: opts.matrix && Object.keys(opts.matrix).length > 0 ? opts.matrix : undefined,
+      noMatrix: opts.collapseMatrix === true,
       backend: opts.backend === 'auto' ? 'auto' : (opts.backend as BackendName),
       maxParallel: opts.maxParallel,
       failFast: opts.failFast,

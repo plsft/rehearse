@@ -179,6 +179,17 @@ export interface RunOptions {
    * comma-separating: `--matrix os=ubuntu-latest,node-version=20`.
    */
   matrixFilter?: Record<string, string>;
+  /**
+   * Collapse all matrix combinations into a single representative cell —
+   * picks the FIRST value of each matrix variable. Use for fast local
+   * iteration on multi-cell matrix workflows: 9-cell job becomes 1 cell.
+   * CLI: `--no-matrix`.
+   *
+   * Inspired by redwoodjs/agent-ci's same flag. Kept distinct from
+   * matrixFilter (which constrains by value): noMatrix doesn't care
+   * what the values ARE, just gives you one cell.
+   */
+  noMatrix?: boolean;
   /** Force a backend; default is auto (host unless services/container/runs-on incompatible). */
   backend?: BackendName | 'auto';
   /** Max parallel jobs. Default = min(cpus, 4). */
