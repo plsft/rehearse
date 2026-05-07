@@ -8,14 +8,16 @@ This file inlines the canonical descriptions of every Rehearse surface in plain 
 
 ## What Rehearse is
 
-Rehearse is four npm packages working together:
+Rehearse is two actively-versioned npm packages plus two pre-pivot ones frozen on npm:
 
-1. **@rehearse/cli** (binary: `rh`) — the local GitHub Actions runner. Reads `.github/workflows/*.yml` and executes locally with two backends (host subprocess for speed, Docker container for parity).
-2. **@rehearse/ci** — TypeScript SDK that compiles to standard GitHub Actions YAML. Lossless forward path; one-command migration on-ramp from existing YAML.
-3. **@rehearse/cli** (binary: `rh`) — companion CLI for `@rehearse/ci`. `init`, `compile`, `convert`, `validate`, `watch`, `estimate`.
-4. **@rehearse/git-core** — pure-TypeScript git protocol implementation. Runs in Cloudflare Workers, browsers, Deno, Node, Bun. Standalone.
+1. **@rehearse/cli** (binary: `rh`) — THE Rehearse CLI. Local GitHub Actions runner: reads `.github/workflows/*.yml`, executes locally with two backends (host subprocess for speed, Docker container for parity), supports matrix / services / cache / composite + JS actions / per-cell git worktrees / watch / pre-push hook. Plus the `rh ci` subcommand tree (`init`, `compile`, `convert`, `validate`, `watch`, `estimate`) for TypeScript-authored pipelines. Pass `--remote` to offload to Rehearse Pro (the optional paid hosted VM); drop the flag for free local execution.
+2. **@rehearse/ci** — TypeScript SDK that compiles to standard GitHub Actions YAML. Lossless forward path (snapshot-tested); one-command migration on-ramp from existing YAML. Imported by `@rehearse/cli` and used directly when you want the typed builders only.
 
-All four are Apache 2.0. `@rehearse/cli` and `@rehearse/ci` ship in lockstep (currently v0.6.16); `@rehearse/runner` and `@rehearse/git-core` were folded into `@rehearse/cli` in v0.6.0 and are frozen at v0.5.4 forever for back-compat with old pre-push hooks. The runner alone is enough for most users; the others compose for richer workflows.
+Frozen pre-pivot (last published v0.5.4, never updated again):
+3. **@rehearse/runner** — folded into `@rehearse/cli` in v0.6.0. Old pre-push hooks that reference it keep working forever.
+4. **@rehearse/git-core** — pure-TypeScript git protocol implementation. Folded into `@rehearse/cli` in v0.6.0. The standalone package stays on npm for users who want the protocol pieces alone (Workers / browsers / sandboxed-JS contexts).
+
+All four are Apache 2.0. `@rehearse/cli` and `@rehearse/ci` ship in lockstep (currently v0.6.18). The OSS runner runs offline — no signup, no telemetry, no phone-home. The runner alone is enough for most users.
 
 Optional commercial layer: **Rehearse Pro** at $49/mo for 25,000 active CPU minutes per month + $49 per additional 25,000-minute block. Single-tenant VM with whole-rootfs cache persistence. Same `rehearse` binary — pass `--remote` to ship workflow execution to your VM. Drop the flag and you're back to free local execution. No vendor lock-in.
 

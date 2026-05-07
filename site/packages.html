@@ -44,12 +44,20 @@
   <div class="max-w-3xl mx-auto px-5">
     <div class="eyebrow">// Packages</div>
     <h1 class="mt-2 text-4xl sm:text-5xl font-semibold tracking-tight gradient-text">
-      Four packages on npm. All Apache 2.0.
+      Two npm packages. All Apache 2.0.
     </h1>
     <p class="mt-5 text-lg text-[var(--rh-muted)]">
-      Each one is independent — you can install just one. They compose well
-      when you want them to. No hosted product, no signup, no telemetry.
-      Versions move in lockstep.
+      <code class="font-mono text-white/85">@rehearse/cli</code> is the runner +
+      the <code class="font-mono">rh ci</code> TS-pipeline subcommand tree;
+      <code class="font-mono text-white/85">@rehearse/ci</code> is the typed
+      builders. Two earlier packages
+      (<code class="font-mono">@rehearse/runner</code>,
+      <code class="font-mono">@rehearse/git-core</code>) were folded into
+      <code class="font-mono">@rehearse/cli</code> in v0.6.0; their last
+      published versions stay on npm for back-compat with old pre-push hooks.
+      The OSS runner runs offline — no signup, no telemetry, no phone-home.
+      <a href="/pro" class="link">Rehearse Pro</a> is an opt-in paid hosted
+      offload (single flag); the OSS path stays free forever.
     </p>
   </div>
 </section>

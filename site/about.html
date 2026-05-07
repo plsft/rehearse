@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#08090c" />
 <title>Rehearse — About</title>
-<meta name="description" content="Rehearse is an open-source local-first runner for GitHub Actions, plus three companion packages on npm. Apache 2.0, no hosted product." />
+<meta name="description" content="Rehearse is an open-source local-first runner for GitHub Actions (Apache 2.0, runs offline, no signup needed) with an optional paid hosted offload — Rehearse Pro — for when the laptop isn't enough. Same YAML targets both." />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -43,12 +43,14 @@
   <div class="max-w-3xl mx-auto px-5">
     <div class="eyebrow">// About</div>
     <h1 class="mt-2 text-4xl sm:text-5xl font-semibold tracking-tight gradient-text">
-      Open-source. No hosted product.
+      Free OSS core. Optional hosted offload.
     </h1>
     <p class="mt-5 text-lg text-[var(--rh-muted)]">
-      Rehearse is a small, focused open-source project. Four packages on npm,
-      one source repo, no signup, no account, no telemetry. Just a CLI and the
-      YAML you already have.
+      Rehearse is two things: an Apache 2.0 local-first runner for GitHub Actions
+      that runs on your laptop with no signup, no telemetry, and no network
+      dependency — and an optional paid hosted layer (<a href="/pro" class="link">Rehearse Pro</a>)
+      for when the laptop isn't enough. Same YAML targets both; you opt into Pro
+      with a single <code class="font-mono">--remote</code> flag.
     </p>
   </div>
 </section>
@@ -69,13 +71,27 @@
     </p>
 
     <p>
-      Around the runner, three companion packages ship under the same Apache 2.0
-      umbrella: <a href="/packages#ci" class="link">@rehearse/ci</a> (TypeScript
-      pipeline SDK), <a href="/packages#git-core" class="link">@rehearse/git-core</a>
-      (pure-TypeScript git engine), and <a href="/packages#cli" class="link">@rehearse/cli</a>
-      (the <code class="font-mono">rh</code> companion CLI). All four are on
-      npm, all four version in lockstep, all four are independent — install
-      only what you need.
+      The OSS core is two npm packages today: <a href="/packages" class="link">@rehearse/cli</a>
+      (the <code class="font-mono">rh</code> binary that runs your workflows + an
+      <code class="font-mono">rh ci</code> subcommand tree for TypeScript-authored
+      pipelines) and <a href="/packages" class="link">@rehearse/ci</a> (the
+      typed builders that compile to standard GitHub Actions YAML). Two earlier
+      packages — <code class="font-mono">@rehearse/runner</code> and
+      <code class="font-mono">@rehearse/git-core</code> — were folded into
+      <code class="font-mono">@rehearse/cli</code> in v0.6.0; their last
+      published versions stay on npm forever for back-compat with old pre-push
+      hooks. All Apache 2.0.
+    </p>
+
+    <p>
+      <a href="/pro" class="link">Rehearse Pro</a> is the optional paid layer:
+      a single-tenant microVM (<a href="https://fly.io/" class="link">Fly Machines</a>
+      via the Sprites runtime) you offload to when your laptop can't keep up
+      with a multi-cell matrix. Same workflow YAML; switch with
+      <code class="font-mono">rh run --remote</code>. Pricing is in
+      $49 / 25,000-CPU-minute blocks — predictable, no per-minute meter.
+      The OSS runner stays free forever and Pro is never required;
+      <code class="font-mono">rh run</code> on a laptop is the primary use case.
     </p>
 
     <h2 class="text-2xl font-semibold gradient-text tracking-tight pt-6">
@@ -83,11 +99,11 @@
     </h2>
 
     <ul class="space-y-2 list-disc list-outside pl-6">
-      <li>Not a hosted product. There is no <code class="font-mono">rehearse.sh</code> backend that runs your CI for you. The runner runs on your laptop or your own infra.</li>
-      <li>Not a SaaS. No accounts, no API keys, no monthly fee, no rate limits.</li>
-      <li>Not a fork or rewrite of <code class="font-mono">act</code>. Different architecture, different goals — the bench page documents the differences.</li>
-      <li>Not a wrapper around the <code class="font-mono">git</code> binary. <a href="/packages#git-core" class="link">@rehearse/git-core</a> is a from-scratch TypeScript implementation of the git protocol; it has zero native dependencies.</li>
-      <li>Not telemetry-instrumented. The runner doesn't phone home. Compat audits, bench numbers, and provenance information stay on your machine.</li>
+      <li>Not a fork or rewrite of <code class="font-mono">act</code>. Different architecture (host backend in addition to container; per-cell git worktrees for matrix; in-process action shims), different goals (pre-push and watch are first-class). The <a href="/bench" class="link">bench</a> documents the deltas.</li>
+      <li>Not a hosted-runner replacement like <a href="/vs" class="link">Blacksmith / Ubicloud / RunsOn</a>. Those are post-push services that swap GitHub-hosted runners for faster ones — orthogonal to what Rehearse does. Pro is similar in shape but the OSS runner is what defines the product, and it runs offline.</li>
+      <li>Not telemetry-instrumented. The OSS runner doesn't phone home — compat audits, bench numbers, and provenance stay on your machine. Pro's API logs run metadata to gate billing + capacity, audited at <a href="/security" class="link">/security</a>.</li>
+      <li>Not locked to Pro. Drop the <code class="font-mono">--remote</code> flag and the same workflow runs locally. Your CI keeps working if Pro disappears, costs change, or you stop paying.</li>
+      <li>Not a wrapper around the <code class="font-mono">git</code> binary's protocol bits. The pure-TypeScript git protocol implementation is folded into <code class="font-mono">@rehearse/cli</code> as of v0.6.0; the standalone <code class="font-mono">@rehearse/git-core</code> package is frozen at v0.5.4 for users who want the protocol pieces alone.</li>
     </ul>
 
     <h2 class="text-2xl font-semibold gradient-text tracking-tight pt-6">
@@ -96,24 +112,24 @@
 
     <div class="mt-4 grid sm:grid-cols-2 gap-4">
       <a href="/#install" class="card hover:border-white/20 transition">
-        <div class="font-mono text-xs text-[var(--rh-accent)]">RUN A WORKFLOW</div>
+        <div class="font-mono text-xs text-[var(--rh-accent)]">RUN A WORKFLOW (FREE)</div>
         <div class="mt-2 text-base font-semibold text-white"><code class="font-mono">npm install -g @rehearse/cli</code></div>
-        <p class="mt-2 text-sm text-[var(--rh-muted)]">Then <code class="font-mono">rh run .github/workflows/ci.yml</code>.</p>
+        <p class="mt-2 text-sm text-[var(--rh-muted)]">Then <code class="font-mono">rh run .github/workflows/ci.yml</code>. No account needed.</p>
+      </a>
+      <a href="/pro" class="card hover:border-white/20 transition">
+        <div class="font-mono text-xs text-[var(--rh-accent)]">OFFLOAD TO PRO ($49/MO)</div>
+        <div class="mt-2 text-base font-semibold text-white">Single-tenant microVM</div>
+        <p class="mt-2 text-sm text-[var(--rh-muted)]">For multi-cell matrices, heavier installs, or shared cache. Same YAML; opt in with <code class="font-mono">--remote</code>.</p>
       </a>
       <a href="/packages" class="card hover:border-white/20 transition">
         <div class="font-mono text-xs text-[var(--rh-accent)]">EXPLORE THE PACKAGES</div>
-        <div class="mt-2 text-base font-semibold text-white">All four, in detail</div>
-        <p class="mt-2 text-sm text-[var(--rh-muted)]">What each package does, how it's used, and how they fit together.</p>
-      </a>
-      <a href="/docs" class="card hover:border-white/20 transition">
-        <div class="font-mono text-xs text-[var(--rh-accent)]">QUICKSTART</div>
-        <div class="mt-2 text-base font-semibold text-white">30-second walkthrough</div>
-        <p class="mt-2 text-sm text-[var(--rh-muted)]">Install → run → watch → install-hook.</p>
+        <div class="mt-2 text-base font-semibold text-white">@rehearse/cli + @rehearse/ci</div>
+        <p class="mt-2 text-sm text-[var(--rh-muted)]">What each package does, the public API, and how they fit together.</p>
       </a>
       <a href="https://github.com/plsft/rehearse" class="card hover:border-white/20 transition">
         <div class="font-mono text-xs text-[var(--rh-accent)]">SOURCE</div>
         <div class="mt-2 text-base font-semibold text-white">github.com/plsft/rehearse</div>
-        <p class="mt-2 text-sm text-[var(--rh-muted)]">All four packages, the bench harness, and the marketing site.</p>
+        <p class="mt-2 text-sm text-[var(--rh-muted)]">Both packages, bench harness, compat scoreboard, and the marketing site source.</p>
       </a>
     </div>
 

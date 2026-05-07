@@ -2,7 +2,7 @@
 
 > Local-first GitHub Actions runner with TypeScript-authored CI and an optional hosted offload target. Run your `.github/workflows/*.yml` on every save in sub-second; same YAML scales to a single-tenant VM ($49/mo for 25,000 CPU minutes) and to stock GitHub Actions. Apache 2.0.
 
-Rehearse is four npm packages that together let you author CI in TypeScript, execute it locally on your laptop, push it to a private VM when the laptop isn't enough, and ship the same compiled YAML to standard GitHub Actions — no Rehearse runtime dependency on GitHub's side. The OSS runner is free forever; Pro is the optional hosted offload at $49/mo for 25,000 active CPU minutes per month, with $49 per additional 25,000-minute block. Project source: https://github.com/plsft/rehearse. Marketing site: https://rehearse.sh.
+Rehearse ships two actively-versioned npm packages (`@rehearse/cli` — the runner + the `rh ci` TS-pipeline subcommand tree; `@rehearse/ci` — the typed builders that compile to standard GitHub Actions YAML). Two earlier packages, `@rehearse/runner` and `@rehearse/git-core`, were folded into `@rehearse/cli` in v0.6.0 and are frozen on npm at v0.5.4 forever for back-compat with old pre-push hooks. Together they let you author CI in TypeScript, execute it locally on your laptop, push it to a private VM when the laptop isn't enough, and ship the same compiled YAML to standard GitHub Actions — no Rehearse runtime dependency on GitHub's side. The OSS runner is free forever and runs offline; Rehearse Pro is the optional paid hosted offload at $49/mo for 25,000 active CPU minutes per month, with $49 per additional 25,000-minute block. Project source: https://github.com/plsft/rehearse. Marketing site: https://rehearse.sh.
 
 ## Documentation
 
