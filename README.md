@@ -114,7 +114,7 @@ Roadmap lives on the GitHub issues for the repo.
 # Requires Node 22+ and pnpm 9+
 pnpm install
 pnpm turbo typecheck       # passes across all 5 workspace packages
-pnpm turbo test             # 323 tests passing across all packages
+pnpm turbo test             # 162 cli tests + ts-ci snapshot tests, all green
 pnpm --filter @rehearse/cli build
 node cli/dist/index.js run .github/workflows/ci.yml
 ```

@@ -21,7 +21,7 @@
     <a href="/" class="flex items-center gap-2.5 font-mono group" aria-label="Rehearse home">
       <span class="logo-mark logo-mark-md text-[var(--rh-accent)] transition-transform group-hover:scale-110"></span>
       <span class="font-semibold tracking-tight text-white">rehearse</span>
-      <span class="hidden sm:inline text-[11px] text-[var(--rh-muted)] border border-white/10 rounded px-1.5 py-0.5">v0.5.2 · 4 pkgs · 323 tests</span>
+      <span class="hidden sm:inline text-[11px] text-[var(--rh-muted)] border border-white/10 rounded px-1.5 py-0.5">v0.6.17 · 2 pkgs · 163 tests</span>
     </a>
     <nav class="flex items-center gap-4 md:gap-7 overflow-x-auto whitespace-nowrap nav-scroll min-w-0">
       <a href="/packages" class="nav-link ">Packages</a>
@@ -56,6 +56,114 @@
 <!-- ============== RELEASES ============== -->
 <section class="py-16 hairline">
   <div class="max-w-3xl mx-auto px-5 space-y-12">
+
+    <!-- v0.6.17 -->
+    <article>
+      <div class="flex items-baseline gap-3 mb-3">
+        <h2 class="text-2xl font-semibold text-white">v0.6.17</h2>
+        <span class="text-[12px] font-mono text-[var(--rh-muted)]">2026-05-06 · Round 3 OSS validation fix — worktree ELOOP</span>
+      </div>
+      <div class="card p-6 space-y-4 text-[var(--rh-muted)]">
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1">Fixed: source-tree walk ELOOP</div>
+          <p class="text-sm leading-relaxed">Workflows whose steps walk the source tree (coverage tools like <code class="font-mono">c8</code>, linters, file-globbing scripts) hit Windows <code class="font-mono">ELOOP</code> after ~70 levels because the per-cell worktree lived at <code class="font-mono">&lt;repo&gt;/.runner/worktrees/&lt;id&gt;/</code> and the worktree symlinked <code class="font-mono">.runner/</code> back to the parent repo. Fixed by removing <code class="font-mono">.runner/</code> from the worktree symlink list. Per-cell caches (npm/yarn/pip) are unaffected — they use absolute env-var paths set by the host backend.</p>
+        </div>
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-amber)] mb-1">Surfaced by</div>
+          <p class="text-sm leading-relaxed">Round 3 validation against <code class="font-mono">lukeed/kleur</code>'s CI. The kleur workflow runs <code class="font-mono">c8 npm test</code> for coverage; <code class="font-mono">c8</code> walked into <code class="font-mono">.runner/worktrees/test/.runner/worktrees/test/...</code> indefinitely on Windows. Reproduced 100%, fixed in v0.6.17.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- v0.6.16 -->
+    <article>
+      <div class="flex items-baseline gap-3 mb-3">
+        <h2 class="text-2xl font-semibold gradient-text">v0.6.16</h2>
+        <span class="text-[12px] font-mono text-[var(--rh-muted)]">2026-05-06 · agent-ci gap closure — features for real-world workflows</span>
+      </div>
+      <div class="card p-6 space-y-4 text-[var(--rh-muted)]">
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1">Remote reusable workflows</div>
+          <p class="text-sm leading-relaxed">Workflows that call <code class="font-mono">uses: org/repo/.github/workflows/x.yml@ref</code> at the job level now run instead of skip-with-reason. Target repo is shallow-cloned into the shared action cache; nested <code class="font-mono">./</code> refs inside the called workflow resolve relative to the cloned repo. Caller's <code class="font-mono">with:</code> and <code class="font-mono">secrets:</code> still substitute correctly.</p>
+        </div>
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1">Reusable workflow outputs flow</div>
+          <p class="text-sm leading-relaxed">A reusable workflow's <code class="font-mono">on.workflow_call.outputs:</code> declarations now propagate to caller dependents. <code class="font-mono">${{ needs.&lt;callerKey&gt;.outputs.&lt;X&gt; }}</code> resolves against the inner job results via a synthetic "umbrella" job the planner emits per caller. Inner failure propagates to the umbrella so downstream <code class="font-mono">needs:</code> short-circuits properly.</p>
+        </div>
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1">Shared action cache</div>
+          <p class="text-sm leading-relaxed">Action repos (<code class="font-mono">actions/checkout</code>, <code class="font-mono">setup-node</code>, etc.) now cache to <code class="font-mono">~/.rehearse/actions-cache/</code> instead of <code class="font-mono">.runner/actions/</code> per repo. Override with <code class="font-mono">REHEARSE_ACTIONS_CACHE</code>. Second run of the same action from any repo on the same host is a no-op resolve. Falls back to per-repo if HOME is unwritable (CI sandboxes).</p>
+        </div>
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1">workflow_dispatch input prompts</div>
+          <pre class="font-mono text-[12px] text-white/85 bg-black/40 p-3 rounded border border-white/10 overflow-x-auto"><span class="comment"># before: missing required inputs collapsed to '' silently</span>
+rh run .github/workflows/release.yml
+
+<span class="comment"># now: prompted in TTY, validated, fail-loud in CI</span>
+rh run .github/workflows/release.yml --input env=staging --input tag=v1.2.3</pre>
+          <p class="text-sm leading-relaxed">Resolution order: CLI flag → API option → action.yml default → interactive prompt → error. Type validation for <code class="font-mono">boolean</code>, <code class="font-mono">number</code>, and <code class="font-mono">choice</code>. Non-TTY environments get a clear "missing required input" error instead of hanging on stdin.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- v0.6.15 -->
+    <article>
+      <div class="flex items-baseline gap-3 mb-3">
+        <h2 class="text-2xl font-semibold text-white">v0.6.15</h2>
+        <span class="text-[12px] font-mono text-[var(--rh-muted)]">2026-05-06 · stability — recursive reusables, --collapse-matrix, sprite cold-wake</span>
+      </div>
+      <div class="card p-6 space-y-4 text-[var(--rh-muted)]">
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1">Recursive reusable workflows + cycle detection</div>
+          <p class="text-sm leading-relaxed">Reusable expansion now recurses up to the GitHub Actions spec limit of 4 levels. A self-referential workflow throws <code class="font-mono">cycle detected in reusable workflows</code> instead of hanging the planner. Composite job keys accumulate (<code class="font-mono">caller__inner__deeper__terminal</code>).</p>
+        </div>
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1"><code class="font-mono">--collapse-matrix</code></div>
+          <p class="text-sm leading-relaxed">Collapses an N-cell matrix to a single representative cell (first value of each variable). For fast local iteration on multi-cell workflows when you just want a green/red signal once. Composes with <code class="font-mono">--matrix</code>.</p>
+        </div>
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1">Pro — sprite cold-wake budget 12s → 60s</div>
+          <p class="text-sm leading-relaxed">Round 2 validation hit transient 500s on back-to-back remote runs when the sprite went idle between runs. API now retries the wake-up handshake for up to 60s (was 12s) before surfacing the error. Eliminated the cold-wake regression seen in three of six sequential <code class="font-mono">--remote</code> runs.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- v0.6.13 — v0.6.14 -->
+    <article>
+      <div class="flex items-baseline gap-3 mb-3">
+        <h2 class="text-2xl font-semibold text-white">v0.6.13 → v0.6.14</h2>
+        <span class="text-[12px] font-mono text-[var(--rh-muted)]">2026-05-06 · OSS validation fixes (Round 1)</span>
+      </div>
+      <div class="card p-6 space-y-4 text-[var(--rh-muted)]">
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1">Two real-world bugs fixed</div>
+          <ul class="space-y-1 text-sm">
+            <li>— <strong class="text-white">Daemon CRLF normalization (Pro v0.2.1):</strong> <code class="font-mono">honojs/hono</code>'s editorconfig check was failing on the daemon-written <code class="font-mono">_rehearse_run.yml</code> when developers cloned on Windows with <code class="font-mono">autocrlf=true</code>. Daemon now writes LF-only.</li>
+            <li>— <strong class="text-white">JS-action input env-var contract (CLI v0.6.14):</strong> per <code class="font-mono">@actions/core</code> spec, only spaces are replaced in input names — dashes are preserved. <code class="font-mono">moonrepo/setup-rust</code>'s <code class="font-mono">getBooleanInput('inherit-toolchain')</code> threw because we were converting dashes to underscores. We now set BOTH the canonical (<code class="font-mono">INPUT_INHERIT-TOOLCHAIN</code>) and legacy underscore variant per dashed input.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <!-- v0.6.1 → v0.6.12 -->
+    <article>
+      <div class="flex items-baseline gap-3 mb-3">
+        <h2 class="text-2xl font-semibold text-white">v0.6.1 → v0.6.12</h2>
+        <span class="text-[12px] font-mono text-[var(--rh-muted)]">2026-05-06 · post-pivot polish</span>
+      </div>
+      <div class="card p-6 space-y-4 text-[var(--rh-muted)]">
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1">Selected fixes</div>
+          <ul class="space-y-1 text-sm">
+            <li>— Non-strict <code class="font-mono">--matrix</code> filter — constraints on keys a job doesn't have are treated as N/A instead of filtering the job out.</li>
+            <li>— <code class="font-mono">--remote</code> uses the streaming endpoint — output prints as it arrives.</li>
+            <li>— Live-streaming spinner repaints with elapsed time so captured-output steps don't look frozen.</li>
+            <li>— Per-cell git worktrees: matrix cells parallelize cleanly without npm-cache races.</li>
+            <li>— First external-repo validation against <code class="font-mono">plsft/typey</code>: local &lt;1s, Pro 2s, GitHub Actions 10s.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
 
     <!-- v0.6.0 -->
     <article>
@@ -404,7 +512,7 @@ rh ci compile</pre>
         <span class="text-white">rehearse</span> · by <a href="https://github.com/plsft" class="link">plsft</a>
       </div>
       <div class="font-mono text-[11px] text-[var(--rh-muted)]">
-        <span class="ok">●</span> v0.5.2 · Apache 2.0
+        <span class="ok">●</span> v0.6.17 · Apache 2.0
       </div>
     </div>
   </div>

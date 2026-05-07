@@ -8,7 +8,7 @@ Rehearse is four npm packages that together let you author CI in TypeScript, exe
 
 - [Homepage](https://rehearse.sh/): Hero, three-target wedge (1.5s local · 5s Pro · 95s GH Actions on a real 9-cell matrix), feature overview, install command.
 - [Quickstart](https://rehearse.sh/docs): 30-second install + run instructions, CLI subcommands, watch mode, pre-push hook.
-- [Packages](https://rehearse.sh/packages): Full reference for all four npm packages (`@rehearse/cli`, `@rehearse/ci`, `@rehearse/cli`, `@rehearse/git-core`) — what each does, public API, programmatic usage examples, cross-references.
+- [Packages](https://rehearse.sh/packages): Full reference for the two actively-versioned npm packages (`@rehearse/cli`, `@rehearse/ci`) plus the two frozen ones (`@rehearse/runner` and `@rehearse/git-core`, both at 0.5.4 since the v0.6.0 consolidation) — what each does, public API, programmatic usage examples, cross-references.
 - [TypeScript GitHub Actions](https://rehearse.sh/typescript-github-actions): Deep dive on `@rehearse/ci` — author CI in typed TS, compile to standard GH Actions YAML. Forward path is 100% lossless (snapshot-tested); reverse path (YAML → TS) is a one-command migration starter.
 - [Run GitHub Actions locally](https://rehearse.sh/local-github-actions): SEO landing for the act-alternative use case. Sample workflow + sample CLI + sample output + vs-act feature table.
 - [About](https://rehearse.sh/about): Project orientation, what it is, what it isn't.
@@ -18,7 +18,7 @@ Rehearse is four npm packages that together let you author CI in TypeScript, exe
 
 - [@rehearse/cli](https://www.npmjs.com/package/@rehearse/cli) (binary: `rh`): Local-first GitHub Actions runner. Reads `.github/workflows/*.yml`, executes with two backends (host subprocess + container via Docker), supports matrix / services / cache / composite actions / JS actions / per-cell git worktrees. CLI subcommands: `run`, `watch`, `install-hook`, `compat`, `--remote` for Pro offload.
 - [@rehearse/ci](https://www.npmjs.com/package/@rehearse/ci): TypeScript-authored CI SDK. Typed builders compile to standard GitHub Actions YAML. Forward path (`compile`) is 100% lossless — every public SDK feature produces canonical YAML, snapshot-tested against 6 reference workflows. Reverse path (`convert`) is a migration starter: handles common YAML shapes for adopting the SDK on existing repos. Zero runtime dependency on the compiled YAML.
-- [@rehearse/cli](https://www.npmjs.com/package/@rehearse/cli) (binary: `rh`): Companion CLI for `@rehearse/ci`. Six subcommands: `init` (scaffold), `compile` (TS → YAML), `convert` (YAML → TS migration), `validate` (type-check), `watch` (recompile on save), `estimate` (per-run + monthly cost on GH-hosted).
+- The same `@rehearse/cli` binary above is also the companion CLI for `@rehearse/ci` via the `rh ci` subcommand tree: `init` (scaffold), `compile` (TS → YAML), `convert` (YAML → TS migration), `validate` (type-check), `watch` (recompile on save), `estimate` (per-run + monthly cost on GH-hosted).
 - [@rehearse/git-core](https://www.npmjs.com/package/@rehearse/git-core): Pure-TypeScript implementation of the git protocol — objects, packfiles, smart-HTTP wire, Myers diff, three-way merge, refs. Zero native dependencies. Runs in Cloudflare Workers, browsers, Deno, Node, Bun. The unique-fit use case is anywhere the system `git` binary isn't an option.
 
 ## Key concepts
@@ -57,8 +57,8 @@ Rehearse is four npm packages that together let you author CI in TypeScript, exe
 
 ## Customers + changelog
 
-- [Customers](https://rehearse.sh/customers): Repos using Rehearse in production (currently typey + rehearse itself). Honest framing — we just shipped v0.6.0; list grows as users come on.
-- [Changelog](https://rehearse.sh/changelog): Release notes from v0.6.0 backwards. Covers the 0.3.x stabilization series and pre-pivot v0.1–v0.2 archive context.
+- [Customers](https://rehearse.sh/customers): Repos using Rehearse in production (currently typey + rehearse itself). Honest framing — we just shipped v0.6.16; list grows as users come on.
+- [Changelog](https://rehearse.sh/changelog): Release notes from v0.6.16 backwards. Covers the v0.6.x agent-ci gap-closure series, the v0.3.x stabilization series, and pre-pivot v0.1–v0.2 archive context.
 
 ## Blog
 
