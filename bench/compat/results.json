@@ -1,16 +1,37 @@
 {
   "cli": "@rehearse/cli@latest",
-  "ran_at": "2026-05-07T03:33:13.125Z",
-  "passed": 1,
-  "total": 1,
+  "ran_at": "2026-05-07T12:07:51.588Z",
+  "passed": 4,
+  "total": 4,
   "score": 1,
   "results": [
     {
-      "name": "is-plain-obj-smoke",
+      "name": "typey",
       "expected": "pass",
       "pass": true,
       "reason": "exit=0",
-      "durationMs": 58337
+      "durationMs": 44964
+    },
+    {
+      "name": "kleur",
+      "expected": "no-eloop",
+      "pass": true,
+      "reason": "no ELOOP in log (worktree fix held)",
+      "durationMs": 22766
+    },
+    {
+      "name": "workflow-dispatch-input",
+      "expected": "input-substituted",
+      "pass": true,
+      "reason": "input substituted (sentinel-test step exited 0)",
+      "durationMs": 2623
+    },
+    {
+      "name": "is-plain-obj",
+      "expected": "pass",
+      "pass": true,
+      "reason": "exit=0",
+      "durationMs": 56783
     }
   ]
 }

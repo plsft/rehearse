@@ -54,22 +54,44 @@ for (const fx of fixtures) {
   let reason = '';
 
   try {
-    // 1. Clone (or refresh).
+    // 1. Materialize the workflow source. Two modes:
+    //    - `repo`: clone an OSS project (real-world compat target)
+    //    - `local_workflow`: copy a synthetic workflow we control into
+    //      a fresh git repo. Use this when the assertion needs the
+    //      workflow shape pinned (e.g. testing --input substitution
+    //      requires the workflow to actually echo the input).
     if (!existsSync(dir)) {
-      const r = spawnSync(
-        'git',
-        ['clone', '--depth=50', '--branch', fx.ref, fx.repo, dir],
-        { encoding: 'utf-8' },
-      );
-      if (r.status !== 0) {
-        // SHA refs don't work with --branch; full clone + checkout.
-        spawnSync('git', ['clone', fx.repo, dir], { encoding: 'utf-8' });
-        spawnSync('git', ['checkout', fx.ref], { cwd: dir, encoding: 'utf-8' });
+      if (fx.local_workflow) {
+        const src = resolve(here, fx.local_workflow);
+        if (!existsSync(src)) {
+          throw new Error(`local_workflow not found: ${src}`);
+        }
+        const wfDest = join(dir, '.github', 'workflows', 'compat-fixture.yml');
+        mkdirSync(dirname(wfDest), { recursive: true });
+        execSync(`git init -q "${dir}"`);
+        execSync(`git -C "${dir}" config user.email t@compat.local && git -C "${dir}" config user.name compat`);
+        const { copyFileSync } = await import('node:fs');
+        copyFileSync(src, wfDest);
+        execSync(`git -C "${dir}" add -A && git -C "${dir}" commit -q -m fixture`);
+      } else {
+        const r = spawnSync(
+          'git',
+          ['clone', '--depth=50', '--branch', fx.ref, fx.repo, dir],
+          { encoding: 'utf-8' },
+        );
+        if (r.status !== 0) {
+          // SHA refs don't work with --branch; full clone + checkout.
+          spawnSync('git', ['clone', fx.repo, dir], { encoding: 'utf-8' });
+          spawnSync('git', ['checkout', fx.ref], { cwd: dir, encoding: 'utf-8' });
+        }
       }
     }
 
     // 2. Build the rh invocation.
-    const args = ['-y', cliPkg, 'run', fx.workflow];
+    const workflowPath = fx.local_workflow
+      ? '.github/workflows/compat-fixture.yml'
+      : fx.workflow;
+    const args = ['-y', cliPkg, 'run', workflowPath];
     if (fx.matrix_filter) args.push('--matrix', fx.matrix_filter);
     if (fx.inputs) {
       for (const [k, v] of Object.entries(fx.inputs)) args.push('--input', `${k}=${v}`);
@@ -99,16 +121,17 @@ for (const fx of fixtures) {
           : 'ELOOP found — worktree symlink regression';
         break;
       case 'input-substituted':
-        // workflow_dispatch + --input flow target. The input must show
-        // up substituted into the workflow's run output. Fixture stores
-        // the input value and we look for it.
-        const expected = Object.values(fx.inputs ?? {})[0];
-        pass = r.status === 0 && (!expected || log.includes(expected));
+        // workflow_dispatch + --input flow target. The synthetic fixture
+        // (bench/compat/synthetic/workflow-dispatch-input.yml) uses
+        // `if [ "${{ inputs.sentinel }}" = "COMPAT_OK_42" ]; then …;
+        // else exit 1; fi` so a bad substitution forces a non-zero exit.
+        // We don't grep for stdout markers because rh's default mode
+        // suppresses successful steps' output; the workflow's own exit
+        // code is the source of truth.
+        pass = r.status === 0;
         reason = pass
-          ? 'input substituted into workflow'
-          : r.status === 0
-          ? 'workflow ran but input not found in output'
-          : `exit=${r.status}`;
+          ? 'input substituted (sentinel-test step exited 0)'
+          : `exit=${r.status} (sentinel mismatch — input parsing/substitution broken)`;
         break;
       default:
         pass = false;

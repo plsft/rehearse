@@ -1,0 +1,37 @@
+# Synthetic compat fixture — verifies that `--input/-i` flows through
+# to ${{ inputs.X }} substitution at workflow-step time.
+#
+# How it works: we pass `--input sentinel=COMPAT_OK_42` on the CLI. The
+# workflow's first step echoes the substituted value, the second step
+# uses bash `test` to assert it equals the expected sentinel. If --input
+# parsing OR substitution is broken, the test exits non-zero and the
+# fixture FAILS clearly.
+#
+# Why a synthetic fixture instead of a real OSS repo: real workflows
+# rarely echo their inputs verbatim — most pass them into composite
+# actions' `with:` blocks where they're absorbed. Asserting "input
+# substituted into stdout" depends too much on the upstream workflow's
+# shape. A vendored fixture controls both ends of the contract.
+name: workflow_dispatch input substitution
+on:
+  workflow_dispatch:
+    inputs:
+      sentinel:
+        description: Test value the rh CLI's --input flag should pass through
+        required: true
+        type: string
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo received input
+        run: |
+          echo "received: ${{ inputs.sentinel }}"
+      - name: Assert input matches expected sentinel
+        run: |
+          if [ "${{ inputs.sentinel }}" = "COMPAT_OK_42" ]; then
+            echo "PASS: --input flag flowed through to \${{ inputs.* }}"
+          else
+            echo "FAIL: expected COMPAT_OK_42, got '${{ inputs.sentinel }}'" >&2
+            exit 1
+          fi

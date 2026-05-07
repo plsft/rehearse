@@ -20,13 +20,11 @@
       "rationale": "v0.6.17 worktree ELOOP regression target. Workflow uses c8 coverage which walks the source tree; pre-fix this hit Windows ELOOP. We don't require pass — workflow has unrelated legacy-Node-version failures — but ZERO `ELOOP` mentions in the log."
     },
     {
-      "name": "changed-files-dispatch",
-      "repo": "https://github.com/tj-actions/changed-files.git",
-      "ref": "main",
-      "workflow": ".github/workflows/manual-triggered-job-example.yml",
-      "inputs": { "files": "README.md" },
+      "name": "workflow-dispatch-input",
+      "local_workflow": "synthetic/workflow-dispatch-input.yml",
+      "inputs": { "sentinel": "COMPAT_OK_42" },
       "expected": "input-substituted",
-      "rationale": "v0.6.16 workflow_dispatch + --input/-i target. Input must substitute into ${{ inputs.files }} during the run."
+      "rationale": "v0.6.16 workflow_dispatch + --input/-i target. Synthetic workflow asserts via bash `test` that the sentinel string round-trips through ${{ inputs.sentinel }}. Replaces the original tj-actions/changed-files fixture which used a composite-action `with:` and never echoed the input to stdout, making the assertion unreliable."
     },
     {
       "name": "is-plain-obj",
