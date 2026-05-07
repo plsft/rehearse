@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#08090c" />
+<title>Compat scoreboard — Rehearse</title>
+<meta name="description" content="Live compat-with-GitHub-Actions scoreboard. Curated OSS workflows + the rh CLI's behavior on each, refreshed nightly. Fail = the rh release didn't reproduce the upstream workflow's expected outcome." />
+<meta property="og:title" content="Compat scoreboard — Rehearse" />
+<meta property="og:description" content="Curated OSS workflows + the rh CLI's behavior on each. Refreshed nightly. Anyone can audit." />
+<meta property="og:type" content="website" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script type="module" src="/src/main.ts"></script>
+</head>
+<body class="antialiased">
+
+<!-- ============== NAV ============== -->
+<header class="fixed inset-x-0 top-0 z-50 border-b border-white/10 backdrop-blur bg-black/55">
+  <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2.5 font-mono group" aria-label="Rehearse home">
+      <span class="logo-mark logo-mark-md text-[var(--rh-accent)] transition-transform group-hover:scale-110"></span>
+      <span class="font-semibold tracking-tight text-white">rehearse</span>
+      <span class="hidden sm:inline text-[11px] text-[var(--rh-muted)] border border-white/10 rounded px-1.5 py-0.5">v0.6.18 · 2 pkgs · 168 tests</span>
+    </a>
+    <nav class="flex items-center gap-4 md:gap-7 overflow-x-auto whitespace-nowrap nav-scroll min-w-0">
+      <a href="/packages" class="nav-link ">Packages</a>
+      <a href="/docs" class="nav-link ">Docs</a>
+      <a href="/bench" class="nav-link ">Bench</a>
+      <a href="/blog" class="nav-link ">Blog</a>
+      <a href="/pro" class="nav-link text-white ">Pro
+        <span class="ml-1 text-[10px] font-mono text-[var(--rh-accent)] border border-[var(--rh-accent)]/40 rounded px-1 py-0.5 align-middle">$49/mo</span>
+      </a>
+    </nav>
+    <div class="flex items-center gap-2 shrink-0">
+      <a href="https://pro.rehearse.sh/sign-in" class="btn btn-ghost btn-sm">Sign in</a>
+      <a href="/#install" class="btn btn-primary btn-sm">Install</a>
+    </div>
+  </div>
+</header>
+
+<!-- ============== HERO ============== -->
+<section class="pt-32 pb-12">
+  <div class="max-w-3xl mx-auto px-5">
+    <div class="text-[12px] uppercase tracking-[0.18em] text-[var(--rh-muted)] mb-2">// compat scoreboard</div>
+    <h1 class="text-3xl sm:text-4xl font-semibold tracking-tight mb-3">Live compat-with-GitHub-Actions scoreboard.</h1>
+    <p class="text-[var(--rh-muted)] mb-8 max-w-2xl text-[15px] leading-relaxed">
+      Real OSS workflows + the published <code class="font-mono text-white/85">@rehearse/cli</code>'s behavior on each, refreshed nightly. Pass = rh reproduced the workflow's expected outcome on a fresh GitHub-hosted ubuntu runner. Fail = a real compat gap. The strategic decision to <em>not</em> wrap the official GH runner binary (vs <a href="https://agent-ci.dev" class="link">agent-ci</a>) is defensible only if these stay green.
+    </p>
+  </div>
+</section>
+
+<!-- ============== SCOREBOARD CARD ============== -->
+<section class="pb-12">
+  <div class="max-w-3xl mx-auto px-5">
+    <div id="board" class="card p-6 sm:p-8">
+      <div id="board-loading" class="font-mono text-sm text-[var(--rh-muted)]">
+        <span class="text-[var(--rh-accent)]">⠋</span> loading latest results…
+      </div>
+      <div id="board-error" class="hidden font-mono text-sm text-[var(--rh-amber)]">
+        Could not load results.json. The next nightly run will write one. Meanwhile see
+        <a href="https://github.com/plsft/rehearse/actions/workflows/compat.yml" class="link">workflow runs on GitHub</a>.
+      </div>
+      <div id="board-content" class="hidden">
+        <!-- score header -->
+        <div class="flex flex-wrap items-baseline gap-x-6 gap-y-2 mb-1">
+          <div>
+            <div class="text-[11px] font-mono uppercase tracking-[0.16em] text-[var(--rh-muted)]">score</div>
+            <div class="text-4xl font-semibold tracking-tight">
+              <span id="score-passed" class="ok">—</span><span class="text-[var(--rh-muted)]">/</span><span id="score-total">—</span>
+            </div>
+          </div>
+          <div>
+            <div class="text-[11px] font-mono uppercase tracking-[0.16em] text-[var(--rh-muted)]">rate</div>
+            <div id="score-rate" class="text-2xl font-semibold accent-text">—</div>
+          </div>
+          <div>
+            <div class="text-[11px] font-mono uppercase tracking-[0.16em] text-[var(--rh-muted)]">cli</div>
+            <code id="score-cli" class="font-mono text-sm text-white/85">—</code>
+          </div>
+          <div>
+            <div class="text-[11px] font-mono uppercase tracking-[0.16em] text-[var(--rh-muted)]">last run</div>
+            <div id="score-when" class="text-sm font-mono text-white/85">—</div>
+          </div>
+        </div>
+
+        <!-- per-fixture table -->
+        <div class="mt-8 overflow-x-auto">
+          <table class="min-w-full text-sm font-mono">
+            <thead class="bg-white/[0.02] text-[var(--rh-muted)] text-left">
+              <tr>
+                <th class="py-2.5 px-4 font-semibold">Fixture</th>
+                <th class="py-2.5 px-4 font-semibold">Expected</th>
+                <th class="py-2.5 px-4 font-semibold">Result</th>
+                <th class="py-2.5 px-4 font-semibold text-right">Time</th>
+                <th class="py-2.5 px-4 font-semibold">Reason</th>
+              </tr>
+            </thead>
+            <tbody id="board-rows" class="divide-y divide-white/5"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- meta + audit links -->
+    <p class="mt-4 text-[12.5px] font-mono text-[var(--rh-muted)]">
+      Source: <a href="https://github.com/plsft/rehearse/blob/main/bench/compat/results.json" class="link">bench/compat/results.json</a>
+      · runs <a href="https://github.com/plsft/rehearse/actions/workflows/compat.yml" class="link">on GitHub Actions</a>
+      · fixtures <a href="https://github.com/plsft/rehearse/blob/main/bench/compat/fixtures.json" class="link">audit them here</a>
+    </p>
+  </div>
+</section>
+
+<!-- ============== HOW IT WORKS ============== -->
+<section class="py-12 hairline">
+  <div class="max-w-3xl mx-auto px-5">
+    <h2 class="text-2xl font-semibold gradient-text mb-3">How the scoreboard updates.</h2>
+    <p class="text-[var(--rh-muted)] mb-8 text-[15px] leading-relaxed">Three triggers, all driving the same <code class="font-mono text-white/85">bench/compat/run.mjs</code>. The result JSON is committed back to <code class="font-mono text-white/85">main</code> after every run, which is what this page reads.</p>
+
+    <div class="grid gap-4">
+      <div class="card p-5">
+        <div class="text-[11px] font-mono uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1.5">Nightly · 07:00 UTC</div>
+        <p class="text-sm text-[var(--rh-muted)]">A fresh GH-hosted ubuntu runner installs Node + bun, runs <code class="font-mono">npx -y @rehearse/cli@latest run …</code> against every fixture, scores each against its declared expectation, commits the JSON.</p>
+      </div>
+      <div class="card p-5">
+        <div class="text-[11px] font-mono uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1.5">PR gate</div>
+        <p class="text-sm text-[var(--rh-muted)]">Every PR that touches <code class="font-mono">cli/</code>, <code class="font-mono">ts-ci/</code>, or <code class="font-mono">bench/compat/</code> runs the same scoreboard. A PR that drops any fixture's expected outcome fails CI and can't merge until either (a) the regression is fixed, or (b) the fixture is honestly updated to match new reality.</p>
+      </div>
+      <div class="card p-5">
+        <div class="text-[11px] font-mono uppercase tracking-[0.16em] text-[var(--rh-accent)] mb-1.5">Manual</div>
+        <pre class="font-mono text-[12px] text-white/85 bg-black/40 p-3 rounded border border-white/10 overflow-x-auto">gh workflow run compat.yml \
+  --ref main \
+  -f cli=@rehearse/cli@0.6.18</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== HONEST FRAMING ============== -->
+<section class="py-12 hairline">
+  <div class="max-w-3xl mx-auto px-5">
+    <h2 class="text-2xl font-semibold gradient-text mb-3">Honest framing.</h2>
+    <ul class="space-y-2.5 text-sm text-[var(--rh-muted)] leading-relaxed">
+      <li>— <span class="text-white">Four fixtures is small.</span> This is a starting set focused on the surfaces where compat regressions historically hurt: matrix execution (typey), source-tree walking under matrix worktrees (kleur), <code class="font-mono">workflow_dispatch</code> input substitution (synthetic), and the host-shim happy path (is-plain-obj). Adding a fixture is a deliberate act — we add when reality changes, never to soften an assertion.</li>
+      <li>— <span class="text-white">"Pass" doesn't mean "100% bit-equivalent."</span> Each fixture declares one of: <code class="font-mono">pass</code> (workflow exits 0), <code class="font-mono">no-eloop</code> (no infinite recursion in the log), <code class="font-mono">input-substituted</code> (workflow_dispatch input round-trips). The runner's source is in the <a href="https://github.com/plsft/rehearse/blob/main/bench/compat/run.mjs" class="link">repo</a>; nothing is hidden.</li>
+      <li>— <span class="text-white">Failing the gate is the point.</span> The first nightly run flagged a real customer-facing bug (host-tool shims silently lying when bun/python/etc. wasn't on PATH). Fixed in v0.6.18 with regression tests. That's the value: catching compat drift the moment it lands, not when a customer files an issue.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============== FOOTER ============== -->
+<footer class="py-14 hairline">
+  <div class="max-w-6xl mx-auto px-5">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-10">
+      <div>
+        <div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Product</div>
+        <ul class="space-y-2 font-mono text-[13px]">
+          <li><a href="/packages" class="nav-link">Packages</a></li>
+          <li><a href="/docs" class="nav-link">Docs</a></li>
+          <li><a href="/bench" class="nav-link">Bench</a></li>
+          <li><a href="/compat" class="nav-link">Compat</a></li>
+          <li><a href="/vs" class="nav-link">vs competitors</a></li>
+          <li><a href="/typescript-github-actions" class="nav-link">TS GitHub Actions</a></li>
+          <li><a href="/local-github-actions" class="nav-link">Run GH Actions locally</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Pro</div>
+        <ul class="space-y-2 font-mono text-[13px]">
+          <li><a href="/pro" class="nav-link">Overview</a></li>
+          <li><a href="/pricing" class="nav-link">Pricing</a></li>
+          <li><a href="https://buy.stripe.com/6oU9AMdTI8VUdZH7ehgjC0r" class="nav-link">Buy 25k block — $49</a></li>
+          <li><a href="https://pro.rehearse.sh/sign-in" class="nav-link">Sign in</a></li>
+          <li><a href="/security" class="nav-link">Security</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Open source</div>
+        <ul class="space-y-2 font-mono text-[13px]">
+          <li><a href="https://github.com/plsft/rehearse" class="nav-link">GitHub</a></li>
+          <li><a href="https://www.npmjs.com/package/@rehearse/cli" class="nav-link">npm</a></li>
+          <li><a href="https://github.com/plsft/rehearse/issues" class="nav-link">Issues</a></li>
+          <li><a href="/changelog" class="nav-link">Changelog</a></li>
+          <li><a href="/llms.txt" class="nav-link">llms.txt</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--rh-muted)] mb-3">Company</div>
+        <ul class="space-y-2 font-mono text-[13px]">
+          <li><a href="/" class="nav-link">Home</a></li>
+          <li><a href="/customers" class="nav-link">Customers</a></li>
+          <li><a href="/about" class="nav-link">About</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 pt-6 border-t border-white/5">
+      <div class="flex items-center gap-2 font-mono text-sm text-[var(--rh-muted)]">
+        <span class="logo-mark logo-mark-sm text-[var(--rh-accent)]"></span>
+        <span class="text-white">rehearse</span> · by <a href="https://github.com/plsft" class="link">plsft</a>
+      </div>
+      <div class="font-mono text-[11px] text-[var(--rh-muted)]">
+        <span class="ok">●</span> v0.6.18 · Apache 2.0
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ============== SCOREBOARD JS ============== -->
+<script>
+(async function loadCompat() {
+  // raw.githubusercontent.com is edge-cached by GitHub for ~5 minutes;
+  // bust the cache with a timestamp so the page always shows the
+  // newest result the moment the workflow's commit step pushes it.
+  const RAW = 'https://raw.githubusercontent.com/plsft/rehearse/main/bench/compat/results.json?_=' + Date.now();
+  const $ = (id) => document.getElementById(id);
+  function fmtMs(ms) {
+    if (ms < 1000) return ms.toFixed(0) + 'ms';
+    return (ms / 1000).toFixed(2) + 's';
+  }
+  function fmtAgo(iso) {
+    const t = Date.parse(iso);
+    if (isNaN(t)) return iso;
+    const sec = (Date.now() - t) / 1000;
+    if (sec < 60) return Math.floor(sec) + 's ago';
+    if (sec < 3600) return Math.floor(sec / 60) + 'm ago';
+    if (sec < 86400) return Math.floor(sec / 3600) + 'h ago';
+    return Math.floor(sec / 86400) + 'd ago';
+  }
+  function escape(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  try {
+    const res = await fetch(RAW, { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+
+    $('score-passed').textContent = data.passed;
+    $('score-passed').className = data.passed === data.total ? 'ok' : 'err';
+    $('score-total').textContent = data.total;
+    const ratePct = data.total > 0 ? (data.score * 100).toFixed(1) + '%' : '—';
+    $('score-rate').textContent = ratePct;
+    $('score-rate').className = 'text-2xl font-semibold ' + (data.passed === data.total ? 'accent-text' : 'err');
+    $('score-cli').textContent = data.cli || '—';
+    $('score-when').textContent = data.ran_at ? fmtAgo(data.ran_at) : '—';
+    $('score-when').title = data.ran_at || '';
+
+    const tbody = $('board-rows');
+    tbody.innerHTML = '';
+    for (const r of data.results || []) {
+      const tr = document.createElement('tr');
+      const mark = r.pass ? '<span class="ok">✓ PASS</span>' : '<span class="err">✗ FAIL</span>';
+      tr.innerHTML =
+        '<td class="py-2.5 px-4 text-white/90">' + escape(r.name) + '</td>' +
+        '<td class="py-2.5 px-4 text-[var(--rh-muted)]">' + escape(r.expected) + '</td>' +
+        '<td class="py-2.5 px-4">' + mark + '</td>' +
+        '<td class="py-2.5 px-4 text-right text-[var(--rh-muted)]">' + fmtMs(r.durationMs) + '</td>' +
+        '<td class="py-2.5 px-4 text-[var(--rh-muted)] text-[12px]">' + escape(r.reason) + '</td>';
+      tbody.appendChild(tr);
+    }
+
+    $('board-loading').classList.add('hidden');
+    $('board-content').classList.remove('hidden');
+  } catch (err) {
+    $('board-loading').classList.add('hidden');
+    $('board-error').classList.remove('hidden');
+    console.error('compat: failed to load results.json', err);
+  }
+})();
+</script>
+
+</body>
+</html>

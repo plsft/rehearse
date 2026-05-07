@@ -34,7 +34,13 @@ export const compat = pipeline('Compat scoreboard', {
       },
     }),
   ],
-  permissions: { contents: 'read' },
+  // contents: write so we can commit the latest results.json back to main
+  // after each scheduled / dispatched run. The /compat page on rehearse.sh
+  // reads it directly via raw.githubusercontent.com — public, no auth,
+  // cacheable by Cloudflare. Without the commit step, scoreboard data
+  // would only be reachable by clicking into a workflow run and manually
+  // downloading the artifact.
+  permissions: { contents: 'write' },
   jobs: [
     job('compat', {
       runner: Runner.github('ubuntu-latest'),
@@ -69,6 +75,35 @@ export const compat = pipeline('Compat scoreboard', {
             path: 'bench/compat/results.json',
           },
         }),
+        // Commit results.json back to main so the /compat page on
+        // rehearse.sh can fetch it from raw.githubusercontent.com without
+        // needing GH auth. Skipped on PR runs (the PR head isn't main),
+        // skipped if the file didn't actually change (avoids commit-loop
+        // noise on nights where every fixture stays at its previous score).
+        // [skip ci] in the message keeps the commit from re-triggering
+        // any of our workflows.
+        step.run(
+          [
+            'set -euo pipefail',
+            'if [ "${{ github.event_name }}" = "pull_request" ]; then',
+            '  echo "skipping commit on PR run"',
+            '  exit 0',
+            'fi',
+            'if git diff --quiet bench/compat/results.json; then',
+            '  echo "results.json unchanged — nothing to commit"',
+            '  exit 0',
+            'fi',
+            'git config user.name "rehearse-bot"',
+            'git config user.email "bot@rehearse.sh"',
+            'git add bench/compat/results.json',
+            'git commit -m "compat: nightly results $(jq -r .ran_at bench/compat/results.json) [skip ci]"',
+            'git push',
+          ].join('\n'),
+          {
+            name: 'Commit results to main (so /compat can read it)',
+            condition: 'always()',
+          },
+        ),
       ],
     }),
   ],

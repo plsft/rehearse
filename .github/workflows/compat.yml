@@ -20,7 +20,7 @@ on:
   schedule:
     - cron: '0 7 * * *'
 permissions:
-  contents: read
+  contents: write
 jobs:
   compat:
     name: compat
@@ -45,3 +45,20 @@ jobs:
         with:
           name: compat-results
           path: bench/compat/results.json
+      - name: Commit results to main (so /compat can read it)
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "skipping commit on PR run"
+            exit 0
+          fi
+          if git diff --quiet bench/compat/results.json; then
+            echo "results.json unchanged — nothing to commit"
+            exit 0
+          fi
+          git config user.name "rehearse-bot"
+          git config user.email "bot@rehearse.sh"
+          git add bench/compat/results.json
+          git commit -m "compat: nightly results $(jq -r .ran_at bench/compat/results.json) [skip ci]"
+          git push

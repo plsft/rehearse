@@ -18,6 +18,7 @@ export default defineConfig({
         security: resolve(__dirname, 'security.html'),
         vs: resolve(__dirname, 'vs.html'),
         bench: resolve(__dirname, 'bench.html'),
+        compat: resolve(__dirname, 'compat.html'),
         customers: resolve(__dirname, 'customers.html'),
         changelog: resolve(__dirname, 'changelog.html'),
         localGithubActions: resolve(__dirname, 'local-github-actions.html'),
