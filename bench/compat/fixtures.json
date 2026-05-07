@@ -1,6 +1,6 @@
 {
-  "$comment": "Compat scoreboard fixtures — popular OSS workflows we test rh against on every PR + nightly. Add new entries when a real-world repro of a compat gap surfaces. Each row pins (repo, ref, workflow path, expected outcome) so a regression is unambiguous: a PASS that turns into a FAIL is a real compat break, not flakiness.",
-  "$schema_version": 1,
+  "$comment": "Compat scoreboard fixtures — popular OSS workflows + synthetic feature-surface tests we run rh against on every PR + nightly. Each row pins (repo|local_workflow|local_repo, ref, workflow path, expected outcome). Add when reality changes; never to soften an assertion.",
+  "$schema_version": 2,
   "fixtures": [
     {
       "name": "typey",
@@ -20,19 +20,57 @@
       "rationale": "v0.6.17 worktree ELOOP regression target. Workflow uses c8 coverage which walks the source tree; pre-fix this hit Windows ELOOP. We don't require pass — workflow has unrelated legacy-Node-version failures — but ZERO `ELOOP` mentions in the log."
     },
     {
-      "name": "workflow-dispatch-input",
-      "local_workflow": "synthetic/workflow-dispatch-input.yml",
-      "inputs": { "sentinel": "COMPAT_OK_42" },
-      "expected": "input-substituted",
-      "rationale": "v0.6.16 workflow_dispatch + --input/-i target. Synthetic workflow asserts via bash `test` that the sentinel string round-trips through ${{ inputs.sentinel }}. Replaces the original tj-actions/changed-files fixture which used a composite-action `with:` and never echoed the input to stdout, making the assertion unreliable."
-    },
-    {
       "name": "is-plain-obj",
       "repo": "https://github.com/sindresorhus/is-plain-obj.git",
       "ref": "main",
       "workflow": ".github/workflows/main.yml",
       "expected": "pass",
-      "rationale": "Tiny package (~10 lines of code), fast install. Smoke test for the host-shim path (actions/checkout, setup-node, no real action download)."
+      "rationale": "Tiny package, fast install. Smoke test for the host-shim path (actions/checkout, setup-node, no real action download)."
+    },
+    {
+      "name": "workflow-dispatch-input",
+      "local_workflow": "synthetic/workflow-dispatch-input.yml",
+      "inputs": { "sentinel": "COMPAT_OK_42" },
+      "expected": "input-substituted",
+      "rationale": "v0.6.16 workflow_dispatch + --input/-i target. Synthetic workflow asserts via bash `test` that the sentinel string round-trips through ${{ inputs.sentinel }}."
+    },
+    {
+      "name": "needs-outputs",
+      "local_workflow": "synthetic/needs-outputs.yml",
+      "expected": "pass",
+      "rationale": "Job-output flow via needs.X.outputs.Y. Pins the v0.6.16 umbrella-job pattern that handles both top-level needs and reusable-workflow callers."
+    },
+    {
+      "name": "matrix-include-exclude",
+      "local_workflow": "synthetic/matrix-include-exclude.yml",
+      "expected": "pass",
+      "rationale": "matrix.include + matrix.exclude semantics. Each cell asserts its own (node, env) pair is allowed; the excluded (16, prod) cell would fail loudly if the planner emits it."
+    },
+    {
+      "name": "cache-hashfiles",
+      "local_workflow": "synthetic/cache-hashfiles.yml",
+      "expected": "pass",
+      "rationale": "actions/cache shim + ${{ hashFiles(...) }} expression. Asserts cache-hit output is well-formed (true/false), not empty/undefined."
+    },
+    {
+      "name": "nested-reusable",
+      "local_repo": "synthetic/nested-reusable",
+      "workflow": ".github/workflows/caller.yml",
+      "expected": "known-fail",
+      "rationale": "KNOWN-FAIL (added 2026-05-07): 3-deep reusable workflow chain (caller → mid → terminal). The terminal job emits a sentinel correctly, but the caller's `needs.via-mid.outputs.sentinel` reads as empty — when the inner reusable is itself further expanded, scheduler.ts::evalUmbrellaOutputs doesn't propagate outputs up the chain. Pins the depth-4 invariant from v0.6.15 + the umbrella synthesis from v0.6.16. To fix: scheduler.ts evalUmbrellaOutputs must follow the inner-key map recursively (or the planner must inline the outputsSpec across nested umbrellas)."
+    },
+    {
+      "name": "composite-of-composite",
+      "local_repo": "synthetic/composite-of-composite",
+      "workflow": ".github/workflows/ci.yml",
+      "expected": "known-fail",
+      "rationale": "KNOWN-FAIL (added 2026-05-07): Local composite action whose runs.steps[0] is itself `uses: ./.github/actions/inner` — i.e. composite calls composite. rh's planner.ts::planSteps expands the OUTER composite into PlannedSteps but doesn't recurse on the inner steps' `uses:`. Result: `⊘ uses: ./.github/actions/inner (no shim, no-op)`. To fix: planSteps should call expandComposite recursively, OR expandComposite should inline nested composites itself."
+    },
+    {
+      "name": "services-postgres",
+      "local_workflow": "synthetic/services-postgres.yml",
+      "expected": "known-fail",
+      "rationale": "KNOWN-FAIL (added 2026-05-07): Container backend with `services: postgres:`. Job picks the container backend correctly but fails in <300ms with no streamed output before the first step. Likely Docker daemon not reachable on the local Windows host (Docker Desktop) AND/OR a real bug in container.ts services networking. The 32× speedup over `act` on this shape is a headline marketing claim — this fixture exists specifically to keep that claim honest. To fix: investigate on a Linux host with Docker known-good (e.g. the GH-hosted ubuntu runner the compat workflow itself uses)."
     }
   ]
 }

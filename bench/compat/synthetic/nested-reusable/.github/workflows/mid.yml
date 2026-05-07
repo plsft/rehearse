@@ -1,0 +1,12 @@
+# Middle layer of the nested-reusable chain. Calls terminal.yml; exposes
+# its output upward to caller.yml.
+on:
+  workflow_call:
+    outputs:
+      sentinel:
+        description: forwarded from terminal.yml
+        value: ${{ jobs.via-terminal.outputs.sentinel }}
+
+jobs:
+  via-terminal:
+    uses: ./.github/workflows/terminal.yml

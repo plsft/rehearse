@@ -1,8 +1,8 @@
 {
   "cli": "@rehearse/cli@latest",
-  "ran_at": "2026-05-07T12:51:27.220Z",
-  "passed": 4,
-  "total": 4,
+  "ran_at": "2026-05-07T14:10:43.386Z",
+  "passed": 10,
+  "total": 10,
   "score": 1,
   "results": [
     {
@@ -10,28 +10,70 @@
       "expected": "pass",
       "pass": true,
       "reason": "exit=0",
-      "durationMs": 8888
+      "durationMs": 49033
     },
     {
       "name": "kleur",
       "expected": "no-eloop",
       "pass": true,
       "reason": "no ELOOP in log (worktree fix held)",
-      "durationMs": 5656
-    },
-    {
-      "name": "workflow-dispatch-input",
-      "expected": "input-substituted",
-      "pass": true,
-      "reason": "input substituted (sentinel-test step exited 0)",
-      "durationMs": 718
+      "durationMs": 11826
     },
     {
       "name": "is-plain-obj",
       "expected": "pass",
       "pass": true,
       "reason": "exit=0",
-      "durationMs": 30583
+      "durationMs": 57613
+    },
+    {
+      "name": "workflow-dispatch-input",
+      "expected": "input-substituted",
+      "pass": true,
+      "reason": "input substituted (sentinel-test step exited 0)",
+      "durationMs": 3007
+    },
+    {
+      "name": "needs-outputs",
+      "expected": "pass",
+      "pass": true,
+      "reason": "exit=0",
+      "durationMs": 2534
+    },
+    {
+      "name": "matrix-include-exclude",
+      "expected": "pass",
+      "pass": true,
+      "reason": "exit=0",
+      "durationMs": 4427
+    },
+    {
+      "name": "cache-hashfiles",
+      "expected": "pass",
+      "pass": true,
+      "reason": "exit=0",
+      "durationMs": 2565
+    },
+    {
+      "name": "nested-reusable",
+      "expected": "known-fail",
+      "pass": true,
+      "reason": "known-fail (exit=1; tracked compat gap, see fixture rationale)",
+      "durationMs": 2690
+    },
+    {
+      "name": "composite-of-composite",
+      "expected": "known-fail",
+      "pass": true,
+      "reason": "known-fail (exit=1; tracked compat gap, see fixture rationale)",
+      "durationMs": 2901
+    },
+    {
+      "name": "services-postgres",
+      "expected": "known-fail",
+      "pass": true,
+      "reason": "known-fail (exit=1; tracked compat gap, see fixture rationale)",
+      "durationMs": 2624
     }
   ]
 }

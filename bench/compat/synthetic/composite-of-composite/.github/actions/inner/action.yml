@@ -1,0 +1,19 @@
+# Inner composite — actually runs a step. Echoes its `payload` input
+# verbatim into its `echoed` output. The roundtrip workflow asserts
+# that the value passed into outer arrives in inner intact.
+name: inner
+inputs:
+  payload:
+    description: the value to echo back
+    required: true
+outputs:
+  echoed:
+    description: the input, verbatim
+    value: ${{ steps.echo.outputs.payload }}
+runs:
+  using: composite
+  steps:
+    - id: echo
+      shell: bash
+      run: |
+        echo "payload=${{ inputs.payload }}" >> "$GITHUB_OUTPUT"

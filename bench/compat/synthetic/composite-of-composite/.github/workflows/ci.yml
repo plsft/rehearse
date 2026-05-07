@@ -1,0 +1,35 @@
+# Synthetic compat fixture — verifies a local composite action that
+# itself invokes another local composite action expands correctly.
+#
+# Chain: ci.yml step `uses: ./.github/actions/outer` →
+#        outer/action.yml step `uses: ./.github/actions/inner` →
+#        inner/action.yml runs the actual command.
+#
+# composite.ts's `expandComposite` is recursive — each composite step
+# replaces the parent step with its inner steps. Two regressions this
+# guards against:
+#   1. Recursive expansion stops at depth 1 (only the outer composite
+#      gets inlined; the inner stays as `uses:` and never runs).
+#   2. ${{ inputs.X }} substitution doesn't carry across the boundary
+#      (outer's `with:` doesn't reach inner's `with:`).
+name: composite-of-composite
+on:
+  workflow_dispatch: {}
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Invoke outer composite
+        id: outer
+        uses: ./.github/actions/outer
+        with:
+          message: COMPAT_COMPOSITE_OK_42
+      - name: Verify outer.outputs.echoed matches input
+        run: |
+          GOT='${{ steps.outer.outputs.echoed }}'
+          if [ "$GOT" = "COMPAT_COMPOSITE_OK_42" ]; then
+            echo "PASS: composite-of-composite preserved input through 2 layers"
+          else
+            echo "FAIL: expected COMPAT_COMPOSITE_OK_42, got '$GOT'" >&2
+            exit 1
+          fi

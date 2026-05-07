@@ -1,0 +1,36 @@
+# Synthetic compat fixture — verifies job outputs flow through `needs`.
+#
+# Job A declares an output via $GITHUB_OUTPUT; Job B reads it via
+# ${{ needs.a.outputs.value }} and asserts equality. If the output flow
+# breaks (planner doesn't propagate, scheduler doesn't aggregate, expression
+# evaluator misses the namespace), the bash `test` fails the workflow.
+#
+# This is a regression guard for the v0.6.16 work that introduced umbrella
+# jobs for reusable workflows — the same code path also handles top-level
+# `needs.X.outputs.Y` substitution.
+name: needs-outputs flow
+on:
+  workflow_dispatch: {}
+jobs:
+  a:
+    runs-on: ubuntu-latest
+    outputs:
+      value: ${{ steps.emit.outputs.value }}
+    steps:
+      - id: emit
+        run: |
+          echo "value=COMPAT_NEEDS_OK_42" >> "$GITHUB_OUTPUT"
+
+  b:
+    runs-on: ubuntu-latest
+    needs: a
+    steps:
+      - name: Assert needs.a.outputs.value matches expected
+        run: |
+          GOT='${{ needs.a.outputs.value }}'
+          if [ "$GOT" = "COMPAT_NEEDS_OK_42" ]; then
+            echo "PASS: needs.a.outputs.value flowed through"
+          else
+            echo "FAIL: expected COMPAT_NEEDS_OK_42, got '$GOT'" >&2
+            exit 1
+          fi

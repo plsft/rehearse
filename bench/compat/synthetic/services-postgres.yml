@@ -1,0 +1,58 @@
+# Synthetic compat fixture — verifies the container backend's
+# `services:` networking against a real postgres container.
+#
+# rh's container backend picks itself when a job declares services. It
+# starts a network, runs each service container on it with --alias <name>,
+# runs the job in its own container on the same network, then joins them
+# so `psql -h postgres` resolves correctly.
+#
+# This is the same pattern that's been in bench/RESULTS.md for a year:
+# we beat `act` 32× on this shape because act's services networking
+# never worked. This fixture pins that we don't regress.
+#
+# Prereq for the compat scoreboard env: Docker daemon running on the
+# host (GH-hosted ubuntu has it).
+name: services-postgres
+on:
+  workflow_dispatch: {}
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: compat
+          POSTGRES_DB: compat
+          POSTGRES_USER: compat
+        # Health check via pg_isready — Docker waits for healthy before
+        # starting our job container. Without this, our first psql tries
+        # to connect before postgres has booted.
+        options: >-
+          --health-cmd "pg_isready -U compat -d compat"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 12
+        ports:
+          - '5432:5432'
+    steps:
+      - name: Verify postgres reachable + run a real query
+        env:
+          PGPASSWORD: compat
+        run: |
+          # Make sure psql is on PATH (most images ship it; install if not).
+          which psql >/dev/null 2>&1 || (
+            apt-get update -qq && apt-get install -y -qq postgresql-client
+          )
+          # Connect to the service container by alias — the container
+          # backend wires postgres at the network alias, NOT localhost.
+          # The fallback to localhost is for hosted-runner GH Actions
+          # behavior where the service ports are forwarded.
+          for HOST in postgres localhost 127.0.0.1; do
+            if psql -h "$HOST" -U compat -d compat -tAc "SELECT 'compat-postgres-ok'" 2>/dev/null | grep -q compat-postgres-ok; then
+              echo "PASS: postgres reachable at $HOST + query returned sentinel"
+              exit 0
+            fi
+          done
+          echo "FAIL: could not reach postgres at any of: postgres / localhost / 127.0.0.1" >&2
+          exit 1

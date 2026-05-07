@@ -1,0 +1,18 @@
+# Outer composite — accepts `message`, forwards to inner, propagates
+# inner's `echoed` output as its own.
+name: outer
+inputs:
+  message:
+    description: passed through to inner
+    required: true
+outputs:
+  echoed:
+    description: round-trip from inner
+    value: ${{ steps.inner.outputs.echoed }}
+runs:
+  using: composite
+  steps:
+    - id: inner
+      uses: ./.github/actions/inner
+      with:
+        payload: ${{ inputs.message }}

@@ -1,0 +1,19 @@
+# Terminal layer of the nested-reusable chain. The actual sentinel
+# emitter — outputs.sentinel propagates up to mid.yml, then to
+# caller.yml's verify job.
+on:
+  workflow_call:
+    outputs:
+      sentinel:
+        description: hard-coded sentinel for round-trip verification
+        value: ${{ jobs.emit.outputs.sentinel }}
+
+jobs:
+  emit:
+    runs-on: ubuntu-latest
+    outputs:
+      sentinel: ${{ steps.s.outputs.sentinel }}
+    steps:
+      - id: s
+        run: |
+          echo "sentinel=COMPAT_NESTED_OK_42" >> "$GITHUB_OUTPUT"

@@ -16,7 +16,7 @@
  * running real workflows can.
  */
 import { execSync, spawnSync } from 'node:child_process';
-import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
+import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -54,14 +54,26 @@ for (const fx of fixtures) {
   let reason = '';
 
   try {
-    // 1. Materialize the workflow source. Two modes:
-    //    - `repo`: clone an OSS project (real-world compat target)
-    //    - `local_workflow`: copy a synthetic workflow we control into
-    //      a fresh git repo. Use this when the assertion needs the
-    //      workflow shape pinned (e.g. testing --input substitution
-    //      requires the workflow to actually echo the input).
+    // 1. Materialize the workflow source. Three modes:
+    //    - `repo`: clone an OSS project (real-world compat target).
+    //    - `local_workflow`: copy a single synthetic workflow file into
+    //      a fresh git repo at .github/workflows/compat-fixture.yml.
+    //    - `local_repo`: copy an entire vendored directory into a fresh
+    //      git repo (preserves multi-file shape — composite actions,
+    //      reusable workflows, fixture data files). Workflow path comes
+    //      from fx.workflow inside the repo.
     if (!existsSync(dir)) {
-      if (fx.local_workflow) {
+      if (fx.local_repo) {
+        const src = resolve(here, fx.local_repo);
+        if (!existsSync(src)) {
+          throw new Error(`local_repo not found: ${src}`);
+        }
+        mkdirSync(dir, { recursive: true });
+        cpSync(src, dir, { recursive: true });
+        execSync(`git init -q "${dir}"`);
+        execSync(`git -C "${dir}" config user.email t@compat.local && git -C "${dir}" config user.name compat`);
+        execSync(`git -C "${dir}" add -A && git -C "${dir}" commit -q -m fixture`);
+      } else if (fx.local_workflow) {
         const src = resolve(here, fx.local_workflow);
         if (!existsSync(src)) {
           throw new Error(`local_workflow not found: ${src}`);
@@ -86,7 +98,8 @@ for (const fx of fixtures) {
       }
     }
 
-    // 2. Build the rh invocation.
+    // 2. Build the rh invocation. local_workflow gets a fixed path;
+    // local_repo + repo use the path declared on the fixture.
     const workflowPath = fx.local_workflow
       ? '.github/workflows/compat-fixture.yml'
       : fx.workflow;
@@ -131,6 +144,24 @@ for (const fx of fixtures) {
         reason = pass
           ? 'input substituted (sentinel-test step exited 0)'
           : `exit=${r.status} (sentinel mismatch — input parsing/substitution broken)`;
+        break;
+      case 'known-fail':
+        // Fixture surfaces a real compat gap we know about + have a
+        // ticket to fix. Counts as PASS for the scoreboard score
+        // (because regressing a known-fail is not the same as
+        // introducing a new one), but tagged distinctly so the UI can
+        // visually separate it. If the fixture suddenly passes
+        // (exit=0), the scoreboard SCREAMS — that means somebody
+        // fixed the underlying bug and the fixture should flip to
+        // `expected:'pass'`. Inverse: `expected:'pass'` regressing to
+        // fail is the regular red signal.
+        if (r.status === 0) {
+          pass = false;
+          reason = 'known-fail unexpectedly passed — bug must be fixed; flip expected to "pass"';
+        } else {
+          pass = true;
+          reason = `known-fail (exit=${r.status}; tracked compat gap, see fixture rationale)`;
+        }
         break;
       default:
         pass = false;

@@ -1,0 +1,35 @@
+# Synthetic compat fixture — verifies recursive reusable-workflow
+# expansion + outputs flow through multiple levels.
+#
+# Chain: caller.yml (this file) → mid.yml → terminal.yml
+#
+# terminal.yml's job emits a sentinel output. mid.yml exposes it as its
+# own workflow_call output. caller.yml's downstream verify job reads
+# `needs.via-mid.outputs.sentinel` and asserts equality.
+#
+# This pins the v0.6.16 work that introduced the "umbrella" PlannedJob
+# pattern for reusable workflow callers. Two regressions this guards
+# against:
+#   1. Output spec on the inner reusable doesn't propagate up the chain.
+#   2. The umbrella's needs[] aren't computed correctly, so the verify
+#      job runs before the inner chain finishes.
+name: nested-reusable caller
+on:
+  workflow_dispatch: {}
+jobs:
+  via-mid:
+    uses: ./.github/workflows/mid.yml
+
+  verify:
+    runs-on: ubuntu-latest
+    needs: via-mid
+    steps:
+      - name: Assert output flowed through both reusable layers
+        run: |
+          GOT='${{ needs.via-mid.outputs.sentinel }}'
+          if [ "$GOT" = "COMPAT_NESTED_OK_42" ]; then
+            echo "PASS: sentinel flowed through caller → mid → terminal"
+          else
+            echo "FAIL: expected COMPAT_NESTED_OK_42, got '$GOT'" >&2
+            exit 1
+          fi
