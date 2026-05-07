@@ -93,6 +93,35 @@ describe('host backend — concurrent worktree creation', () => {
     await Promise.all(sessions.map((s) => backend.teardown(s)));
   });
 
+  it('does NOT symlink .runner into the worktree (v0.6.17 ELOOP regression guard)', async () => {
+    // Pre-v0.6.17, createWorktree symlinked `.runner` from the worktree
+    // back into the parent repo. Since the worktree itself lives at
+    // <repo>/.runner/worktrees/<id>/, the symlink created an infinite
+    // directory loop — any tool that walks the tree (c8, eslint, vitest,
+    // ripgrep, find) hit Windows ELOOP after ~70 levels. Reproduced by
+    // kleur's `c8 npm test` in Round 3 OSS validation. Fixed by removing
+    // .runner from DEFAULT_SYMLINK; this test enforces it.
+    const { existsSync, lstatSync, mkdirSync, writeFileSync } = await import('node:fs');
+    const repo = mkGitRepo();
+    // Pre-create .runner in the repo so the OLD code would have linked it.
+    mkdirSync(resolve(repo, '.runner'), { recursive: true });
+    writeFileSync(resolve(repo, '.runner', 'sentinel.txt'), 'parent');
+    const backend = new HostBackend();
+    const session = await backend.prepare({
+      jobId: 'matrix-cell:foo',
+      hostCwd: repo,
+      job: makeJob('matrix-cell:foo', { x: '1' }),
+    });
+    const wtRunner = resolve(session.workdir, '.runner');
+    // Either: doesn't exist (good — fresh worktree), OR exists but is NOT
+    // a symlink (good — created by some downstream code). It MUST NOT be a
+    // symlink to the parent's .runner, which would re-introduce the loop.
+    if (existsSync(wtRunner)) {
+      expect(lstatSync(wtRunner).isSymbolicLink()).toBe(false);
+    }
+    await backend.teardown(session);
+  });
+
   it('throws (no silent fallback) when worktree creation fails', async () => {
     // Point at a non-git directory — createWorktree() will throw inside
     // git, and the new behavior should surface it to the caller, not

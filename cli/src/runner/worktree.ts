@@ -40,14 +40,26 @@ const DEFAULT_SYMLINK = [
   // Build-artifact dirs that are write-rare and read-heavy across cells.
   // `.turbo` uses content-addressed remote-cache semantics — safe to share.
   '.turbo',
-  // Shared artifact + cache root. Per-cell vs shared layout INSIDE this
-  // dir is enforced by host.ts (per-cell npm/yarn/pip, shared pnpm/bun/cargo).
-  '.runner',
+  // v0.6.17: `.runner` is NOT in this list anymore. Symlinking it from the
+  // worktree back to the repo created an infinite directory loop — the
+  // worktree itself lives at `<repo>/.runner/worktrees/<id>/`, so descending
+  // through `<worktree>/.runner -> <repo>/.runner -> .../worktrees/<id>/`
+  // landed back in the same worktree. Any tool that walks the source tree
+  // (c8, eslint, vitest, ripgrep, find) hit Windows ELOOP after ~70 levels.
+  // Repro: kleur's `c8 npm test` in Round 3 OSS validation.
+  //
+  // Practical impact: per-cell caches (npm/yarn/pip) are unaffected — they
+  // use absolute env-var paths set by host.ts::setupCellCaches, not the
+  // worktree-relative `.runner/`. Content-addressed caches (pnpm/bun/cargo)
+  // also live in the user's global cache, not `<repoRoot>/.runner/`.
+  // `actions/upload-artifact` writes per-worktree now; consolidate at
+  // `<repoRoot>/.runner/artifacts/` post-run if needed.
+  //
   // Note: `node_modules`, `.pnpm-store`, `.bun-install` were here historically
   // to skip reinstall, but they raced on parallel `npm install` writes.
   // Each cell now installs into its own worktree's node_modules; the shared
-  // content-addressed package-manager caches under `.runner/cache/_shared/`
-  // give the same warm-second-run benefit without the race.
+  // content-addressed package-manager caches give the same warm-second-run
+  // benefit without the race.
 ];
 
 export function isGitRepo(dir: string): boolean {
