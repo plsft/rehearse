@@ -1,79 +1,79 @@
 {
   "cli": "@rehearse/cli@latest",
-  "ran_at": "2026-05-09T07:41:19.742Z",
-  "passed": 9,
+  "ran_at": "2026-05-09T12:37:21.489Z",
+  "passed": 10,
   "total": 10,
-  "score": 0.9,
+  "score": 1,
   "results": [
     {
       "name": "typey",
       "expected": "pass",
       "pass": true,
       "reason": "exit=0",
-      "durationMs": 9677
+      "durationMs": 11480
     },
     {
       "name": "kleur",
       "expected": "no-eloop",
       "pass": true,
       "reason": "no ELOOP in log (worktree fix held)",
-      "durationMs": 4141
+      "durationMs": 5439
     },
     {
       "name": "is-plain-obj",
       "expected": "pass",
       "pass": true,
       "reason": "exit=0",
-      "durationMs": 29129
+      "durationMs": 30875
     },
     {
       "name": "workflow-dispatch-input",
       "expected": "input-substituted",
       "pass": true,
       "reason": "input substituted (sentinel-test step exited 0)",
-      "durationMs": 676
+      "durationMs": 744
     },
     {
       "name": "needs-outputs",
       "expected": "pass",
       "pass": true,
       "reason": "exit=0",
-      "durationMs": 692
+      "durationMs": 722
     },
     {
       "name": "matrix-include-exclude",
       "expected": "pass",
       "pass": true,
       "reason": "exit=0",
-      "durationMs": 822
+      "durationMs": 926
     },
     {
       "name": "cache-hashfiles",
       "expected": "pass",
       "pass": true,
       "reason": "exit=0",
-      "durationMs": 690
+      "durationMs": 780
     },
     {
       "name": "nested-reusable",
       "expected": "known-fail",
       "pass": true,
       "reason": "known-fail (exit=1; tracked compat gap, see fixture rationale)",
-      "durationMs": 697
+      "durationMs": 753
     },
     {
       "name": "composite-of-composite",
       "expected": "known-fail",
       "pass": true,
       "reason": "known-fail (exit=1; tracked compat gap, see fixture rationale)",
-      "durationMs": 690
+      "durationMs": 745
     },
     {
       "name": "services-postgres",
-      "expected": "known-fail",
-      "pass": false,
-      "reason": "known-fail unexpectedly passed — bug must be fixed; flip expected to \"pass\"",
-      "durationMs": 18101
+      "expected": "pass",
+      "pass": true,
+      "reason": "exit=0",
+      "durationMs": 18683
     }
   ]
 }
