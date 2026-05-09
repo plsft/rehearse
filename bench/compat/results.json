@@ -1,6 +1,6 @@
 {
   "cli": "@rehearse/cli@latest",
-  "ran_at": "2026-05-08T07:40:41.795Z",
+  "ran_at": "2026-05-09T07:41:19.742Z",
   "passed": 9,
   "total": 10,
   "score": 0.9,
@@ -10,70 +10,70 @@
       "expected": "pass",
       "pass": true,
       "reason": "exit=0",
-      "durationMs": 9223
+      "durationMs": 9677
     },
     {
       "name": "kleur",
       "expected": "no-eloop",
       "pass": true,
       "reason": "no ELOOP in log (worktree fix held)",
-      "durationMs": 5806
+      "durationMs": 4141
     },
     {
       "name": "is-plain-obj",
       "expected": "pass",
       "pass": true,
       "reason": "exit=0",
-      "durationMs": 32379
+      "durationMs": 29129
     },
     {
       "name": "workflow-dispatch-input",
       "expected": "input-substituted",
       "pass": true,
       "reason": "input substituted (sentinel-test step exited 0)",
-      "durationMs": 743
+      "durationMs": 676
     },
     {
       "name": "needs-outputs",
       "expected": "pass",
       "pass": true,
       "reason": "exit=0",
-      "durationMs": 736
+      "durationMs": 692
     },
     {
       "name": "matrix-include-exclude",
       "expected": "pass",
       "pass": true,
       "reason": "exit=0",
-      "durationMs": 872
+      "durationMs": 822
     },
     {
       "name": "cache-hashfiles",
       "expected": "pass",
       "pass": true,
       "reason": "exit=0",
-      "durationMs": 757
+      "durationMs": 690
     },
     {
       "name": "nested-reusable",
       "expected": "known-fail",
       "pass": true,
       "reason": "known-fail (exit=1; tracked compat gap, see fixture rationale)",
-      "durationMs": 754
+      "durationMs": 697
     },
     {
       "name": "composite-of-composite",
       "expected": "known-fail",
       "pass": true,
       "reason": "known-fail (exit=1; tracked compat gap, see fixture rationale)",
-      "durationMs": 747
+      "durationMs": 690
     },
     {
       "name": "services-postgres",
       "expected": "known-fail",
       "pass": false,
       "reason": "known-fail unexpectedly passed — bug must be fixed; flip expected to \"pass\"",
-      "durationMs": 20292
+      "durationMs": 18101
     }
   ]
 }
