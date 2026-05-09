@@ -69,8 +69,8 @@
     {
       "name": "services-postgres",
       "local_workflow": "synthetic/services-postgres.yml",
-      "expected": "known-fail",
-      "rationale": "KNOWN-FAIL (added 2026-05-07): Container backend with `services: postgres:`. Job picks the container backend correctly but fails in <300ms with no streamed output before the first step. Likely Docker daemon not reachable on the local Windows host (Docker Desktop) AND/OR a real bug in container.ts services networking. The 32× speedup over `act` on this shape is a headline marketing claim — this fixture exists specifically to keep that claim honest. To fix: investigate on a Linux host with Docker known-good (e.g. the GH-hosted ubuntu runner the compat workflow itself uses)."
+      "expected": "pass",
+      "rationale": "Container backend with `services: postgres:`. Wires the service container on a Docker network with --alias postgres, runs the job container on the same network, and the step's `psql -h postgres` returns the sentinel. Originally registered known-fail (2026-05-07) because the local Windows host (Docker Desktop) couldn't reach the daemon — the GH-hosted ubuntu runner the compat workflow uses confirmed it works on a real Linux + Docker host (2026-05-09). Pins the headline 32× speedup-vs-act claim in marketing copy."
     }
   ]
 }
