@@ -1,6 +1,6 @@
 {
   "cli": "@rehearse/cli@latest",
-  "ran_at": "2026-06-20T08:14:35.500Z",
+  "ran_at": "2026-06-21T08:35:42.923Z",
   "passed": 10,
   "total": 10,
   "score": 1,
@@ -10,21 +10,21 @@
       "expected": "pass",
       "pass": true,
       "reason": "exit=0",
-      "durationMs": 10022
+      "durationMs": 9627
     },
     {
       "name": "kleur",
       "expected": "no-eloop",
       "pass": true,
       "reason": "no ELOOP in log (worktree fix held)",
-      "durationMs": 5789
+      "durationMs": 4420
     },
     {
       "name": "is-plain-obj",
       "expected": "pass",
       "pass": true,
       "reason": "exit=0",
-      "durationMs": 30438
+      "durationMs": 31156
     },
     {
       "name": "workflow-dispatch-input",
@@ -38,42 +38,42 @@
       "expected": "pass",
       "pass": true,
       "reason": "exit=0",
-      "durationMs": 760
+      "durationMs": 699
     },
     {
       "name": "matrix-include-exclude",
       "expected": "pass",
       "pass": true,
       "reason": "exit=0",
-      "durationMs": 826
+      "durationMs": 830
     },
     {
       "name": "cache-hashfiles",
       "expected": "pass",
       "pass": true,
       "reason": "exit=0",
-      "durationMs": 705
+      "durationMs": 706
     },
     {
       "name": "nested-reusable",
       "expected": "known-fail",
       "pass": true,
       "reason": "known-fail (exit=1; tracked compat gap, see fixture rationale)",
-      "durationMs": 703
+      "durationMs": 710
     },
     {
       "name": "composite-of-composite",
       "expected": "known-fail",
       "pass": true,
       "reason": "known-fail (exit=1; tracked compat gap, see fixture rationale)",
-      "durationMs": 713
+      "durationMs": 722
     },
     {
       "name": "services-postgres",
       "expected": "pass",
       "pass": true,
       "reason": "exit=0",
-      "durationMs": 20387
+      "durationMs": 20025
     }
   ]
 }
