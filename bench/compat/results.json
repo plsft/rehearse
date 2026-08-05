@@ -1,6 +1,6 @@
 {
   "cli": "@rehearse/cli@latest",
-  "ran_at": "2026-08-04T09:42:47.979Z",
+  "ran_at": "2026-08-05T09:41:18.234Z",
   "passed": 10,
   "total": 10,
   "score": 1,
@@ -10,70 +10,70 @@
       "expected": "pass",
       "pass": true,
       "reason": "exit=0",
-      "durationMs": 10815
+      "durationMs": 10079
     },
     {
       "name": "kleur",
       "expected": "no-eloop",
       "pass": true,
       "reason": "no ELOOP in log (worktree fix held)",
-      "durationMs": 5592
+      "durationMs": 4944
     },
     {
       "name": "is-plain-obj",
       "expected": "pass",
       "pass": true,
       "reason": "exit=0",
-      "durationMs": 30827
+      "durationMs": 29062
     },
     {
       "name": "workflow-dispatch-input",
       "expected": "input-substituted",
       "pass": true,
       "reason": "input substituted (sentinel-test step exited 0)",
-      "durationMs": 651
+      "durationMs": 618
     },
     {
       "name": "needs-outputs",
       "expected": "pass",
       "pass": true,
       "reason": "exit=0",
-      "durationMs": 642
+      "durationMs": 622
     },
     {
       "name": "matrix-include-exclude",
       "expected": "pass",
       "pass": true,
       "reason": "exit=0",
-      "durationMs": 797
+      "durationMs": 741
     },
     {
       "name": "cache-hashfiles",
       "expected": "pass",
       "pass": true,
       "reason": "exit=0",
-      "durationMs": 667
+      "durationMs": 631
     },
     {
       "name": "nested-reusable",
       "expected": "known-fail",
       "pass": true,
       "reason": "known-fail (exit=1; tracked compat gap, see fixture rationale)",
-      "durationMs": 646
+      "durationMs": 631
     },
     {
       "name": "composite-of-composite",
       "expected": "known-fail",
       "pass": true,
       "reason": "known-fail (exit=1; tracked compat gap, see fixture rationale)",
-      "durationMs": 654
+      "durationMs": 607
     },
     {
       "name": "services-postgres",
       "expected": "pass",
       "pass": true,
       "reason": "exit=0",
-      "durationMs": 22394
+      "durationMs": 17991
     }
   ]
 }
