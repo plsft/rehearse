@@ -24,8 +24,8 @@
     "@rehearse/ci": "workspace:*",
     "commander": "^12.1.0",
     "picocolors": "^1.1.1",
-    "tsx": "^4.19.2",
-    "yaml": "^2.6.1"
+    "tsx": "^4.23.13",
+    "yaml": "^2.9.1"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
