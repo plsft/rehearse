@@ -1,0 +1,30 @@
+# Dependabot — automatic dependency update PRs.
+# Docs: https://docs.github.com/code-security/dependabot/working-with-dependabot/dependabot-options-reference
+version: 2
+updates:
+  # pnpm workspace (root pnpm-lock.yaml covers ts-ci, cli, site).
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: deps
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+
+  # Action versions in .github/workflows/. Note: most workflows are generated
+  # by `rh ci compile` from .rehearse/pipelines/ — port any bump there too, or
+  # the next compile will revert it.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns: ["*"]
