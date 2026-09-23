@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - uses: charmbracelet/vhs-action@v2
         # The action installs vhs + ttyd + ffmpeg + JetBrains Mono on
@@ -45,14 +45,14 @@ jobs:
           vhs "${{ inputs.tape }}"
 
       - name: Upload mp4
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: demo-mp4
           path: demos/*.mp4
           retention-days: 30
 
       - name: Upload gif (if produced)
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         if: hashFiles('demos/*.gif') != ''
         with:
           name: demo-gif
