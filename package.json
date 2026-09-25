@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@rehearse/ci": "workspace:*",
-    "@types/node": "^22.10.0",
+    "@types/node": "^26.6.1",
     "prettier": "^3.9.7",
     "tsx": "^4.23.13",
     "turbo": "^2.10.13",
