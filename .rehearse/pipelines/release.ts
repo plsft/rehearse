@@ -68,9 +68,9 @@ export const release = pipeline('Release', {
     job('publish', {
       runner: Runner.github('ubuntu-latest'),
       steps: [
-        step.checkout({ fetchDepth: 0 }),
-        step.action('pnpm/action-setup@v4', { with: { version: '9.15.0' }, name: 'Setup pnpm' }),
-        step.action('actions/setup-node@v4', {
+        step.action('actions/checkout@v7', { name: 'Checkout', with: { 'fetch-depth': 0 } }),
+        step.action('pnpm/action-setup@v6', { with: { version: '9.15.0' }, name: 'Setup pnpm' }),
+        step.action('actions/setup-node@v7', {
           with: {
             'node-version': '22',
             cache: 'pnpm',

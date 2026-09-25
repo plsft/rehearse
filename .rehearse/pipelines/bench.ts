@@ -18,9 +18,9 @@
 import { Runner, expr, job, pipeline, step, triggers } from '@rehearse/ci';
 
 const setup = [
-  step.checkout({ fetchDepth: 0 }),
-  step.action('pnpm/action-setup@v4', { with: { version: '9.15.0' }, name: 'Setup pnpm' }),
-  step.action('actions/setup-node@v4', {
+  step.action('actions/checkout@v7', { name: 'Checkout', with: { 'fetch-depth': 0 } }),
+  step.action('pnpm/action-setup@v6', { with: { version: '9.15.0' }, name: 'Setup pnpm' }),
+  step.action('actions/setup-node@v7', {
     with: { 'node-version': '22', cache: 'pnpm' },
     name: 'Setup Node 22',
   }),
@@ -69,7 +69,7 @@ const bench = (target: string, extraCondition?: string) =>
     },
   );
 
-const upload = step.action('actions/upload-artifact@v4', {
+const upload = step.action('actions/upload-artifact@v7', {
   with: {
     name: `bench-results-${expr('runner.os')}`,
     path: 'bench-*.txt',

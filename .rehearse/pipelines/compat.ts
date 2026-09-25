@@ -46,8 +46,8 @@ export const compat = pipeline('Compat scoreboard', {
       runner: Runner.github('ubuntu-latest'),
       timeoutMinutes: 20,
       steps: [
-        step.checkout(),
-        step.action('actions/setup-node@v4', {
+        step.action('actions/checkout@v7', { name: 'Checkout' }),
+        step.action('actions/setup-node@v7', {
           with: { 'node-version': '22' },
           name: 'Setup Node 22',
         }),
@@ -59,7 +59,7 @@ export const compat = pipeline('Compat scoreboard', {
         // loudly when missing — which means the scoreboard runner
         // actually needs them. Add new tools here when fixtures need
         // them, not by softening the assertion.
-        step.action('oven-sh/setup-bun@v1', {
+        step.action('oven-sh/setup-bun@v2', {
           with: { 'bun-version': 'latest' },
           name: 'Install bun (host tool for typey fixture)',
         }),
@@ -67,7 +67,7 @@ export const compat = pipeline('Compat scoreboard', {
           'node bench/compat/run.mjs --cli "${{ github.event.inputs.cli || \'@rehearse/cli@latest\' }}"',
           { name: 'Run compat scoreboard' },
         ),
-        step.action('actions/upload-artifact@v4', {
+        step.action('actions/upload-artifact@v7', {
           name: 'Upload results',
           condition: 'always()',
           with: {
