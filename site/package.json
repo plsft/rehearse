@@ -17,7 +17,7 @@
     "@types/alpinejs": "^3.13.10",
     "tailwindcss": "^4.3.3",
     "typescript": "^5.8.0",
-    "vite": "^6.0.0",
+    "vite": "^8.3.0",
     "wrangler": "^4.133.0"
   }
 }
