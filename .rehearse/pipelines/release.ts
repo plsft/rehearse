@@ -31,7 +31,7 @@ export const release = pipeline('Release', {
         tag_name: '${{ steps.rp.outputs.tag_name }}',
       },
       steps: [
-        step.action('googleapis/release-please-action@v4', { id: 'rp', name: 'Run release-please' }),
+        step.action('googleapis/release-please-action@v5', { id: 'rp', name: 'Run release-please' }),
       ],
     }),
     job('publish', {
