@@ -7,11 +7,16 @@ zero=0000000000000000000000000000000000000000
 input=$(cat)
 while read -r _ local_sha _ remote_sha; do
   if [ -z "${local_sha:-}" ] || [ "$local_sha" = "$zero" ]; then continue; fi  # deletion
-  from=$remote_sha
-  if [ "$from" = "$zero" ] || ! git cat-file -e "$from^{commit}" 2>/dev/null; then
-    from=$(git merge-base origin/main "$local_sha")  # new branch / unknown remote tip
+  # Only lint commits that aren't on the remote yet. A range from the old
+  # remote tip would, after a rebase or a merge of main, re-lint commits
+  # already on main (squash-merge bodies, bot commits) and block the push.
+  exclude=(--remotes)
+  if [ "$remote_sha" != "$zero" ] && git cat-file -e "$remote_sha^{commit}" 2>/dev/null; then
+    exclude+=("$remote_sha")
   fi
-  pnpm exec commitlint --from "$from" --to "$local_sha"
+  for c in $(git rev-list --reverse "$local_sha" --not "${exclude[@]}"); do
+    git log -1 --format=%B "$c" | pnpm exec commitlint
+  done
 done <<< "$input"
 local_hook="$(git rev-parse --git-common-dir)/hooks/pre-push"
 if [ -x "$local_hook" ]; then printf '%s\n' "$input" | "$local_hook" "$@"; fi
