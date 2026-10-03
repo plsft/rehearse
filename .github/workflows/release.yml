@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: Run release-please
         id: rp
-        uses: 'googleapis/release-please-action@v4'
+        uses: 'googleapis/release-please-action@v5'
   publish:
     name: publish
     runs-on: ubuntu-latest
