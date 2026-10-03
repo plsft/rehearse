@@ -10,7 +10,7 @@
     "deploy": "vite build && wrangler deploy"
   },
   "dependencies": {
-    "alpinejs": "^3.17.3"
+    "alpinejs": "^3.17.4"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
