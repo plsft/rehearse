@@ -1,6 +1,6 @@
 {
   "name": "rehearse-monorepo",
-  "version": "0.1.0",
+  "version": "0.6.20",
   "private": true,
   "description": "Rehearse — local-first runner for GitHub Actions workflows",
   "homepage": "https://github.com/plsft/rehearse#readme",
