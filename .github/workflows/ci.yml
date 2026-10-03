@@ -55,3 +55,7 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Test ts-ci
         run: 'pnpm --filter @rehearse/ci test'
+      - name: Build ts-ci
+        run: 'pnpm --filter @rehearse/ci build'
+      - name: Test cli
+        run: 'pnpm --filter @rehearse/cli test'
