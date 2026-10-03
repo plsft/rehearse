@@ -18,9 +18,12 @@
     "typecheck": "turbo typecheck",
     "format": "prettier --write .",
     "pipelines:compile": "tsx cli/src/index.ts ci compile",
+    "prepare": "git config core.hooksPath .githooks || true",
     "release": "node scripts/release.mjs"
   },
   "devDependencies": {
+    "@commitlint/cli": "^21.2.3",
+    "@commitlint/config-conventional": "^21.2.3",
     "@rehearse/ci": "workspace:*",
     "@types/node": "^26.6.1",
     "prettier": "^3.9.7",
