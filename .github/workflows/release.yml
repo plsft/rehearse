@@ -31,6 +31,7 @@ jobs:
     if: 'needs.release-please.outputs.release_created == ''true'''
     permissions:
       contents: read
+      id-token: write
     steps:
       - name: Checkout
         uses: 'actions/checkout@v7'
@@ -46,15 +47,41 @@ jobs:
           node-version: '22'
           cache: pnpm
           registry-url: 'https://registry.npmjs.org'
+      - name: Upgrade npm
+        run: 'npm install -g npm@11 && npm --version'
       - name: Install
         run: pnpm install --frozen-lockfile
       - name: Build all packages
         run: pnpm turbo build
       - name: 'Publish @rehearse/ci'
-        run: 'pnpm --filter @rehearse/ci publish --tag latest --access public --no-git-checks'
+        run: |
+          set -euo pipefail
+          : "${PKG_NAME:?}" "${PKG_DIR:?}"
+          VERSION=$(node -p "require('./$PKG_DIR/package.json').version")
+          if npm view "$PKG_NAME@$VERSION" version >/dev/null 2>&1; then
+            echo "$PKG_NAME@$VERSION is already on npm, skipping"
+            exit 0
+          fi
+          mkdir -p "$RUNNER_TEMP/out"
+          TARBALL=$(cd "$PKG_DIR" && pnpm pack --pack-destination "$RUNNER_TEMP/out" | tail -n 1)
+          test -f "$TARBALL"
+          npm publish "$TARBALL" --access public --tag latest
         env:
-          NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
+          PKG_NAME: '@rehearse/ci'
+          PKG_DIR: ts-ci
       - name: 'Publish @rehearse/cli'
-        run: 'pnpm --filter @rehearse/cli publish --tag latest --access public --no-git-checks'
+        run: |
+          set -euo pipefail
+          : "${PKG_NAME:?}" "${PKG_DIR:?}"
+          VERSION=$(node -p "require('./$PKG_DIR/package.json').version")
+          if npm view "$PKG_NAME@$VERSION" version >/dev/null 2>&1; then
+            echo "$PKG_NAME@$VERSION is already on npm, skipping"
+            exit 0
+          fi
+          mkdir -p "$RUNNER_TEMP/out"
+          TARBALL=$(cd "$PKG_DIR" && pnpm pack --pack-destination "$RUNNER_TEMP/out" | tail -n 1)
+          test -f "$TARBALL"
+          npm publish "$TARBALL" --access public --tag latest
         env:
-          NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
+          PKG_NAME: '@rehearse/cli'
+          PKG_DIR: cli
