@@ -58,6 +58,9 @@ local reusable workflows. Free, Apache 2.0, source on
 - The PR title becomes the squash commit on `main`, so it decides whether a
   release is cut. Use `fix(deps)` only for runtime dependency bumps in `cli/` or
   `ts-ci/`. Tooling, docs and hook changes use `chore`/`ci`/`docs`, never `fix`.
+  `site/` is private and its dependencies are all `devDependencies` on purpose
+  (Vite bundles them), so Dependabot labels them `chore(deps-dev)` and they never
+  release. Keep it that way: a runtime dependency in `site/` would get `fix(deps)`.
 - Dependabot's GitHub Actions bumps edit only the generated
   `.github/workflows/*.yml`. Make the same bump in `.rehearse/pipelines/*.ts`
   in that PR, or the next `pnpm pipelines:compile` reverts it.
