@@ -48,6 +48,21 @@ local reusable workflows. Free, Apache 2.0, source on
   (`chore(main): release X.Y.Z`); CI tags, creates the GitHub Release and
   publishes to npm. Never run `pnpm release` (retired). Force a version with a
   `Release-As: x.y.z` commit footer
+  - The release PR is opened with `GITHUB_TOKEN`, so **no CI runs on it**. Build
+    and `pnpm pack` (run inside `cli/` and `ts-ci/`) the merged result locally
+    before merging it.
+  - npm auth: the `publish` job uses the `NPM_TOKEN` secret, a short-lived
+    granular token for the npm user `rehearse`. Moving to trusted publishing
+    (OIDC) is tracked in #11. If publish fails, fix the auth and use **Re-run
+    failed jobs**. npm can take about 2 minutes to show a new version.
+- The PR title becomes the squash commit on `main`, so it decides whether a
+  release is cut. Use `fix(deps)` only for runtime dependency bumps in `cli/` or
+  `ts-ci/`. Tooling, docs and hook changes use `chore`/`ci`/`docs`, never `fix`.
+- Dependabot's GitHub Actions bumps edit only the generated
+  `.github/workflows/*.yml`. Make the same bump in `.rehearse/pipelines/*.ts`
+  in that PR, or the next `pnpm pipelines:compile` reverts it.
+- Compiling on Windows rewrites the `# Source:` header in the generated YAML
+  with backslashes. Don't commit a diff that only changes that header.
 - Deploy the marketing site: from `site/`, `npm run deploy` (vite build + wrangler deploy to `rehearse-web` Worker)
 
 ## History
