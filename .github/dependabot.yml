@@ -1,5 +1,10 @@
 # Dependabot — automatic dependency update PRs.
 # Docs: https://docs.github.com/code-security/dependabot/working-with-dependabot/dependabot-options-reference
+#
+# Commit prefixes drive release-please (see release-please-config.json):
+#   fix(deps):        runtime dependency bump → patch release
+#   chore(deps-dev):  devDependency bump      → no release
+#   ci(deps):         Actions bump            → no release
 version: 2
 updates:
   # pnpm workspace (root pnpm-lock.yaml covers ts-ci, cli, site).
@@ -12,9 +17,17 @@ updates:
     cooldown:
       default-days: 7
     commit-message:
-      prefix: deps
+      prefix: fix
+      prefix-development: chore
+      include: scope
+    # Split by dependency type so a grouped PR never mixes runtime and dev
+    # bumps under one (wrong) prefix.
     groups:
-      minor-and-patch:
+      production:
+        dependency-type: production
+        update-types: [minor, patch]
+      development:
+        dependency-type: development
         update-types: [minor, patch]
 
   # Action versions in .github/workflows/. Note: most workflows are generated
@@ -27,6 +40,7 @@ updates:
       day: monday
     commit-message:
       prefix: ci
+      include: scope
     cooldown:
       default-days: 7
     groups:

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "bootstrap-sha": "a79480e27b035bb620766a4ff8222e90035b8009",
+  "include-component-in-tag": false,
+  "bump-minor-pre-major": true,
+  "packages": {
+    ".": {
+      "release-type": "node",
+      "exclude-paths": ["site", "bench", "poc", "demos", "examples", "packages", "rehearse-pro", "git-engine", ".rehearse"],
+      "extra-files": [
+        { "type": "json", "path": "cli/package.json", "jsonpath": "$.version" },
+        { "type": "json", "path": "ts-ci/package.json", "jsonpath": "$.version" }
+      ]
+    }
+  }
+}

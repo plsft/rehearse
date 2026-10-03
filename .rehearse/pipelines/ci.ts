@@ -29,7 +29,6 @@ export const ci = pipeline('CI', {
       steps: [
         ...setupNodePnpm,
         step.run('pnpm --filter @rehearse/ci test', { name: 'Test ts-ci' }),
-        step.run('pnpm --filter @rehearse/git-core test', { name: 'Test git-engine' }),
       ],
     }),
   ],
