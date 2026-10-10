@@ -51,10 +51,13 @@ local reusable workflows. Free, Apache 2.0, source on
   - The release PR is opened with `GITHUB_TOKEN`, so **no CI runs on it**. Build
     and `pnpm pack` (run inside `cli/` and `ts-ci/`) the merged result locally
     before merging it.
-  - npm auth: the `publish` job uses the `NPM_TOKEN` secret, a short-lived
-    granular token for the npm user `rehearse`. Moving to trusted publishing
-    (OIDC) is tracked in #11. If publish fails, fix the auth and use **Re-run
-    failed jobs**. npm can take about 2 minutes to show a new version.
+  - npm auth is trusted publishing (OIDC), not a token (#11). Each package has a
+    trusted publisher on npmjs.com (repo `plsft/rehearse`, workflow `release.yml`)
+    and the `publish` job has `id-token: write`. **Don't rename `release.yml` or
+    move the publish step into a reusable workflow** without updating both
+    trusted publishers, or publishing breaks. If publish fails, fix the cause and
+    use **Re-run failed jobs**; it skips versions already on npm. npm can take
+    about 2 minutes to show a new version.
 - The PR title becomes the squash commit on `main`, so it decides whether a
   release is cut. Use `fix(deps)` only for runtime dependency bumps in `cli/` or
   `ts-ci/`. Tooling, docs and hook changes use `chore`/`ci`/`docs`, never `fix`.
