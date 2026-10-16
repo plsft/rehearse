@@ -29,9 +29,9 @@ local reusable workflows. Free, Apache 2.0, source on
 - 2 packages on npm, Apache 2.0: `@rehearse/cli` and `@rehearse/ci`, versioned
   in lockstep (current version is in `cli/package.json`; release-please bumps it)
 - Tests: `cli/test/` (`pnpm --filter @rehearse/cli test`) and `ts-ci/test/`
-  (`pnpm --filter @rehearse/ci test`). CI runs only the ts-ci tests plus
-  typecheck; the cli suite is not in CI yet (the bundled `dorny/paths-filter`
-  `dist/` is gitignored, and the compat test needs a prior build)
+  (`pnpm --filter @rehearse/ci test`). CI runs both plus typecheck. The cli
+  tests need `@rehearse/ci` built first (`pnpm --filter @rehearse/ci build`).
+  `git-context.test.ts` has two failures on macOS only (`/var` symlink)
 - Benchmarks vs `act` (and nightly compat results): `bench/RESULTS.md`, `bench/compat/`
 
 ## Working in this repo
