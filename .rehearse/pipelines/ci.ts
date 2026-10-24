@@ -29,6 +29,9 @@ export const ci = pipeline('CI', {
       steps: [
         ...setupNodePnpm,
         step.run('pnpm --filter @rehearse/ci test', { name: 'Test ts-ci' }),
+        // cli's compat test imports @rehearse/ci, which resolves to its built dist.
+        step.run('pnpm --filter @rehearse/ci build', { name: 'Build ts-ci' }),
+        step.run('pnpm --filter @rehearse/cli test', { name: 'Test cli' }),
       ],
     }),
   ],
