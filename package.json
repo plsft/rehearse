@@ -22,15 +22,15 @@
     "release": "node scripts/release.mjs"
   },
   "devDependencies": {
-    "@commitlint/cli": "^21.2.3",
-    "@commitlint/config-conventional": "^21.2.3",
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
     "@rehearse/ci": "workspace:*",
-    "@types/node": "^26.6.3",
-    "prettier": "^3.9.9",
+    "@types/node": "^26.6.5",
+    "prettier": "^3.9.10",
     "tsx": "^4.23.15",
-    "turbo": "^2.11.4",
+    "turbo": "^2.11.9",
     "typescript": "^7.0.2",
-    "vitest": "^5.0.2"
+    "vitest": "^5.0.5"
   },
   "packageManager": "pnpm@9.15.0",
   "engines": {
